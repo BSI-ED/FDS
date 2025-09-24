@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresque Chronologique VR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+        }
+        
+        #enterVR {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: linear-gradient(145deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #enterVR:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
+        }
+        
+        #enterVR:disabled {
+            background: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .control-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .control-btn:hover {
+            background: #555;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .progress-bar {
+            width: 200px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b35, #f7931e);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            text-align: center;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <h2>Chargement de l'expérience VR...</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="loadingText">Initialisation...</p>
+    </div>
+
+    <div id="info">
+        <h3>🏛️ Fresque Chronologique VR</h3>
+        <p>Explorez l'histoire des ingénieurs et savants en réalité virtuelle.</p>
+        <p><strong>Contrôles VR :</strong></p>
+        <ul>
+            <li>👋 Pointez et cliquez pour sélectionner</li>
+            <li>🚶 Déplacez-vous dans l'espace</li>
+            <li>🔄 Rotation naturelle de la tête</li>
+            <li>📱 Téléportation par pointage au sol</li>
+        </ul>
+    </div>
+
+    <div id="controls">
+        <button class="control-btn" onclick="resetView()">🏠 Reset</button>
+        <button class="control-btn" onclick="toggleAutoRotate()">🔄 Auto</button>
+        <button class="control-btn" onclick="switchTheme()">🌙 Thème</button>
+        <button class="control-btn" onclick="randomSelection()">🎲 Random</button>
+    </div>
+
+    <div id="instructions">
+        Utilisez WASD ou les flèches pour naviguer • Cliquez sur les personnages • Espace: auto-rotation
+    </div>
+
+    <button id="enterVR">🥽 Entrer en VR</button>
+
+    <script>
+        // === DONNÉES DES PERSONNAGES (AVEC VRAIES IMAGES) ===
+        const items = [
+
+            {id:1, cat:'Ingénieur', name:`Léonard de Vinci`,years:`1452—1519`,year:1500,img:`proto/leonardo.jpg`,
+             short:`Polymathe de la Renaissance : peintre, ingénieur, inventeur.`,
+             bio:`Ses carnets mêlent études d'anatomie, d'ingénierie, d'hydraulique et d'optique. Œuvres majeures : la Joconde, La Cène. Esquisses d'hélicoptère et de chars.`},
+            {id:2, cat:'Ingénieur', name:`Sébastien Le Prestre de Vauban`,years:`1633—1707`,year:1670,img:`proto/Vauban.jpg`,
+             short:`Maréchal et maître des fortifications sous Louis XIV.`,
+             bio:`Refonda l'art du siège et des forteresses en Europe ; proposa aussi des réformes fiscales dans ses mémoires.`},
+            {id:3, cat:'Ingénieur', name:`Joseph et Étienne Montgolfier`,years:`1740—1810 & 1745—1799`,year:1783,img:`proto/montgolfier.jpg`,
+             short:`Cofondateurs de l'aérostation à air chaud.`,
+             bio:`En 1783, lancement des premiers ballons à air chaud habités ; débuts de l'ère des vols humains.`},
+            {id:4, cat:'Ingénieur', name:`Claude Chappe`,years:`1763—1805`,year:1794,img:`proto/chappe.jpg`,
+             short:`Inventeur du télégraphe optique (sémaphore).`,
+             bio:`Un réseau de tours sémaphores transmit rapidement des dépêches d'État avant l'ère électrique.`},
+            {id:5, cat:'Ingénieur', name:`Charles Babbage`,years:`1792—1871`,year:1837,img:`proto/Babbage.jpg`,
+             short:`Concepteur de la machine analytique (proto‑ordinateur).`,
+             bio:`Imagina une machine programmable à cartes, avec mémoire et unité de calcul, préfigurant l'ordinateur.`},
+            {id:6, cat:'Ingénieur', name:`Gustave Eiffel`,years:`1832—1923`,year:1889,img:`proto/Eiffel.jpg`,
+             short:`Ingénieur des structures métalliques, à l'origine de la tour Eiffel et la Statue de la Liberté.`,
+             bio:`La Tour Eiffel et le viaduc de Garabit ; travaux en aérodynamique et résistance des matériaux.`},
+            {id:7, cat:'Ingénieur', name:`Clément Ader`,years:`1841—1925`,year:1890,img:`proto/Ader.jpg`,
+             short:`Pionnier français de l'aviation (Éole).`,
+             bio:`Appareils expérimentaux et travaux d'aérodynamique avant les vols contrôlés.`},
+            {id:8, cat:'Ingénieur', name:`Thomas Edison`,years:`1847—1931`,year:1880,img:`proto/Edison.jpg`,
+             short:`Inventeur prolifique (lampe, phonographe, cinéma).`,
+             bio:`Menlo Park : R&D industrielle, plus d'un millier de brevets.`},
+            {id:9, cat:'Ingénieur', name:`George Eastman`,years:`1854—1932`,year:1900,img:`proto/Eastman.jpg`,
+             short:`Fondateur de Kodak ; popularise la photographie.`,
+             bio:`Films souples et appareils abordables ; démocratisation de la photo.`},
+            {id:10, cat:'Ingénieur', name:`Henry Ford`,years:`1863—1947`,year:1913,img:`proto/ford.jpg`,
+             short:`Production de masse automobile.`,
+             bio:`Chaîne de montage, Ford T ; transformation industrielle et sociale.`},
+            
+            // Savants
+            {id:20, cat:'Savant', name:`Galileo Galilei`,years:`1564—1642`,year:1610,img:`proto/galilee.jpg`,
+             short:`Fondateur de la physique moderne et de l'astronomie expérimentale.`,
+             bio:`Observations télescopiques (lunes de Jupiter), méthode expérimentale, défense de l'héliocentrisme.`},
+            {id:21, cat:'Savant', name:`Isaac Newton`,years:`1642—1727`,year:1687,img:`proto/newton.jpg`,
+             short:`Lois du mouvement et de la gravitation universelle.`,
+             bio:`Principia Mathematica ; optique et calcul infinitésimal.`},
+            {id:22, cat:'Savant', name:`William Herschel`,years:`1738—1822`,year:1781,img:`proto/william-herschel.jpg`,
+             short:`Découvreur d'Uranus ; pionnier de l'astronomie infrarouge.`,
+             bio:`Cartographie de la Voie lactée ; découverte du rayonnement infrarouge.`},
+            {id:23, cat:'Savant', name:`Blaise Pascal`,years:`1623—1662`,year:1654,img:`proto/pascal.jpg`,
+             short:`Mathématicien, physicien et philosophe.`,
+             bio:`Presse hydraulique, machine à calculer (Pascaline), probabilités.`},
+            {id:24, cat:'Savant', name:`Georg Simon Ohm`,years:`1789—1854`,year:1827,img:`proto/ohm.jpg`,
+             short:`Physicien, il formule la loi d'Ohm sur la résistance électrique`,
+             bio:`Relation U=RI, fondement de l'électrocinétique.`},
+            {id:25, cat:'Savant', name:`Sadi Carnot`,years:`1796—1832`,year:1824,img:`proto/carnot.jpg`,
+             short:`Fondateur de la thermodynamique.`,
+             bio:`Cycle de Carnot ; rendements des machines thermiques.`},
+            {id:26, cat:'Savant', name:`Charles Darwin`,years:`1809—1882`,year:1859,img:`proto/darwin.jpg`,
+             short:`Théorie de l'évolution par sélection naturelle.`,
+             bio:`« L'Origine des espèces » ; observations au cours du Beagle.`},
+            {id:27, cat:'Savant', name:`Marie Curie`,years:`1867—1934`,year:1903,img:`proto/marie-curie.jpg`,
+             short:`Radioactivité ; deux prix Nobel.`,
+             bio:`Découverte du polonium et du radium ; physique et chimie de la radioactivité.`},
+            {id:28, cat:'Savant', name:`Albert Einstein`,years:`1879—1955`,year:1915,img:`proto/einstein.jpg`,
+             short:`Relativité restreinte et générale.`,
+             bio:`Effet photoélectrique (Nobel), équivalence masse-énergie, espace-temps courbe.`},
+            {id:29, cat:'Savant', name:`Max Planck`,years:`1858—1947`,year:1900,img:`proto/planck.jpg`,
+             short:`Fondateur de la mécanique quantique.`,
+             bio:`Hypothèse de quantification de l'énergie ; constante de Planck.`}
+        ];
+
+        // Tri par année
+        items.sort((a,b) => a.year - b.year);
+
+        // === VARIABLES GLOBALES ===
+        let scene, camera, renderer, vrButton;
+        let characters = [];
+        let selectedCharacter = null;
+        let infoPanel = null;
+        let raycaster, mouse;
+        let isVRActive = false;
+        let controllers = [];
+        let autoRotate = false;
+        let isDarkTheme = true;
+        let loadingProgress = 0;
+        let clock;
+        let cameraControls = {
+            moveForward: false,
+            moveBackward: false,
+            moveLeft: false,
+            moveRight: false,
+            moveUp: false,
+            moveDown: false
+        };
+
+        // === INITIALISATION ===
+        async function init() {
+            try {
+                updateLoadingProgress(10, "Configuration de la scène...");
+                
+                clock = new THREE.Clock();
+                
+                // Scene
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x0b0c10);
+                
+                // Camera
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(0, 1.6, 5);
+                
+                // Renderer avec support WebXR
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                renderer.xr.enabled = true;
+                
+                document.body.appendChild(renderer.domElement);
+                
+                updateLoadingProgress(20, "Configuration de la VR...");
+                
+                // Configuration VR
+                setupVR();
+                
+                updateLoadingProgress(30, "Création des lumières...");
+                
+                // Lumières
+                setupLighting();
+                
+                updateLoadingProgress(40, "Création de l'environnement...");
+                
+                // Environnement
+                await createEnvironment();
+                
+                updateLoadingProgress(60, "Placement des personnages...");
+                
+                // Personnages
+                await createCharacters();
+                
+                updateLoadingProgress(80, "Configuration des interactions...");
+                
+                // Interactions
+                setupInteractions();
+                
+                updateLoadingProgress(90, "Finalisation...");
+                
+                // Interface
+                createInfoPanel();
+                
+                // Contrôles clavier
+                setupKeyboardControls();
+                
+                updateLoadingProgress(100, "Prêt !");
+                
+                // Démarrage
+                animate();
+                
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation:', error);
+                document.getElementById('loadingText').textContent = 'Erreur: ' + error.message;
+            }
+        }
+
+        function updateLoadingProgress(progress, text) {
+            loadingProgress = progress;
+            const progressFill = document.getElementById('progressFill');
+            const loadingText = document.getElementById('loadingText');
+            if (progressFill) progressFill.style.width = progress + '%';
+            if (loadingText) loadingText.textContent = text;
+        }
+
+        // === CONFIGURATION VR ===
+        function setupVR() {
+            const vrButton = document.getElementById('enterVR');
+            
+            // Vérification du support WebXR
+            if ('xr' in navigator && navigator.xr) {
+                navigator.xr.isSessionSupported('immersive-vr').then((supported) => {
+                    if (supported) {
+                        vrButton.style.display = 'block';
+                        vrButton.onclick = toggleVR;
+                    } else {
+                        vrButton.textContent = '❌ VR non supportée';
+                        vrButton.disabled = true;
+                    }
+                }).catch(() => {
+                    vrButton.textContent = '🥽 Mode Émulateur VR';
+                    vrButton.onclick = simulateVR;
+                });
+            } else {
+                // Fallback pour les émulateurs WebXR ou navigateurs sans support
+                vrButton.textContent = '🥽 Mode Émulateur VR';
+                vrButton.onclick = simulateVR;
+            }
+
+            // Configuration des contrôleurs VR
+            const controller1 = renderer.xr.getController(0);
+            const controller2 = renderer.xr.getController(1);
+            
+            controller1.addEventListener('selectstart', onControllerSelect);
+            controller2.addEventListener('selectstart', onControllerSelect);
+            
+            scene.add(controller1);
+            scene.add(controller2);
+            
+            controllers.push(controller1, controller2);
+            
+            // Rayons des contrôleurs
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0, -1)
+            ]);
+            
+            const line1 = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xff4444 }));
+            const line2 = new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0x4444ff }));
+            
+            controller1.add(line1);
+            controller2.add(line2);
+        }
+
+        async function toggleVR() {
+            if (!isVRActive) {
+                try {
+                    const session = await navigator.xr.requestSession('immersive-vr');
+                    await renderer.xr.setSession(session);
+                    isVRActive = true;
+                    document.getElementById('enterVR').textContent = '🚪 Quitter VR';
+                    hideUIElements();
+                } catch (error) {
+                    console.error('Erreur VR:', error);
+                    alert('Impossible de démarrer la VR. Assurez-vous que votre casque est connecté.');
+                }
+            } else {
+                renderer.xr.setSession(null);
+                isVRActive = false;
+                document.getElementById('enterVR').textContent = '🥽 Entrer en VR';
+                showUIElements();
+            }
+        }
+
+        function simulateVR() {
+            // Mode émulateur pour le développement
+            isVRActive = !isVRActive;
+            if (isVRActive) {
+                document.getElementById('enterVR').textContent = '🚪 Quitter Émulateur';
+                hideUIElements();
+                camera.position.set(0, 1.6, 3);
+            } else {
+                document.getElementById('enterVR').textContent = '🥽 Mode Émulateur VR';
+                showUIElements();
+            }
+        }
+
+        function hideUIElements() {
+            document.getElementById('info').style.display = 'none';
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+        }
+
+        function showUIElements() {
+            document.getElementById('info').style.display = 'block';
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('instructions').style.display = 'block';
+        }
+
+        // === LUMIÈRES ===
+        function setupLighting() {
+            // Lumière ambiante plus forte
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+            scene.add(ambientLight);
+            
+            // Lumière directionnelle principale
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 50;
+            directionalLight.shadow.camera.left = -20;
+            directionalLight.shadow.camera.right = 20;
+            directionalLight.shadow.camera.top = 20;
+            directionalLight.shadow.camera.bottom = -20;
+            scene.add(directionalLight);
+            
+            // Lumières ponctuelles colorées pour l'ambiance
+            const spotLight1 = new THREE.SpotLight(0xff6b35, 0.5, 50, Math.PI/4);
+            spotLight1.position.set(-15, 8, 0);
+            spotLight1.target.position.set(0, 0, 0);
+            scene.add(spotLight1);
+            scene.add(spotLight1.target);
+            
+            const spotLight2 = new THREE.SpotLight(0x3b82f6, 0.5, 50, Math.PI/4);
+            spotLight2.position.set(15, 8, 0);
+            spotLight2.target.position.set(0, 0, 0);
+            scene.add(spotLight2);
+            scene.add(spotLight2.target);
+        }
+
+        // === ENVIRONNEMENT ===
+        async function createEnvironment() {
+            // Sol amélioré
+            const floorGeometry = new THREE.PlaneGeometry(100, 100);
+            const floorMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x2a2a2a,
+                transparent: false
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            scene.add(floor);
+            
+            // Grille plus visible
+            const gridHelper = new THREE.GridHelper(100, 100, 0x666666, 0x333333);
+            gridHelper.position.y = 0.01;
+            scene.add(gridHelper);
+            
+            // Murs avec meilleure visibilité
+            createWalls();
+            
+            // Particules réduites pour les performances
+            createParticles();
+            
+            // Timeline visible
+            createTimeline();
+            
+            // Ciel étoilé
+            createStarField();
+        }
+
+        function createWalls() {
+            const wallGeometry = new THREE.PlaneGeometry(100, 20);
+            const wallMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x1a1a2e,
+                transparent: true,
+                opacity: 0.5
+            });
+            
+            // Mur arrière
+            const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
+            backWall.position.set(0, 10, -50);
+            scene.add(backWall);
+            
+            // Murs latéraux
+            const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
+            leftWall.rotation.y = Math.PI / 2;
+            leftWall.position.set(-50, 10, 0);
+            scene.add(leftWall);
+            
+            const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
+            rightWall.rotation.y = -Math.PI / 2;
+            rightWall.position.set(50, 10, 0);
+            scene.add(rightWall);
+        }
+
+        function createParticles() {
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCnt = 300; // Réduit pour les performances
+            const posArray = new Float32Array(particlesCnt * 3);
+            
+            for(let i = 0; i < particlesCnt * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 80;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.1,
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+        }
+
+        function createTimeline() {
+            const timelineGeometry = new THREE.CylinderGeometry(0.1, 0.1, 60);
+            const timelineMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffd700,
+                emissive: 0x222200
+            });
+            const timeline = new THREE.Mesh(timelineGeometry, timelineMaterial);
+            timeline.rotation.z = Math.PI / 2;
+            timeline.position.y = 0.2;
+            scene.add(timeline);
+        }
+
+        function createStarField() {
+            const starGeometry = new THREE.BufferGeometry();
+            const starCount = 1000;
+            const positions = new Float32Array(starCount * 3);
+            
+            for(let i = 0; i < starCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = Math.random() * 50 + 20;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+            }
+            
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            const starMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.5,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const stars = new THREE.Points(starGeometry, starMaterial);
+            scene.add(stars);
+        }
+
+        // === CHARGEMENT DES VRAIES IMAGES ===
+        async function loadCharacterImage(character) {
+            return new Promise((resolve, reject) => {
+                const loader = new THREE.TextureLoader();
+                
+                // Gestionnaire de succès
+                const onLoad = (texture) => {
+                    console.log(`Image chargée: ${character.img}`);
+                    
+                    // Configuration de la texture
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    texture.minFilter = THREE.LinearFilter;
+                    texture.magFilter = THREE.LinearFilter;
+                    
+                    resolve(texture);
+                };
+                
+                // Gestionnaire d'erreur
+                const onError = (error) => {
+                    console.warn(`Impossible de charger l'image: ${character.img}`, error);
+                    
+                    // Fallback vers texture générée
+                    const fallbackTexture = createPortraitTexture(character);
+                    resolve(fallbackTexture);
+                };
+                
+                // Gestionnaire de progression
+                const onProgress = (progress) => {
+                    if (progress.lengthComputable) {
+                        const percentComplete = (progress.loaded / progress.total) * 100;
+                        console.log(`Chargement ${character.name}: ${percentComplete.toFixed(1)}%`);
+                    }
+                };
+                
+                // Charger l'image
+                loader.load(character.img, onLoad, onProgress, onError);
+            });
+        }
+
+        // === FONCTION DE FALLBACK POUR CRÉER UNE TEXTURE GÉNÉRÉE ===
+        async function createCharacters() {
+            const totalCharacters = items.length;
+            const radius = 20;
+            
+            for (let i = 0; i < totalCharacters; i++) {
+                const character = items[i];
+                const angle = (i / totalCharacters) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                
+                await createCharacterModel(character, x, 0, z, i);
+            }
+        }
+
+        async function createCharacterModel(character, x, y, z, index) {
+            // Groupe pour le personnage
+            const characterGroup = new THREE.Group();
+            characterGroup.position.set(x, y, z);
+            characterGroup.userData = { character, index };
+            
+            // Piédestal amélioré
+            const pedestalGeometry = new THREE.CylinderGeometry(1.2, 1.4, 0.6);
+            const pedestalMaterial = new THREE.MeshLambertMaterial({ 
+                color: character.cat === 'Ingénieur' ? 0xff6b35 : 0x3b82f6,
+                emissive: character.cat === 'Ingénieur' ? 0x331a0a : 0x0a1433
+            });
+            const pedestal = new THREE.Mesh(pedestalGeometry, pedestalMaterial);
+            pedestal.position.y = 0.3;
+            pedestal.castShadow = true;
+            characterGroup.add(pedestal);
+            
+            // Portrait avec vraie image
+            const portraitTexture = await loadCharacterImage(character);
+            const portraitGeometry = new THREE.PlaneGeometry(2.5, 3.5);
+            const portraitMaterial = new THREE.MeshLambertMaterial({ 
+                map: portraitTexture,
+                transparent: false
+            });
+            const portrait = new THREE.Mesh(portraitGeometry, portraitMaterial);
+            portrait.position.y = 3;
+            portrait.castShadow = true;
+            characterGroup.add(portrait);
+            
+            // Texte du nom amélioré
+            createTextLabel(characterGroup, character.name, character.years);
+            
+            // Effet de brillance plus visible
+            const glowGeometry = new THREE.RingGeometry(1.8, 2.2, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({ 
+                color: character.cat === 'Ingénieur' ? 0xff6b35 : 0x3b82f6,
+                transparent: true,
+                opacity: 0.4,
+                side: THREE.DoubleSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.y = 0.1;
+            glow.rotation.x = -Math.PI / 2;
+            characterGroup.add(glow);
+            
+            // Halo vertical
+            const haloGeometry = new THREE.CylinderGeometry(2, 2, 0.1);
+            const haloMaterial = new THREE.MeshBasicMaterial({
+                color: character.cat === 'Ingénieur' ? 0xff6b35 : 0x3b82f6,
+                transparent: true,
+                opacity: 0.2
+            });
+            const halo = new THREE.Mesh(haloGeometry, haloMaterial);
+            halo.position.y = 5;
+            characterGroup.add(halo);
+            
+            // Animation d'hover
+            characterGroup.userData.originalY = y;
+            characterGroup.userData.hovered = false;
+            
+            characters.push(characterGroup);
+            scene.add(characterGroup);
+        }
+
+        function createPortraitTexture(character) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 400;
+            canvas.height = 560;
+            const ctx = canvas.getContext('2d');
+            
+            // Fond dégradé selon la catégorie
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (character.cat === 'Ingénieur') {
+                gradient.addColorStop(0, '#ff8c42');
+                gradient.addColorStop(0.5, '#ff6b35');
+                gradient.addColorStop(1, '#f7931e');
+            } else {
+                gradient.addColorStop(0, '#4a90e2');
+                gradient.addColorStop(0.5, '#3b82f6');
+                gradient.addColorStop(1, '#1e40af');
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Bordure élégante
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 12;
+            ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+            
+            // Bordure intérieure
+            ctx.strokeStyle = character.cat === 'Ingénieur' ? '#ffaa77' : '#77aaff';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+            
+            // Icône de personnage stylisé - tête
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, 150, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Corps simplifié
+            ctx.fillRect(canvas.width/2 - 40, 200, 80, 120);
+            
+            // Bras
+            ctx.fillRect(canvas.width/2 - 65, 220, 25, 60);
+            ctx.fillRect(canvas.width/2 + 40, 220, 25, 60);
+            
+            // Symbole de catégorie
+            ctx.fillStyle = character.cat === 'Ingénieur' ? '#ff6b35' : '#3b82f6';
+            ctx.font = 'bold 40px Arial';
+            ctx.textAlign = 'center';
+            const symbol = character.cat === 'Ingénieur' ? '⚙️' : '🔬';
+            ctx.fillText(symbol, canvas.width/2, 380);
+            
+            // Nom en bas avec gestion des noms longs
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            
+            const words = character.name.split(' ');
+            if (words.length > 2 || character.name.length > 18) {
+                const midPoint = Math.ceil(words.length / 2);
+                const line1 = words.slice(0, midPoint).join(' ');
+                const line2 = words.slice(midPoint).join(' ');
+                ctx.fillText(line1, canvas.width/2, canvas.height - 60);
+                ctx.fillText(line2, canvas.width/2, canvas.height - 30);
+            } else {
+                ctx.fillText(character.name, canvas.width/2, canvas.height - 45);
+            }
+            
+            // Années en petite taille
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#cccccc';
+            ctx.fillText(character.years, canvas.width/2, canvas.height - 10);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createTextLabel(parent, name, years) {
+            // Canvas pour le texte avec meilleur contraste
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 512;
+            canvas.height = 256;
+            
+            // Fond semi-transparent avec dégradé
+            const gradient = context.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Bordure colorée
+            context.strokeStyle = '#ffd700';
+            context.lineWidth = 6;
+            context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+            
+            // Texte principal avec ombre
+            context.shadowColor = 'rgba(0,0,0,0.8)';
+            context.shadowBlur = 4;
+            context.shadowOffsetX = 2;
+            context.shadowOffsetY = 2;
+            
+            context.fillStyle = '#ffffff';
+            context.font = 'bold 32px Arial';
+            context.textAlign = 'center';
+            
+            // Gestion du texte long
+            const maxWidth = canvas.width - 40;
+            const words = name.split(' ');
+            let line = '';
+            let y = 70;
+            
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = context.measureText(testLine);
+                
+                if (metrics.width > maxWidth && n > 0) {
+                    context.fillText(line, canvas.width/2, y);
+                    line = words[n] + ' ';
+                    y += 40;
+                } else {
+                    line = testLine;
+                }
+            }
+            context.fillText(line, canvas.width/2, y);
+            
+            // Reset shadow
+            context.shadowColor = 'transparent';
+            
+            // Années
+            context.font = '24px Arial';
+            context.fillStyle = '#cccccc';
+            context.fillText(years, canvas.width/2, canvas.height - 40);
+            
+            // Texture et matériau
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.MeshBasicMaterial({ 
+                map: texture, 
+                transparent: true 
+            });
+            
+            // Mesh du texte
+            const textGeometry = new THREE.PlaneGeometry(5, 2.5);
+            const textMesh = new THREE.Mesh(textGeometry, material);
+            textMesh.position.y = -0.5;
+            parent.add(textMesh);
+        }
+
+        // === INTERACTIONS ===
+        function setupInteractions() {
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            // Souris/écran tactile
+            renderer.domElement.addEventListener('click', onMouseClick);
+            renderer.domElement.addEventListener('mousemove', onMouseMove);
+            
+            // Redimensionnement
+            window.addEventListener('resize', onWindowResize);
+            
+            // Contrôles tactiles
+            setupTouchControls();
+        }
+
+        function onMouseClick(event) {
+            if (isVRActive) return;
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(characters, true);
+            
+            if (intersects.length > 0) {
+                let characterGroup = intersects[0].object.parent;
+                // S'assurer qu'on a le bon groupe parent
+                while (characterGroup && !characterGroup.userData.character) {
+                    characterGroup = characterGroup.parent;
+                }
+                if (characterGroup && characterGroup.userData.character) {
+                    selectCharacter(characterGroup);
+                }
+            }
+        }
+
+        function onMouseMove(event) {
+            if (isVRActive) return;
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(characters, true);
+            
+            // Reset tous les hovers
+            characters.forEach(char => {
+                char.userData.hovered = false;
+            });
+            
+            // Hover sur le nouveau
+            if (intersects.length > 0) {
+                let characterGroup = intersects[0].object.parent;
+                // S'assurer qu'on a le bon groupe parent
+                while (characterGroup && !characterGroup.userData.character) {
+                    characterGroup = characterGroup.parent;
+                }
+                if (characterGroup && characterGroup.userData.character) {
+                    characterGroup.userData.hovered = true;
+                    document.body.style.cursor = 'pointer';
+                }
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        function onControllerSelect(event) {
+            const controller = event.target;
+            const tempMatrix = new THREE.Matrix4();
+            tempMatrix.identity().extractRotation(controller.matrixWorld);
+            
+            raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+            raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+            
+            const intersects = raycaster.intersectObjects(characters, true);
+            if (intersects.length > 0) {
+                let characterGroup = intersects[0].object.parent;
+                while (characterGroup && !characterGroup.userData.character) {
+                    characterGroup = characterGroup.parent;
+                }
+                if (characterGroup && characterGroup.userData.character) {
+                    selectCharacter(characterGroup);
+                }
+            }
+        }
+
+        function selectCharacter(characterGroup) {
+            selectedCharacter = characterGroup.userData.character;
+            
+            // Reset tous les autres personnages
+            characters.forEach(char => {
+                char.children.forEach(child => {
+                    if (child.material && child.material.emissive) {
+                        child.material.emissive.setHex(0x000000);
+                    }
+                });
+            });
+            
+            // Animation de sélection
+            characterGroup.children.forEach(child => {
+                if (child.material && child.material.emissive) {
+                    child.material.emissive.setHex(0x444444);
+                }
+            });
+            
+            // Mise à jour du panneau d'information
+            updateInfoPanel(selectedCharacter);
+            
+            // Animation de la caméra vers le personnage (seulement en mode non-VR)
+            if (!isVRActive) {
+                animateCameraTo(characterGroup.position);
+            }
+        }
+
+        function animateCameraTo(position) {
+            const startPos = camera.position.clone();
+            const endPos = position.clone();
+            endPos.y += 4;
+            endPos.z += 8;
+            
+            const duration = 2000;
+            const startTime = Date.now();
+            
+            function animateCamera() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out
+                
+                camera.position.lerpVectors(startPos, endPos, eased);
+                camera.lookAt(position.x, position.y + 2, position.z);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateCamera);
+                }
+            }
+            
+            animateCamera();
+        }
+
+        // === PANNEAU D'INFORMATION ===
+        function createInfoPanel() {
+            // Création d'un panneau flottant en 3D plus grand
+            const panelGeometry = new THREE.PlaneGeometry(10, 12);
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 720;
+            
+            const panelTexture = new THREE.CanvasTexture(canvas);
+            const panelMaterial = new THREE.MeshBasicMaterial({ 
+                map: panelTexture, 
+                transparent: true,
+                opacity: 0.95
+            });
+            
+            infoPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+            infoPanel.position.set(-12, 6, 0);
+            infoPanel.visible = false;
+            scene.add(infoPanel);
+        }
+
+        function updateInfoPanel(character) {
+            if (!infoPanel || !character) return;
+            
+            const canvas = infoPanel.material.map.image;
+            const ctx = canvas.getContext('2d');
+            
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fond avec dégradé
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, 'rgba(15, 25, 45, 0.98)');
+            bgGradient.addColorStop(1, 'rgba(25, 35, 55, 0.98)');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Bordure brillante animée
+            const borderGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            if (character.cat === 'Ingénieur') {
+                borderGradient.addColorStop(0, '#ff6b35');
+                borderGradient.addColorStop(0.5, '#ffaa77');
+                borderGradient.addColorStop(1, '#f7931e');
+            } else {
+                borderGradient.addColorStop(0, '#3b82f6');
+                borderGradient.addColorStop(0.5, '#77aaff');
+                borderGradient.addColorStop(1, '#1e40af');
+            }
+            
+            ctx.strokeStyle = borderGradient;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+            
+            // Titre avec ombre et effet brillant
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 40px Arial';
+            ctx.textAlign = 'center';
+            
+            // Gestion du nom long
+            const nameWords = character.name.split(' ');
+            if (nameWords.length > 2 || character.name.length > 15) {
+                const line1 = nameWords.slice(0, Math.ceil(nameWords.length/2)).join(' ');
+                const line2 = nameWords.slice(Math.ceil(nameWords.length/2)).join(' ');
+                ctx.fillText(line1, canvas.width/2, 70);
+                ctx.fillText(line2, canvas.width/2, 115);
+            } else {
+                ctx.fillText(character.name, canvas.width/2, 80);
+            }
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            
+            // Années
+            ctx.font = '28px Arial';
+            ctx.fillStyle = '#dddddd';
+            ctx.fillText(character.years, canvas.width/2, 160);
+            
+            // Catégorie avec fond coloré et bordure arrondie
+            const catY = 180;
+            const catWidth = 200;
+            const catHeight = 40;
+            const catX = (canvas.width - catWidth) / 2;
+            
+            // Fond de la catégorie
+            ctx.fillStyle = character.cat === 'Ingénieur' ? '#ff6b35' : '#3b82f6';
+            ctx.beginPath();
+            ctx.roundRect(catX, catY, catWidth, catHeight, 20);
+            ctx.fill();
+            
+            // Texte de la catégorie
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(character.cat, canvas.width/2, catY + 28);
+            
+            // Description courte avec fond légèrement transparent
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(30, 250, canvas.width - 60, 120);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'left';
+            wrapText(ctx, character.short, 45, 280, canvas.width - 90, 28);
+            
+            // Séparateur décoratif
+            ctx.strokeStyle = character.cat === 'Ingénieur' ? '#ff6b35' : '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, 390);
+            ctx.lineTo(canvas.width - 50, 390);
+            ctx.stroke();
+            
+            // Biographie avec fond
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fillRect(30, 410, canvas.width - 60, 200);
+            
+            ctx.font = '18px Arial';
+            ctx.fillStyle = '#cccccc';
+            wrapText(ctx, character.bio, 45, 440, canvas.width - 90, 24);
+            
+            // Instructions en bas
+            ctx.font = 'italic 16px Arial';
+            ctx.fillStyle = '#888888';
+            ctx.textAlign = 'center';
+            const instructions = isVRActive ? 
+                'Pointez avec le contrôleur pour explorer d\'autres personnages' :
+                'Cliquez sur les personnages pour les découvrir • Utilisez WASD pour naviguer';
+            ctx.fillText(instructions, canvas.width/2, canvas.height - 30);
+            
+            // Icône de fermeture
+            ctx.fillStyle = '#ff4444';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('✕', canvas.width - 40, 40);
+            
+            infoPanel.material.map.needsUpdate = true;
+            infoPanel.visible = true;
+            
+            // Animation d'apparition améliorée
+            infoPanel.scale.setScalar(0);
+            infoPanel.rotation.y = Math.PI;
+            animatePanel(infoPanel);
+        }
+
+        function animatePanel(panel) {
+            const duration = 800;
+            const startTime = Date.now();
+            
+            function animatePanelFrame() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 4);
+                
+                panel.scale.setScalar(eased);
+                panel.rotation.y = Math.PI * (1 - eased);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animatePanelFrame);
+                }
+            }
+            
+            animatePanelFrame();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+            
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[n] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+        }
+
+        // === CONTRÔLES CLAVIER ===
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        }
+
+        function onKeyDown(event) {
+            if (isVRActive) return;
+            
+            switch(event.key.toLowerCase()) {
+                case 'w':
+                case 'z': // AZERTY
+                    cameraControls.moveForward = true;
+                    break;
+                case 's':
+                    cameraControls.moveBackward = true;
+                    break;
+                case 'a':
+                case 'q': // AZERTY
+                    cameraControls.moveLeft = true;
+                    break;
+                case 'd':
+                    cameraControls.moveRight = true;
+                    break;
+                case 'arrowup':
+                    cameraControls.moveUp = true;
+                    break;
+                case 'arrowdown':
+                    cameraControls.moveDown = true;
+                    break;
+                case ' ':
+                    event.preventDefault();
+                    toggleAutoRotate();
+                    break;
+                case 'r':
+                    resetView();
+                    break;
+                case 't':
+                    switchTheme();
+                    break;
+                case 'n':
+                    randomSelection();
+                    break;
+                case 'escape':
+                    if (infoPanel && infoPanel.visible) {
+                        infoPanel.visible = false;
+                        selectedCharacter = null;
+                    }
+                    break;
+            }
+        }
+
+        function onKeyUp(event) {
+            if (isVRActive) return;
+            
+            switch(event.key.toLowerCase()) {
+                case 'w':
+                case 'z':
+                    cameraControls.moveForward = false;
+                    break;
+                case 's':
+                    cameraControls.moveBackward = false;
+                    break;
+                case 'a':
+                case 'q':
+                    cameraControls.moveLeft = false;
+                    break;
+                case 'd':
+                    cameraControls.moveRight = false;
+                    break;
+                case 'arrowup':
+                    cameraControls.moveUp = false;
+                    break;
+                case 'arrowdown':
+                    cameraControls.moveDown = false;
+                    break;
+            }
+        }
+
+        function updateCameraMovement() {
+            if (isVRActive || autoRotate) return;
+            
+            const delta = clock.getDelta();
+            const moveSpeed = 15 * delta;
+            
+            const direction = new THREE.Vector3();
+            camera.getWorldDirection(direction);
+            
+            const right = new THREE.Vector3();
+            right.crossVectors(direction, camera.up).normalize();
+            
+            if (cameraControls.moveForward) {
+                camera.position.add(direction.multiplyScalar(moveSpeed));
+            }
+            if (cameraControls.moveBackward) {
+                camera.position.sub(direction.multiplyScalar(moveSpeed));
+            }
+            if (cameraControls.moveLeft) {
+                camera.position.sub(right.multiplyScalar(moveSpeed));
+            }
+            if (cameraControls.moveRight) {
+                camera.position.add(right.multiplyScalar(moveSpeed));
+            }
+            if (cameraControls.moveUp) {
+                camera.position.y += moveSpeed;
+            }
+            if (cameraControls.moveDown) {
+                camera.position.y -= moveSpeed;
+            }
+            
+            // Limites de la caméra
+            camera.position.y = Math.max(0.5, Math.min(50, camera.position.y));
+        }
+
+        // === CONTRÔLES TACTILES ===
+        function setupTouchControls() {
+            if (!('ontouchstart' in window)) return;
+            
+            let touchStartX, touchStartY;
+            let initialDistance = 0;
+            let rotating = false;
+            
+            renderer.domElement.addEventListener('touchstart', function(event) {
+                event.preventDefault();
+                
+                if (event.touches.length === 1) {
+                    touchStartX = event.touches[0].clientX;
+                    touchStartY = event.touches[0].clientY;
+                    rotating = true;
+                } else if (event.touches.length === 2) {
+                    rotating = false;
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    initialDistance = Math.sqrt(dx * dx + dy * dy);
+                }
+            }, { passive: false });
+            
+            renderer.domElement.addEventListener('touchmove', function(event) {
+                event.preventDefault();
+                
+                if (isVRActive) return;
+                
+                if (event.touches.length === 1 && rotating) {
+                    const deltaX = event.touches[0].clientX - touchStartX;
+                    const deltaY = event.touches[0].clientY - touchStartY;
+                    
+                    camera.rotation.y -= deltaX * 0.005;
+                    camera.rotation.x -= deltaY * 0.005;
+                    
+                    // Limiter la rotation verticale
+                    camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+                    
+                    touchStartX = event.touches[0].clientX;
+                    touchStartY = event.touches[0].clientY;
+                } else if (event.touches.length === 2) {
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    const scale = distance / initialDistance;
+                    const direction = new THREE.Vector3();
+                    camera.getWorldDirection(direction);
+                    
+                    const moveDistance = (1 - scale) * 2;
+                    camera.position.add(direction.multiplyScalar(moveDistance));
+                    
+                    initialDistance = distance;
+                }
+            }, { passive: false });
+            
+            renderer.domElement.addEventListener('touchend', function(event) {
+                rotating = false;
+            }, { passive: true });
+        }
+
+        // === CONTRÔLES ===
+        function resetView() {
+            camera.position.set(0, 1.6, 5);
+            camera.rotation.set(0, 0, 0);
+            camera.lookAt(0, 2, 0);
+            if (infoPanel) infoPanel.visible = false;
+            selectedCharacter = null;
+            
+            // Reset des effets de sélection
+            characters.forEach(char => {
+                char.children.forEach(child => {
+                    if (child.material && child.material.emissive) {
+                        child.material.emissive.setHex(0x000000);
+                    }
+                });
+            });
+        }
+
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            const btn = document.querySelector('#controls .control-btn:nth-child(2)');
+            if (btn) {
+                btn.style.background = autoRotate ? '#ff6b35' : '#333';
+            }
+        }
+
+        function switchTheme() {
+            isDarkTheme = !isDarkTheme;
+            const btn = document.querySelector('#controls .control-btn:nth-child(3)');
+            
+            if (isDarkTheme) {
+                scene.background = new THREE.Color(0x0b0c10);
+                if (btn) btn.textContent = '🌙 Thème';
+            } else {
+                scene.background = new THREE.Color(0x1a237e);
+                if (btn) btn.textContent = '☀️ Thème';
+            }
+            if (btn) {
+                btn.style.background = isDarkTheme ? '#333' : '#4a90e2';
+            }
+        }
+
+        function randomSelection() {
+            if (characters.length === 0) return;
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            selectCharacter(characters[randomIndex]);
+        }
+
+        // === ANIMATION PRINCIPALE ===
+        function animate() {
+            renderer.setAnimationLoop(render);
+        }
+
+        function render() {
+            const time = Date.now() * 0.001;
+            
+            // Mise à jour des mouvements de caméra
+            updateCameraMovement();
+            
+            // Auto-rotation de la caméra
+            if (autoRotate && !isVRActive && !selectedCharacter) {
+                const radius = 12;
+                camera.position.x = Math.cos(time * 0.1) * radius;
+                camera.position.z = Math.sin(time * 0.1) * radius;
+                camera.position.y = 1.6 + Math.sin(time * 0.05) * 1;
+                camera.lookAt(0, 2, 0);
+            }
+            
+            // Animation des personnages
+            characters.forEach((character, index) => {
+                // Rotation lente autour de l'axe Y
+                character.rotation.y = time * 0.2 + index * 0.15;
+                
+                // Effet de hover plus prononcé
+                if (character.userData.hovered) {
+                    character.position.y = character.userData.originalY + Math.sin(time * 4) * 0.2 + 0.4;
+                    character.scale.setScalar(1 + Math.sin(time * 4) * 0.08);
+                } else {
+                    character.position.y = character.userData.originalY + Math.sin(time * 1.2 + index) * 0.1;
+                    character.scale.setScalar(1);
+                }
+                
+                // Animation du piédestal
+                const pedestal = character.children[0];
+                if (pedestal && pedestal.material) {
+                    const intensity = character.userData.hovered ? 0.4 : 0.15;
+                    pedestal.material.emissive.setScalar(intensity + Math.sin(time * 2 + index) * 0.08);
+                }
+                
+                // Animation de l'effet de brillance au sol
+                const glow = character.children.find(child => 
+                    child.geometry && child.geometry.type === 'RingGeometry'
+                );
+                if (glow) {
+                    glow.rotation.z = time * 0.6 + index * 0.4;
+                    glow.material.opacity = 0.4 + Math.sin(time * 2.5 + index) * 0.2;
+                }
+                
+                // Animation du halo vertical
+                const halo = character.children.find(child => 
+                    child.geometry && child.geometry.type === 'CylinderGeometry' && child.position.y > 4
+                );
+                if (halo) {
+                    halo.rotation.y = time * 0.3 + index * 0.2;
+                    halo.material.opacity = 0.2 + Math.sin(time * 1.8 + index) * 0.1;
+                }
+            });
+            
+            // Animation du panneau d'information
+            if (infoPanel && infoPanel.visible) {
+                infoPanel.rotation.y = Math.sin(time * 0.5) * 0.03;
+                infoPanel.position.y = 6 + Math.sin(time * 1.2) * 0.15;
+                
+                // Toujours face à la caméra en mode non-VR
+                if (!isVRActive) {
+                    const panelPosition = infoPanel.position.clone();
+                    const cameraDirection = new THREE.Vector3();
+                    camera.getWorldDirection(cameraDirection);
+                    
+                    // Calculer l'angle pour faire face à la caméra
+                    const angle = Math.atan2(cameraDirection.x, cameraDirection.z);
+                    infoPanel.rotation.y += angle * 0.1;
+                }
+            }
+            
+            // Animation des particules
+            scene.children.forEach(child => {
+                if (child.type === 'Points') {
+                    child.rotation.y = time * 0.03;
+                    child.rotation.x = time * 0.01;
+                    
+                    // Mouvement vertical léger pour les particules
+                    if (child.geometry.attributes.position) {
+                        const positions = child.geometry.attributes.position.array;
+                        for (let i = 1; i < positions.length; i += 3) {
+                            positions[i] += Math.sin(time + i * 0.01) * 0.002;
+                        }
+                        child.geometry.attributes.position.needsUpdate = true;
+                    }
+                }
+            });
+            
+            // Animation de la timeline
+            const timeline = scene.children.find(child => 
+                child.geometry && child.geometry.type === 'CylinderGeometry' && child.rotation.z !== 0
+            );
+            if (timeline && timeline.material) {
+                timeline.material.emissive.setScalar(0.15 + Math.sin(time * 3) * 0.08);
+            }
+            
+            // Animation des étoiles
+            const stars = scene.children.find(child => 
+                child.type === 'Points' && child.material.color.getHex() === 0xffffff
+            );
+            if (stars) {
+                stars.rotation.y = time * 0.002;
+                stars.material.opacity = 0.6 + Math.sin(time * 0.5) * 0.3;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // === REDIMENSIONNEMENT ===
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // === GESTION DES ERREURS ===
+        window.addEventListener('error', function(e) {
+            console.error('Erreur:', e.error);
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = 'Erreur de chargement: ' + e.message;
+            }
+        });
+
+        // Gestion des erreurs WebXR
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Promesse rejetée:', event.reason);
+            const loadingText = document.getElementById('loadingText');
+            if (loadingText) {
+                loadingText.textContent = 'Erreur WebXR: ' + event.reason;
+            }
+        });
+
+        // === OPTIMISATIONS PERFORMANCES ===
+        function optimizePerformance() {
+            let fps = 0;
+            let lastTime = performance.now();
+            let frameCount = 0;
+            
+            function trackFPS() {
+                const now = performance.now();
+                frameCount++;
+                
+                if (now - lastTime >= 1000) {
+                    fps = frameCount;
+                    frameCount = 0;
+                    lastTime = now;
+                    
+                    // Si FPS < 30, réduire la qualité
+                    if (fps < 30) {
+                        renderer.setPixelRatio(Math.min(window.devicePixelRatio * 0.8, 1));
+                        // Réduire les particules
+                        const particles = scene.children.find(child => child.type === 'Points' && child.material.color.getHex() === 0xffd700);
+                        if (particles) {
+                            particles.visible = false;
+                        }
+                        // Désactiver les ombres si nécessaire
+                        if (fps < 20) {
+                            renderer.shadowMap.enabled = false;
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(trackFPS);
+            }
+            
+            setTimeout(trackFPS, 5000); // Commencer le monitoring après 5s
+        }
+
+        // === COMPATIBILITÉ MOBILE AMÉLIORÉE ===
+        function setupMobileOptimizations() {
+            // Détection mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Réduire la qualité sur mobile
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+                
+                // Réduire le nombre de particules
+                const particles = scene.children.find(child => child.type === 'Points');
+                if (particles) {
+                    const positions = particles.geometry.attributes.position;
+                    const reducedPositions = new Float32Array(positions.array.length / 2);
+                    for (let i = 0; i < reducedPositions.length; i++) {
+                        reducedPositions[i] = positions.array[i * 2];
+                    }
+                    particles.geometry.setAttribute('position', new THREE.BufferAttribute(reducedPositions, 3));
+                }
+                
+                // Désactiver certains effets visuels
+                renderer.shadowMap.enabled = false;
+                
+                // Interface mobile adaptée
+                document.getElementById('instructions').textContent = 'Touchez et glissez pour naviguer • Pincez pour zoomer • Touchez les personnages';
+            }
+        }
+
+        // === FONCTIONS UTILITAIRES ===
+        function createPlaceholderTexture(color, text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, 256, 256);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 128, 128);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // === SAUVEGARDE PRÉFÉRENCES ===
+        function saveUserPreferences() {
+            try {
+                const prefs = {
+                    theme: isDarkTheme ? 'dark' : 'light',
+                    autoRotate: autoRotate,
+                    selectedCharacter: selectedCharacter ? selectedCharacter.id : null,
+                    cameraPosition: {
+                        x: camera.position.x,
+                        y: camera.position.y,
+                        z: camera.position.z
+                    }
+                };
+                localStorage.setItem('vrFresquePrefs', JSON.stringify(prefs));
+            } catch (error) {
+                console.warn('Impossible de sauvegarder les préférences:', error);
+            }
+        }
+
+        function loadUserPreferences() {
+            try {
+                const saved = localStorage.getItem('vrFresquePrefs');
+                if (saved) {
+                    const prefs = JSON.parse(saved);
+                    if (prefs.theme === 'light') switchTheme();
+                    autoRotate = prefs.autoRotate || false;
+                    
+                    // Restaurer la position de la caméra si elle existe
+                    if (prefs.cameraPosition) {
+                        camera.position.set(
+                            prefs.cameraPosition.x,
+                            prefs.cameraPosition.y,
+                            prefs.cameraPosition.z
+                        );
+                    }
+                }
+            } catch (error) {
+                console.warn('Impossible de charger les préférences:', error);
+            }
+        }
+
+        // === FONCTIONS D'ACCESSIBILITÉ ===
+        function setupAccessibility() {
+            // Support clavier étendu
+            document.addEventListener('keydown', function(event) {
+                // Aide clavier
+                if (event.key === 'h' || event.key === 'H') {
+                    showHelp();
+                }
+                
+                // Navigation rapide entre personnages
+                if (event.key >= '1' && event.key <= '9') {
+                    const index = parseInt(event.key) - 1;
+                    if (index < characters.length) {
+                        selectCharacter(characters[index]);
+                    }
+                }
+            });
+
+            // Descriptions ARIA pour l'accessibilité
+            renderer.domElement.setAttribute('aria-label', 'Expérience VR interactive de la fresque chronologique');
+            renderer.domElement.setAttribute('role', 'application');
+        }
+
+        function showHelp() {
+            const helpText = `
+            Aide - Fresque Chronologique VR
+            
+            Contrôles clavier:
+            WASD ou ZQSD - Déplacement
+            Flèches - Rotation/Hauteur
+            Espace - Auto-rotation
+            R - Reset vue
+            T - Changer thème
+            N - Sélection aléatoire
+            H - Cette aide
+            1-2 - Sélection directe personnage
+            Escape - Fermer panneau
+            
+            Souris/Tactile:
+            Clic - Sélectionner personnage
+            Glisser - Rotation (tactile)
+            Pincer - Zoom (tactile)
+            `;
+            
+            alert(helpText);
+        }
+
+        // === SYSTÈME DE DEBUG ===
+        let debugMode = false;
+        
+        function toggleDebug() {
+            debugMode = !debugMode;
+            
+            if (debugMode) {
+                // Afficher les axes
+                const axesHelper = new THREE.AxesHelper(5);
+                axesHelper.name = 'debug_axes';
+                scene.add(axesHelper);
+                
+                // Afficher les bounding boxes
+                characters.forEach(char => {
+                    const box = new THREE.BoxHelper(char, 0xffff00);
+                    box.name = 'debug_box';
+                    scene.add(box);
+                });
+                
+                console.log('Mode debug activé');
+            } else {
+                // Retirer les éléments de debug
+                const debugObjects = scene.children.filter(child => 
+                    child.name && child.name.startsWith('debug_')
+                );
+                debugObjects.forEach(obj => scene.remove(obj));
+                
+                console.log('Mode debug désactivé');
+            }
+        }
+
+        // Activer le debug avec Ctrl+D
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'd') {
+                event.preventDefault();
+                toggleDebug();
+            }
+        });
+
+        // === DÉMARRAGE DE L'APPLICATION ===
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initialisation de la Fresque Chronologique VR...');
+            
+            init().then(() => {
+                console.log('Application initialisée avec succès');
+                
+                // Initialiser les optimisations après 2 secondes
+                setTimeout(() => {
+                    optimizePerformance();
+                    setupMobileOptimizations();
+                    setupAccessibility();
+                    loadUserPreferences();
+                    
+                    console.log('Optimisations et préférences chargées');
+                }, 2000);
+                
+                // Sauvegarde automatique toutes les 30 secondes
+                setInterval(saveUserPreferences, 30000);
+                
+            }).catch(error => {
+                console.error('Erreur lors de l\'initialisation:', error);
+                const loadingText = document.getElementById('loadingText');
+                if (loadingText) {
+                    loadingText.textContent = 'Erreur critique: ' + error.message;
+                    loadingText.style.color = '#ff4444';
+                }
+            });
+        });
+
+        // Sauvegarde avant fermeture
+        window.addEventListener('beforeunload', function() {
+            saveUserPreferences();
+        });
+
+        // Gestion de la perte de focus
+        window.addEventListener('blur', function() {
+            // Pause des animations coûteuses
+            Object.keys(cameraControls).forEach(key => {
+                cameraControls[key] = false;
+            });
+        });
+
+        // Reprise au focus
+        window.addEventListener('focus', function() {
+            // Reprendre les animations si nécessaire
+            if (clock) {
+                clock.getDelta(); // Reset du delta time
+            }
+        });
+
+        // === FONCTIONS GLOBALES POUR LES BOUTONS HTML ===
+        window.resetView = resetView;
+        window.toggleAutoRotate = toggleAutoRotate;
+        window.switchTheme = switchTheme;
+        window.randomSelection = randomSelection;
+
+    </script>
+</body>
+</html>
