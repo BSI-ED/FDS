@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fresque Chronologique VR - Quest 2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+body { margin: 0; padding: 0; background: #000; font-family: Arial, sans-serif; overflow: hidden; color: white; }
+#info { position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; max-width: 300px; }
+#enterVR { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: linear-gradient(145deg, #ff6b35, #f7931e); color: white; border: none; padding: 15px 30px; border-radius: 25px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4); transition: all 0.3s ease; }
+#enterVR:hover { transform: translateX(-50%) scale(1.05); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6); }
+#enterVR:disabled { background: #666; cursor: not-allowed; box-shadow: none; }
+#controls { position: absolute; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 10px; }
+.control-btn { background: #333; color: white; border: none; padding: 8px 12px; margin: 2px; border-radius: 5px; cursor: pointer; }
+.control-btn:hover { background: #555; }
+#loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; text-align: center; font-size: 18px; }
+.progress-bar { width: 200px; height: 4px; background: #333; border-radius: 2px; margin: 10px auto; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #ff6b35, #f7931e); width: 0%; transition: width 0.3s; }
+#vrStatus { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 10px; color: #ffd700; display: none; }
+</style>
+</head>
+<body>
+<div id="loading">
+    <h2>Chargement VR...</h2>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <p id="loadingText">Initialisation...</p>
+</div>
+<div id="vrStatus"><p id="statusText"></p></div>
+<div id="info">
+    <h3>Fresque Chronologique VR</h3>
+    <p><strong>Quest 2:</strong> Gachette pour sélectionner</p>
+    <p><strong>VR:</strong> Joystick pour téléportation</p>
+    <p><strong>Navigation:</strong> Grip alternatif</p>
+    <p><small>Symbole Venus (♀) = Femme scientifique</small></p>
+</div>
+<div id="controls">
+    <button class="control-btn" onclick="resetView()">Reset</button>
+    <button class="control-btn" onclick="toggleAutoRotate()">Auto</button>
+    <button class="control-btn" onclick="randomSelection()">Random</button>
+</div>
+<button id="enterVR">Entrer en VR</button>
+
+<script>
+// ---- DATA ----
+const items=[ {id:1, cat:'Ingénieur', name:`Léonard de Vinci`,years:`1452–1519`,year:1500,img:`proto/leonardo.jpg`,
+   short:`Polymathe de la Renaissance : peintre, ingénieur, inventeur. Les carnets de Léonard de Vinci mêlent études d'anatomie, d'ingénierie, d'hydraulique et d'optique`,
+   bio:`Ses carnets mêlent études d'anatomie, d'ingénierie, d'hydraulique et d'optique. Œuvres majeures : la Joconde, La Cène. Esquisses d'hélicoptère et de chars.`,
+   morphName:`Hypatie d'Alexandrie`, morphYears:`350/370-415`, morphImg:`proto/hypatia.jpg`,
+   morphShort:`Femme de lettres et de sciences, Hypatie est à la tête de l'école néoplatonicienne d'Alexandrie, au sein de laquelle elle a enseigné la philosophie et l'astronomie. C'est la première mathématicienne dont la vie est bien documentée.`,
+   morphBio:`Algèbre, tables astronomiques, inventrice de l’astrolabe qui a permis de mesurer la position des étoiles)`},
+
+  {id:2, cat:'Ingénieur', name:`Sébastien Le Prestre de Vauban`,years:`1633–1707`,year:1670,img:`proto/Vauban.jpg`,
+   short:`Maréchal et maître des fortifications sous Louis XIV, Vauban refonda l'art du siège et des forteresses en Europe.`,
+   bio:`Vauban refonda l'art du siège et des forteresses en Europe ; Il proposa aussi des réformes fiscales dans ses mémoires.`,
+   morphName:`Sophie Germain`, morphYears:`1776–1831`, morphImg:`proto/sophie-germain.jpg`,
+   morphShort:`Mathématicienne de génie, Sophie Germain a développé des théories utilisées dans l’étude des structures et de la résistance des matériaux liées à l’architecture militaire. `,
+   morphBio:`Sophi Germain a écrit les Essais sur la théorie des nombres (1820)`},
+
+  {id:3, cat:'Ingénieur', name:`Joseph et Étienne Montgolfier`,years:`1740–1810 & 1745–1799`,year:1783,img:`proto/montgolfier.jpg`,
+   short:`Cofondateurs de l'aérostation à air chaud, Joseph et Étienne Montgolfier lancent en 1783 les premiers ballons à air chaud habités ; Ce sont les débuts de l’ère des vols humains.`,
+   bio:`En 1783, Joseph et Étienne Montgolfier lancent les premiers ballons à air chaud habités ; Ce sont les débuts de l’ère des vols humains.`,
+   morphName:`Sophie Blanchard`, morphYears:`1778–1819`, morphImg:`proto/sophie-blanchard.jpg`,
+   morphShort:`Première femme aérostière professionnelle, Sophie Blanchard a été l'aéronaute officielle de Napoléon. Elle a fait de nombreux vols et démonstrations publiques.`,
+   morphBio:`A fait de nombreux vols et démonstrations publiques.`},
+
+  {id:4, cat:'Ingénieur', name:`Claude Chappe`,years:`1763–1805`,year:1794,img:`proto/chappe.jpg`,
+   short:`Inventeur du télégraphe optique (sémaphore), Chappe crée un réseau de tours sémaphores qui transmet rapidement des dépêches d'État avant l'ère électrique.`,
+   bio:`Un réseau de tours sémaphores transmit rapidement des dépêches d'État avant l'ère électrique.`,
+   morphName:`Hedy Lamarr`, morphYears:`1914–2000`, morphImg:`proto/hedy-lamarr.jpg`,
+   morphShort:`Inventrice du saut de fréquence, Hedy Lamarr co-inventa une technique d'étalement de spectre, inspirant le Wi-Fi et le Bluetooth.`,
+   morphBio:`Co-inventa une technique d'étalement de spectre, inspirant Wi-Fi et Bluetooth.`},
+
+  {id:5, cat:'Ingénieur', name:`Charles Babbage`,years:`1792–1871`,year:1837,img:`proto/Babbage.jpg`,
+   short:`Concepteur de la machine analytique (proto-ordinateur), Babbage imagina une machine programmable à cartes, avec mémoire et unité de calcul, préfigurant l'ordinateur.`,
+   bio:`Imagina une machine programmable à cartes, avec mémoire et unité de calcul, préfigurant l'ordinateur.`,
+   morphName:`Ada Lovelace`, morphYears:`1815–1852`, morphImg:`proto/ada-lovelace.jpg`,
+   morphShort:`Première programmeuse, Ada Lovelace rédigea des algorithmes et a pressentit la création d'œuvres par des machines. Elle conçoit l'équivalent du premier programme informatique.`,
+   morphBio:`Rédigea des algorithmes et pressentit la création d'œuvres par des machines.`},
+
+  {id:6, cat:'Ingénieur', name:`Gustave Eiffel`,years:`1832–1923`,year:1889,img:`proto/Eiffel.jpg`,
+   short:`Ingénieur des structures métalliques, Eiffel a fait des travaux en aérodynamique et résistance des matériaux. Il a été à l'origine de la tour Eiffel et la Statue de la Liberté.`,
+   bio:`La Tour Eiffel et le viaduc de Garabit ; travaux en aérodynamique et résistance des matériaux.`,
+   morphName:`Emily Warren Roebling`, morphYears:`1843–1903`, morphImg:`proto/emily-roebling.jpg`,
+   morphShort:`Coordinatrice technique, Emily Warren Roebling a supervisé la construction du Brooklyn Bridge, symbole d'ingénierie durant la convalescense de son son mari.`,
+   morphBio:`Assura la coordination technique lors de la maladie de son mari ; symbole d'ingénierie.`},
+
+  {id:7, cat:'Ingénieur', name:`Clément Ader`,years:`1841–1925`,year:1890,img:`proto/Ader.jpg`,
+   short:`Pionnier français de l'aviation (Éole), Adler a fait des travaux d'aérodynamique avant les vols contrôlés.`,
+   bio:`Appareils expérimentaux et travaux d'aérodynamique avant les vols contrôlés.`,
+   morphName:`Bessie Coleman`, morphYears:`1892-1926`, morphImg:`proto/Bessie_Coleman.jpg`,
+   morphShort:`Première femme afro-américaine et amérindienne pilote, Bessie Coleman a été la première femme américaine à recevoir une licence de pilote internationale. Bloquée par la discrimination sous les Jim Crow Laws, Bessie part en France se former dans la meilleure école d’aviation du pays avant de retourner triomphante aux États-Unis.`,
+   morphBio:`Afro-américaine et amérindienne passionnée par l’aviation mais bloquée par la discrimination sous les Jim Crow Laws, Bessie part en France se former dans la meilleure école d’aviation du pays avant de retourner triomphante aux États-Unis.`},
+
+  {id:8, cat:'Ingénieur', name:`Thomas Edison`,years:`1847–1931`,year:1880,img:`proto/Edison.jpg`,
+   short:`Inventeur prolifique (lampe, phonographe, cinéma), Edison a déposé plus d'un millier de brevets.`,
+   bio:`Menlo Park : R&D industrielle, plus d'un millier de brevets.`,
+   morphName:`Margaret Knight`, morphYears:`1919-2009`, morphImg:`proto/Margaret-Knight.jpg`,
+   morphShort:`Inventrice prolifique, notamment de la machine à fabriquer des sacs en papier, Margaret Knight avec près de 27 brevets à son nom, était connue à sa mort comme l’Edison au féminin.`,
+   morphBio:`Margaret Knight est l’inventrice la plus prolifique du 19ème siècle avec près de 27 brevets à son nom, elle était connue à sa mort comme l’Edison au féminin.`},
+
+  {id:9, cat:'Ingénieur', name:`George Eastman`,years:`1854–1932`,year:1900,img:`proto/Eastman.jpg`,
+   short:`Fondateur de Kodak, Eastman a popularisé la photographie.`,
+   bio:`Films souples et appareils abordables ; démocratisation de la photo.`,
+   morphName:`Anna Atkins`, morphYears:`1799–1871`, morphImg:`proto/anna-atkins.jpg`,
+   morphShort:`Première femme à utiliser la photographie pour illustrer des ouvrages scientifiques, Anna Atkins a intégré des photographies avec la technique du cyanotype dans un ouvrage scientifique compilant 389 spécimens d’algues, ce qui en fait le premier livre illustré par la photographie.`,
+   morphBio:`Adepte de la botanique, Anna Atkins intègre des photographies avec la technique du cyanotype dans un ouvrage scientifique compilant 389 spécimens d’algues, ce que en fait le premier livre illustré par la photographie.`},
+
+  {id:10, cat:'Ingénieur', name:`Henry Ford`,years:`1863–1947`,year:1913,img:`proto/ford.jpg`,
+   short:`Avec la production de masse automobile (chaîne de montage), Ford a contribué à la transformation industrielle et sociale.`,
+   bio:`Chaîne de montage, Ford T ; transformation industrielle et sociale.`,
+   morphName:`Bertha Benz`, morphYears:`1849–1944`, morphImg:`proto/bertha-benz.jpg`,
+   morphShort:`Femme et associée de Carl Benz, Bertha Benz a participé au développement technologique du moteur thermique à deux temps et était force de proposition pour la promotion du concept de la voiture à essence qu’ils avaient produit. Bertha partit en excursion dans un but promotionnel, faisant d’elle la première personne à conduire une automobile sur route dans le but de voyager.
+Elle est également l'inventrice des plaquettes de frein.`,
+   morphBio:`A prouvé la viabilité automobile. Elle a réalisé le premier long trajet en voiture.`},
+
+  {id:11, cat:'Ingénieur', name:`Marius Berliet`,years:`1866–1949`,year:1916,img:`proto/Berliet.jpg`,
+   short:`Constructeur de camions et automobiles, Berliet joue un rôle clé dans les véhicules industriels et militaires.`,
+   bio:`Rôle clé dans les véhicules industriels et militaires (Lyon).`,
+   morphName:`Camille du Gast`, morphYears:`1868-1942`, morphImg:`proto/CamilleGast.jpg`,
+   morphShort:`Surnomée la "Walkyrie de la Mécanique", amille du Gast est pilote automobile et exploratrice, pionnières des courses de vitesse. Elle devient la première française à participer à une course automobile de vitesse et est connue pour son audace, son indépendance et son engagement féministe.`,
+   morphBio:`Camille du Gast s’illustre dans de nombreux sports; elle devient la première française à participer à une course automobile de vitesse. Elle est connue pour son audace, son indépendance et son engagement féministe.`},
+
+  {id:12, cat:'Ingénieur', name:`Orville & Wilbur Wright`,years:`1871–1948 & 1867–1912`,year:1903,img:`proto/Wright.jpg`,
+   short:`En effectuant les premiers vols motorisés contrôlés, Orville & Wilbur Wright sont les parents de l'aviation moderne.`,
+   bio:`Contrôle en roulis, gouvernes et vols prolongés : naissance de l’aviation moderne.`,
+   morphName:`Raymonde de Laroche`, morphYears:`1882–1919`, morphImg:`proto/raymonde-de-laroche.jpg`,
+   morphShort:`Elise Deroche, alias baronne Raymonde de Laroche, a été la première femme pilote brevetée.`,
+   morphBio:`Elise Deroche, alias baronne Raymonde de Laroche, a connu une vie trépidante. La fin de sa vie fu marqué par sa carrière de pilote.`},
+
+  {id:13, cat:'Ingénieur', name:`Louis Renault`,years:`1877–1944`,year:1910,img:`proto/Renault.jpg`,
+   short:`Ingénieur automobile, Renault est un pionnier de l’industrie; Avec son brevet de boîte de vitesses à prise directe, adopté par tous les constructeurs, il a révolutionné l’industrie automobile. `,
+   bio:`Innovations mécaniques et production à grande échelle.`,
+   morphName:`Dorothée Pullinger`, morphYears:`1894–1986`, morphImg:`proto/dorothee-pullinger.jpg`,
+   morphShort:`Ingénieure automobile, Dorothée Pullinger a conçu des voitures adaptées aux femmes. Elle fût la seule femme durant l’après-guerre à être formée pour recruter des femmes dans les usines.`,
+   morphBio:`Elle fu la seule femme durant l’après-guerre à être formée pour recruter des femmes dans les usines.`},
+
+  {id:14, cat:'Ingénieur', name:`André Citroën`,years:`1878–1935`,year:1934,img:`proto/Citroen.jpg`,
+   short:`Industriel visionnaire (traction avant, marketing), Citroën modernisa la production et la publicité automobile en Europe.`,
+   bio:`Modernisa la production et la publicité automobile en Europe.`,
+   morphName:`Hélène Rother`, morphYears:`1908–1999`, morphImg:`proto/Helene-Rother.jpg`,
+   morphShort:`Première femme designer automobile chez General Motors, Hélène Rother a conçu des designs d’intérieurs de voitures adaptés aux femmes.`,
+   morphBio:`Hélène Rother chez General Motors a conçu des designs d’intérieurs de voitures adaptés aux femmes.`},
+
+  {id:15, cat:'Ingénieur', name:`John Logie Baird`,years:`1888–1946`,year:1926,img:`proto/baird.jpg`,
+   short:`Pionnier écossais de la télévision mécanique, nous devons à Baird la transmission d'images à 30 lignes et les couleurs précoces.`,
+   bio:`Transmission d'images à 30 lignes, premières démos publiques et couleurs précoces.`,
+   morphName:`Shirley Ann Jackson`, morphYears:`1946– `, morphImg:`proto/shirley-ann-jackson.jpg`,
+   morphShort:`Physicienne ayant contribué aux avancées des télécommunications, les travaux de Shirley Ann Jackson sur l’interaction des électrons et des phonons dans les semi-conducteurs ont ouvert la voie à plusieurs avancées majeures notamment dans le développement des câbles à fibre optique.`,
+   morphBio:`Les travaux de Shirley Ann Jackson sur l’interaction des électrons et des phonons dans les semi-conducteurs ont ouvert la voie à plusieurs avancées majeures dans le domaine des télécommunications, notamment dans le développement des câbles à fibre optique, essentiels à l’Internet à haut débit et aux réseaux mondiaux de communication.`},
+
+  {id:16, cat:'Ingénieur', name:`René Barthélemy`,years:`1889–1954`,year:1931,img:`proto/Barthelemy.jpg`,
+   short:`Pionnier de la télévision en France, Barthélemy a mené des expériences de télévision mécanique puis électronique`,
+   bio:`Expériences de télévision mécanique puis électronique ; contribution aux standards.`,
+   morphName:`Eliane Victor`, morphYears:`1918-2017`, morphImg:`proto/ElianeVictor.jpg`,
+   morphShort:`Journaliste et productrice, Eliane Victor est une pionnière des documentaires télévisés. Elle a marqué le paysage télévisuel en produisant des émissions et documentaires donnant la parole aux femmes.`,
+   morphBio:`Eliane Victor a marqué le paysage télévisuel en produisant des émissions et documentaires donnant la parole aux femmes.`},
+
+  {id:17, cat:'Ingénieur', name:`René Couzinet`,years:`1904–1956`,year:1933,img:`proto/couzinetr.jpg`,
+   short:`Ingénieur et constructeur aéronautique, Couzinet a déposé 91 brevets et a marqué l’histoire de l’aviation par ses innovations, notamment avec la série des avions "Arc-en-Ciel", des trimoteurs conçus pour les vols transatlantiques, à l’aérodynamique très moderne pour l’époque.`,
+   bio:`Avions long courriers innovants ; design distinctif.`,
+   morphName:`Jacqueline Cochran`, morphYears:`1906–1980`, morphImg:`proto/jacqueline-cochran.jpg`,
+   morphShort:`Pionnière de l’aviation et première femme à franchir le mur du son, Jacqueline Cochran a été pilote d'essai, dirigeante des WASP et a eu nombreux records de vitesse.`,
+   morphBio:`Pilote d'essai, dirigeante des WASP ; nombreux records de vitesse.`},
+
+  {id:18, cat:'Ingénieur', name:`Henri de France`,years:`1911–1986`,year:1967,img:`proto/France.jpg`,
+   short:`Ingénieur et inventeur, Henri de France a inventé le procédé SECAM, la norme de télévision en couleurs adoptée par la France en 1964 et exportée dans de nombreux pays. Pendant la Seconde Guerre mondiale, il a travaillé sur les premiers radars pour l’aviation et la marine, ainsi que sur des calculateurs et des tubes à image, contribuant ainsi à l’effort de guerre.`,
+   bio:`Systèmes de télévision couleur déployés en France et à l'international.`,
+   morphName:`Katharine Burr Blodgett`, morphYears:`1898–1979`, morphImg:`proto/katharine-blodgett.jpg`,
+   morphShort:`Physicienne et chimiste, Katharine Burr Blodgett est la cocréatrice de la pellicule Langmuir-Blodgett, permettant de créer un verre à très faible indice de réflexion. Gone with the Wind est le premier film en couleur projeté à travers une lentille avec un recouvrement basé sur le travail de Blodgett.`,
+   morphBio:`Le travail novateur de Blodgett a trouvé des applications pratiques dans la photographie, le cinéma et plus largement dans la qualité des écrans modernes. Gone with the Wind est le premier film en couleur projeté à travers une lentille avec un recouvrement basé sur le travail de Blodgett.`},
+
+  {id:19, cat:'Ingénieur', name:`Wernher von Braun`,years:`1912–1977`,year:1969,img:`proto/braun.jpg`,
+   short:`Ingénieur en fusées, Wernher von Braun dirigea le Marshall Space Flight Center.`,
+   bio:`Des V2 au programme Apollo ; dirigea le Marshall Space Flight Center.`,
+   morphName:`Valentina Terechkova`, morphYears:`1937–`, morphImg:`proto/valentina-tereshkova.jpg`,
+   morphShort:`Première femme à être allée dans l’espace, Valentina Terechkova a marqué l’histoire par son vol en orbite à bord de Vostok 6. Le travail pionnier de Terechkova a ouvert la voie à une plus grande présence des femmes dans l’exploration spatiale.`,
+   morphBio:`Valentina Terechkova, en devenant la première femme cosmonaute, a marqué l’histoire par son vol en orbite à bord de Vostok 6. Le travail pionnier de Terechkova a ouvert la voie à une plus grande présence des femmes dans l’exploration spatiale et a inspiré de nombreuses générations. `},
+
+  // === 23 Savants ===
+  {id:20, cat:'Savant', name:`Galileo Galilei`,years:`1564–1642`,year:1610,img:`proto/galilee.jpg`,
+   short:`Fondateur de la physique moderne et de l'astronomie expérimentale, Galileo Galilei a défendu l'héliocentrisme .`,
+   bio:`Observations télescopiques (lunes de Jupiter), méthode expérimentale, défense de l'héliocentrisme.`,
+   morphName:`Jeanne Dumée`, morphYears:`1660-1706`, morphImg:`proto/JeanneDumee.jpg`,
+   morphShort:`Auteur d’un traité défendant le système de Copernic, Jeanne Dumée a affirmé avec conviction la place de la Terre autour du Soleil. Seul ce traité nous permet d'attester de son identité.`,
+   morphBio:`Sa voix, rare dans un monde dominé par les hommes, a donné une légitimité nouvelle aux femmes dans les sciences.`},
+
+  {id:21, cat:'Savant', name:`Isaac Newton`,years:`1642–1727`,year:1687,img:`proto/newton.jpg`,
+   short:`Père de la gravitation universelle, nous devons à Newton les lois du mouvement et le calcul infinitésimal (Principia Mathematica ).`,
+   bio:`Principia Mathematica ; optique et calcul infinitésimal.`,
+   morphName:`Émilie du Châtelet`, morphYears:`1706-1749`, morphImg:`proto/Chatelet.jpg`,
+   morphShort:`Femme de lettres, mathématicienne et physicienne française, Émilie du Châtelet est une figure du Siècle des Lumières. Elle a traduit et commenté les Principia Mathematica de Newton, rendant ses théories accessibles en France et en Europe.`,
+   morphBio:`Son travail a non seulement diffusé les idées de Newton mais a aussi contribué à leur rayonnement durable en Europe.`},
+
+  {id:22, cat:'Savant', name:`William Herschel`,years:`1738–1822`,year:1781,img:`proto/william-herschel.jpg`,
+   short:`Découvreur d'Uranus, Herschel est le pionnier de l'astronomie infrarouge. Il a cartographie la Voie lactée. `,
+   bio:`Cartographie de la Voie lactée ; découverte du rayonnement infrarouge.`,
+   morphName:`Caroline Herschel`, morphYears:`1750–1848`, morphImg:`proto/caroline-herschel.jpg`,
+   morphShort:`En découvrant plusieurs comètes Caroline Herschel affine les catalogues d'étoiles. Avec son frère William, ils perfectionnent leurs télescopes, fabriquant une série de dispositifs de plus en plus grands, jusqu'à obtenir le fameux instrument de 40 pieds de distance focale.`,
+   morphBio:`Travaille avec son frère William et ils perfectionnent leurs télescopes, fabriquant une série de dispositifs de plus en plus grands, jusqu'à obtenir le fameux instrument de 40 pieds de distance focale.`},
+
+  {id:23, cat:'Savant', name:`Blaise Pascal`,years:`1623–1662`,year:1654,img:`proto/pascal.jpg`,
+   short:`Mathématicien, physicien et philosophe, Pascal a inventé la première calculatrice mécanique, la Pascaline.`,
+   bio:`Presse hydraulique, machine à calculer (Pascaline), probabilités.`,
+   morphName:`Margaret Cavendish`, morphYears:`1623-1673`, morphImg:`proto/margaretcavendish.jpg`,
+   morphShort:`Philosophe, auteur de traités sur la matière, l’atome et la pensée scientifique, Margaret Cavendish avait pris la défense des droits des femmes contre les rôles de genres stéréotypés.`,
+   morphBio:`Elle prend la défense des droits des femmes contre les rôles de genres stéréotypés.`},
+
+  {id:24, cat:'Savant', name:`Georg Simon Ohm`,years:`1789–1854`,year:1827,img:`proto/ohm.jpg`,
+   short:`Grand physicien, Ohm a formulé la loi d'Ohm sur la résistance électrique`,
+   bio:`Relation U=RI, fondement de l'électrocinétique.`,
+   morphName:`Hertha Ayrton`, morphYears:`1854–1923`, morphImg:`proto/hertha-ayrton.jpg`,
+   morphShort:`Mathématicienne, inventrice et ingénieure britannique, Hertha Ayrton est renommée pour les travaux scientifiques sur l'arc électrique et la dynamique des vagues.`,
+   morphBio:`Recherche appliquée et distinctions scientifiques, notamment la Hughes Medal.`},
+
+  {id:25, cat:'Savant', name:`Sadi Carnot`,years:`1796–1832`,year:1824,img:`proto/carnot.jpg`,
+   short:`Fondateur de la thermodynamique, nous devons à Carnot le cycle de Carnot qui définit le rendement maximal théorique d’une machine thermique. Ce travail a profondément influencé le développement de la physique moderne et de l’ingénierie énergétique.`,
+   bio:`Cycle de Carnot ; rendements des machines thermiques.`,
+   morphName:`Emmy Noether`, morphYears:`1882–1935`, morphImg:`proto/emmynoether.jpg`,
+   morphShort:`Mathématicienne allemande spécialiste d'algèbre abstraite et de physique théorique, Emmy Noether avec le théorème de Noether explique le lien fondamental entre la symétrie et les lois de conservation qui est considéré aussi important que la théorie de la relativité.`,
+   morphBio:`Elle a révolutionné les théories des anneaux, des corps et des algèbres.`},
+
+  {id:26, cat:'Savant', name:`Charles Darwin`,years:`1809–1882`,year:1859,img:`proto/darwin.jpg`,
+   short:`Naturaliste britannique, nous devons à Darwin la Théorie de l'évolution par sélection naturelle.`,
+   bio:`« L’Origine des espèces » ; observations au cours du Beagle.`,
+   morphName:`Marianne North`, morphYears:`1830-1890`, morphImg:`proto/marianne-north.jpg`,
+   morphShort:`Naturaliste et illustratrice botanique anglaise, Marianne North a voyagé dans le monde entier pour pouvoir documenter la flore tropicale.`,
+   morphBio:`Botaniste et illustratrice, elle a voyagé dans le monde entier pour pouvoir documenter la flore tropicale.`},
+
+  {id:27, cat:'Savant', name:`William Crookes`,years:`1832–1919`,year:1870,img:`proto/crookes.jpg`,
+   short:`Découvreur du thallium, William Crookes est l'inventeur des tubes cathodiques.`,
+   bio:`Travaux pionniers sur les rayonnements cathodiques et la radiométrie.`,
+   morphName:`Irène Joliot-Curie`, morphYears:`1897–1956`, morphImg:`proto/irene-joliot-curie.jpg`,
+   morphShort:`Chimiste, physicienne et femme politique, Irène Joliot-Curie a reçu le prix Nobel pour ses travaux sur les rayons X du polonium en 1935.`,
+   morphBio:`Irène Joliot-Curie a utilisé et contribué à développer les applications des rayons X en médecine, et plus largement à l’avancement de la physique nucléaire par la découverte de la radioactivité artificielle.`},
+
+  {id:28, cat:'Savant', name:`Heinrich Hertz`,years:`1857–1894`,year:1887,img:`proto/hertz.jpg`,
+   short:`Physicien allemand, Hertz est célèbre pour avoir démontré expérimentalement l’existence des ondes électromagnétiques en 1887. L’unité de fréquence, le hertz (Hz), porte son nom en hommage à ses travaux. `,
+   bio:`Vérifie expérimentalement la théorie de Maxwell ; base de la TSF.`,
+   morphName:`Elizabeth Fleischman`, morphYears:`1867-1905`, morphImg:`proto/elisabethfleishman.jpg`,
+   morphShort:`Pionnière de la radiologie médicale, Elizabeth Fleischman a utilisé les rayons X dès 1896.`,
+   morphBio:`Elizabeth Fleischman a été l’une des premières à utiliser la radiographie médicale pour visualiser les structures internes du corps humain, transformant cette découverte fondamentale en un outil concret au service de la santé.`},
+
+  {id:29, cat:'Savant', name:`Max Planck`,years:`1858–1947`,year:1900,img:`proto/planck.jpg`,
+   short:`Physicien allemand, Plank est considéré comme le père de la physique quantique. En 1900, il introduit l’idée révolutionnaire que l’énergie n’est pas émise de manière continue, mais par quanta (paquets discontinus), une hypothèse qui a permis d’expliquer le rayonnement du corps noir.`,
+   bio:`Hypothèse de quantification de l’énergie ; constante de Planck.`,
+   morphName:`Maria Goeppert-Mayer`, morphYears:`1906-1972`, morphImg:`proto/Maria_Goeppert-Mayer.jpg`,
+   morphShort:`Physicienne germano-américaine, Maria Goeppert-Mayer développe le modèle en couches qui lui vaudra plus tard le prix Nobel de physique de 1963 pour les découvertes à propos de la structure en couches du noyau atomique. `,
+   morphBio:`Après Marie Curie qui l'obtient en 1903, elle est la deuxième femme à avoir obtenu le prix Nobel de physique.`},
+
+  {id:30, cat:'Savant', name:`Guglielmo Marconi`,years:`1874–1937`,year:1901,img:`proto/marconi.jpg`,
+   short:`Inventeur et ingénieur italien, Guglielmo Marconi est un des pionniers des télécommunications sans fil. Il est surtout connu pour avoir développé et commercialisé la radio, en s’appuyant sur les travaux théoriques de Heinrich Hertz.`,
+   bio:`Transmission transatlantique ; développement de la radio.`,
+   morphName:`Agnes Meyer Driscoll`, morphYears:`1889-1971`, morphImg:`proto/Agnes_meyer_driscoll.jpg`,
+   morphShort:`Cryptanalyste américaine, pionnière du décryptage des communications radio japonaises, entre les deux guerres mondiales, Agnes Meyer Driscoll a développé des systèmes de transmission radio sécurisés et des méthodes de cryptographie pour la marine américaine.`,
+   morphBio:`Elle a perfectionné les systèmes de transmission radio sécurisés et la cryptographie, rendant les communications plus fiables et sûres. Son travail a étendu l’impact pratique des ondes radio, en permettant des usages militaires et civils avancés longtemps après les premières découvertes de Marconi..`},
+
+  {id:31, cat:'Savant', name:`Albert Einstein`,years:`1879–1955`,year:1915,img:`proto/einstein.jpg`,
+   short:`Un des plus grands physiciens de l’histoire, célèbre pour avoir révolutionné notre compréhension de l’univers. En 1905, Einstein publie quatre articles majeurs, dont celui sur la relativité restreinte (avec la fameuse équation E=mc²) et l’explication de l’effet photoélectrique, qui lui vaudra le prix Nobel de physique en 1921.`,
+   bio:`Effet photoélectrique (Nobel), équivalence masse-énergie, espace-temps courbe.`,
+   morphName:`Mileva Maric`, morphYears:`1875–1948`, morphImg:`proto/milevaMaric.jpg`,
+   morphShort:`Mathématicienne et physicienne, Mileva Maric est également la première épouse d’Einstein. Son apport, souvent méconnu, a joué un rôle crucial dans la rigueur scientifique et l’élaboration des concepts qui ont transformé notre compréhension de l’espace et du temps.`,
+   morphBio:`Première épouse d’Einstein Mileva Maric a collaboré étroitement avec lui lors de ses premières recherches sur la relativité restreinte, contribuant aux calculs et aux idées qui ont fondé cette théorie révolutionnaire. Son apport, souvent méconnu, a joué un rôle crucial dans la rigueur scientifique et l’élaboration des concepts qui ont transformé notre compréhension de l’espace et du temps. `},
+
+  {id:32, cat:'Savant', name:`Max von Laue`,years:`1874–1960`,year:1912,img:`proto/vonlaue.jpg`,
+   short:`Physicien allemand, Max von Laue est lauréat du prix Nobel de physique en 1914 pour sa découverte de la diffraction des rayons X par les cristaux. Ses travaux ont prouvé que les rayons X sont des ondes électromagnétiques et ont ouvert la voie à l’étude de la structure atomique des matériaux, fondant ainsi la cristallographie aux rayons X.`,
+   bio:`Montre la nature ondulatoire des rayons X et la structure cristalline.`,
+   morphName:`Dorothy Hodgkin`, morphYears:`1910–1994`, morphImg:`proto/dorothy-hodgkin.jpg`,
+   morphShort:`Chimiste britannique, Dorothy Crowfoot Hodgkin a utilisé la diffraction des rayons X pour élucider la structure de molécules complexes comme la pénicilline, la vitamine B12 ou encore l’insuline.`,
+   morphBio:`La diffractométrie est une méthode de cristallographie permettant de déterminer la géométrie en trois dimensions de molécules complexes, en particulier de molécules d'origine biologique.`},
+
+  {id:33, cat:'Savant', name:`Otto Hahn`,years:`1879–1968`,year:1938,img:`proto/hahn.jpg`,
+   short:`Chimiste et physicien allemand, Otto Hahn est considéré comme le père de la chimie nucléaire. Il est surtout célèbre pour avoir découvert, avec Fritz Strassmann et Lise Meitner, la fission nucléaire en 1938 : ils ont démontré que l’uranium peut être divisé en éléments plus légers en libérant une énorme quantité d’énergie (Nobel 1944).`,
+   bio:`Expériences sur l’uranium ; identification de produits de fission.`,
+   morphName:`Lise Meitner`, morphYears:`1878–1968`, morphImg:`proto/lise-meitner.jpg`,
+   morphShort:`Physicienne autrichienne naturalisée suédoise, Lise Meitner a fait des analyses théoriques de la fission nucléaire. Elle se consacra entre autres à l'étude des spectres de rayonnements bêta et gamma.`,
+   morphBio:`Lise Meitner mena des recherches pionnières en physique nucléaire. Elle se consacra entre autres à l'étude des spectres de rayonnements bêta et gamma.`},
+
+  {id:34, cat:'Savant', name:`Marie Curie`,years:`1867–1934`,year:1903,img:`proto/marie-curie.jpg`,
+   short:`Physicienne et chimiste polonaise naturalisée française, pionnière dans le domaine de la radioactivité. Elle est la première femme à avoir reçu un prix Nobel (physique en 1903, avec Pierre Curie et Henri Becquerel) et la seule à en avoir obtenu deux dans des disciplines différentes (chimie en 1911). Ses travaux ont permis la découverte du radium et du polonium, ainsi que le développement des applications médicales de la radioactivité, comme la radiothérapie.`,
+   bio:`Découverte du polonium et du radium ; physique et chimie de la radioactivité.`,
+   morphName:`Marie Curie`, morphYears:`1859–1906`, morphImg:`proto/marie-curie.jpg`,
+   morphShort:`Spoiler! Marie Curie est déjà une femme...On cherche encore un scientifique qui pourrait l'égaler! Certains rêveraient bien de lêtre.`,
+   morphBio:`Spoiler! Marie Curie est déjà une femme...On cherche encore un scientifique qui pourrait l'égaler! Certains rêveraient bien de l'être. `},
+
+  {id:35, cat:'Savant', name:`Louis Pasteur`,years:`1822–1895`,year:1864,img:`proto/pasteur.jpg`,
+   short:`Chimiste et microbiologiste français, Pasteur est considéré comme l’un des fondateurs de la microbiologie moderne. Ses travaux ont révolutionné la médecine et la santé publique.`,
+   bio:`Théorie des germes ; vaccins contre la rage et l’anthrax.`,
+   morphName:`Alice Catherine Evans`, morphYears:`1881–1975`, morphImg:`proto/evans.jpg`,
+   morphShort:`Microbiologiste américaine, Alice Catherine Evans a démontré la transmission microbienne dans le lait et a fait des travaux sur la pasteurisation du lait (1918)`,
+   morphBio:`Alice Catherine Evans a étudié les bactéries présentes dans le lait et leur impact sur la santé humaine, mettant en évidence la nécessité de la pasteurisation. (1918)`},
+
+  {id:36, cat:'Savant', name:`Julius Robert Oppenheimer`,years:`1904–1967`,year:1945,img:`proto/oppenheimer.jpg`,
+   short:`Physicien théoricien, Oppenheimer a assuré la direction scientifique du Projet Manhattan.`,
+   bio:`Supervision des recherches nucléaires ; réflexions éthiques postérieures.`,
+   morphName:`Katharine Way`, morphYears:`1902–1995`, morphImg:`proto/Katharine_Way.jpg`,
+   morphShort:`Physicienne américaine, spécialiste des constantes nucléaires, Katharine Way a compilé des données critiques pour le projet Manhattan.`,
+   morphBio:`Physicienne nucléaire, elle est connue pour ses travaux sur le Projet des Données Nucléaires . Elle a par la suite compilé des données critiques pour le projet Manhattan.`},
+
+  {id:37, cat:'Savant', name:`Ernest Rutherford`,years:`1871–1937`,year:1911,img:`proto/rutherford.jpg`,
+   short:`Un des pères de la physique nucléaire, Ernest Rutherford a découvert le noyau atomique.`,
+   bio:`Diffusion alpha, modèle planétaire de l’atome, transmutations.`,
+   morphName:`Chien-Shiung Wu`, morphYears:`1912-1997`, morphImg:`proto/chien-shiung-wu.jpg`,
+   morphShort:`Physiciene, spécialiste en physique nucléaire, Chien-Shiung Wu a travaillé à l'enrichissement de l'uranium pour le projet Manhattan.`,
+   morphBio:`Elle a démontré expérimentalement en 1956 la non-conservation de la parité dans les interactions faibles, proposée sur des bases théoriques quelques mois auparavant par Lee et Yang.`},
+
+  {id:38, cat:'Savant', name:`Wilhelm Conrad Röntgen`,years:`1845–1923`,year:1895,img:`proto/roentgen.jpg`,
+   short:`Physicien allemand, Röntgen est célèbre pour sa découverte des rayons X en 1895, une avancée majeure en physique et en médecine. Il a reçu le prix Nobel en 1901.`,
+   bio:`Imagerie médicale révolutionnée ; premières radiographies.`,
+   morphName:`Mária Telkes`, morphYears:`1900–1995`, morphImg:`proto/maria-telkes.jpg`,
+   morphShort:`Scientifique et inventeuse américano-hongroise, Mária Telkes est pionnière dans le domaine de l’énergie solaire et de l'énergie produite par des organismes vivants.`,
+   morphBio:`Elle a travaillé sur les technologies liées à l'énergie solaire (stockage, habitat), elle était surnomée "The Sun Queen".`},
+
+  {id:39, cat:'Savant', name:`Marcellin Berthelot`,years:`1827–1907`,year:1860,img:`proto/berthelot.jpg`,
+   short:`Chimiste et homme politique français, Berthelot  est une figure majeure de la chimie organique et de la thermochimie au XIXe siècle.`,
+   bio:`Travaux sur les affinités chimiques et la chaleur de réaction.`,
+   morphName:`Elizabeth Fulhame`, morphYears:`1759–1810`, morphImg:`proto/elizabethFulhame.jpg`,
+   morphShort:`Chimiste écossaise, Elizabeth Fulhame a décrit le processus de catalyse et de photo-réduction. Elle décrit le phénomène de catalyse dans "Essay Combustion (1794)", quarante ans avant que Jöns Berzelius ne le nomme en 1835. Il n'existe aucun portrait retrouvé d'Elizabeth Fulhame.`,
+   morphBio:`Elle décrit le phénomène de catalyse Essay Combustion (1794) quarante ans avant que Jöns Berzelius le nomme en 1835. `},
+
+  {id:40, cat:'Savant', name:`Enrico Fermi`,years:`1901–1954`,year:1942,img:`proto/fermi.jpg`,
+   short:`Physicien italien naturalisé américain, fermi est considéré comme l’un des plus grands scientifiques du XXe siècle. Nous lui devons entre autres le premier réacteur nucléaire.`,
+   bio:`Réalisations majeures en neutronique, statistiques et accélérateurs.`,
+   morphName:`Darleane Hoffman`, morphYears:`1926-2025`, morphImg:`proto/Darleane-C-Hoffman.jpg`,
+   morphShort:`Chimiste américaine, spécialiste de la chimie nucléaire, Darleane Hoffman a co-découvert l’élément 106 (seaborgium).`,
+   morphBio:`Elle a étudié les propriétés chimiques et nucléaires des éléments transuranium et a confirmé l'existence du séaborgium.`},
+
+  {id:41, cat:'Savant', name:`Félix Wankel`,years:`1902–1988`,year:1957,img:`proto/wankel.jpg`,
+   short:`Ingénieur mécanique allemand, Wankel est célèbre pour avoir inventé le moteur rotatif Wankel (ou moteur à piston rotatif). Contrairement aux moteurs à pistons traditionnels, son moteur utilise un rotor triangulaire tournant dans une chambre en forme d’épitrochoïde, ce qui permet une conception plus compacte, légère et sans vibrationsInventeur du moteur rotatif Wankel.`,
+   bio:`Architecture compacte et fluide ; applications automobiles et aéronautiques.`,
+   morphName:`Ira Rischowski`, morphYears:`1899-1989`, morphImg:`proto/ira-rischowski.jpg`,
+   morphShort:`Ingénieure mécanicienne, résistante durant la seconde guerre mondiale, Ira Rischowski a contribué à l’ingénierie industrielle en Allemagne. Ira a écrit un rapport sur l'égalité de rémunération entre les femmes en ingénierie, qui concluait qu'il n'y avait pas de justification pour que les femmes touchent moins en terme de salaire.`,
+   morphBio:`A écrit un rapport sur l'égalité de rémunération entre les femmes en ingénierie, qui concluait qu'il n'y avait pas de justification pour que les femmes touchent moins en terme de salaire.`},
+
+  {id:42, cat:'Savant', name:`Ivan Petrovitch Pavlov`,years:`1849–1936`,year:1904,img:`proto/pavlov.jpg`,
+   short:`Physiologiste russe, Pavlov a été le lauréat du prix Nobel de médecine en 1904 pour ses travaux sur la digestion. Cependant, il est surtout célèbre pour ses expériences sur le conditionnement classique (ou réflexe conditionné), une découverte fondamentale en psychologie et en neurosciences.`,
+   bio:`Expériences sur la digestion et le conditionnement.`,
+   morphName:`Brenda Milner`, morphYears:`1918–...`, morphImg:`proto/brendaMilner.jpg`,
+   morphShort:`Pionnière des neurosciences cognitives, Brenda Milner a fait des recherches sur le rôle du lobe temporal du cerveau dans les mécanismes de la mémoire épisodique, à partir d'un patient amnésique.`,
+   morphBio:`Elle a fait des travaux dans l'équipe de recherches de Wilder Penfield, sur le rôle du lobe temporal du cerveau dans les mécanismes de la mémoire épisodique, à partir d'un patient amnésique.`}, ];
+
+items.sort((a,b) => a.year - b.year);
+
+// ---- VARIABLES ----
+let scene, camera, renderer, characters = [], raycaster, mouse, clock, autoRotate = false;
+let infoPanel = null, selectedCharacter = null;
+
+// ---- INIT ----
+async function init() {
+    clock = new THREE.Clock();
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0c10);
+
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.6, 5);
+
+    renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.shadowMap.enabled = true;
+    renderer.xr.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    createFloor();
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(10,10,5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040, 0.8));
+
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    window.addEventListener('resize', onWindowResize);
+    renderer.domElement.addEventListener('click', onMouseClick);
+
+    createInfoPanel();
+    await createCharacters();
+
+    document.getElementById('loading').style.display='none';
+    animate();
+}
+
+// ---- TEXTURE LOADER ----
+async function loadCharacterImage(character) {
+    return new Promise(resolve => {
+        const loader = new THREE.TextureLoader();
+        loader.load(character.img,
+            texture => { texture.needsUpdate = true; resolve(texture); },
+            undefined,
+            () => resolve(createFallbackTexture(character))
+        );
+    });
+}
+
+// ---- CHARACTER MODELS ----
+async function createCharacters() {
+    const radius = 15;
+    for(let i=0;i<items.length;i++){
+        const char = items[i];
+        const angle = (i/items.length)*Math.PI*2;
+        const x = Math.cos(angle)*radius;
+        const z = Math.sin(angle)*radius;
+
+        const group = new THREE.Group();
+        group.position.set(x,0,z);
+        group.userData = {character:char, originalY:0, hovered:false};
+
+        // Pedestal
+        const pedestalHeight = char.gender==='F'?1.5:1.2;
+        const color = char.cat==='Ingénieur'?0xff6b35:(char.gender==='F'?0x9333ea:0x3b82f6);
+        const pedestal = new THREE.Mesh(
+            new THREE.CylinderGeometry(1.2,1.4,pedestalHeight),
+            new THREE.MeshStandardMaterial({color: color})
+        );
+        pedestal.position.y = pedestalHeight/2;
+        group.add(pedestal);
+
+        // Portrait
+        const texture = await loadCharacterImage(char);
+        const portrait = new THREE.Mesh(
+            new THREE.PlaneGeometry(2.5,3.5),
+            new THREE.MeshBasicMaterial({map:texture, transparent:true})
+        );
+        portrait.position.y = pedestalHeight+2.8;
+        group.add(portrait);
+
+        // Halo féminin
+        if(char.gender==='F'){
+            const halo = new THREE.Mesh(
+                new THREE.RingGeometry(1.5,1.7,32),
+                new THREE.MeshBasicMaterial({color:0xff69b4, side:THREE.DoubleSide, transparent:true, opacity:0.6})
+            );
+            halo.rotation.x = -Math.PI/2;
+            halo.position.y = pedestalHeight+4.5;
+            group.add(halo);
+        }
+
+        scene.add(group);
+        characters.push(group);
+    }
+}
+
+// ---- FALLBACK ----
+function createFallbackTexture(character){
+    const canvas = document.createElement('canvas');
+    canvas.width=400; canvas.height=560;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = character.cat==='Ingénieur'?'#ff8c42':(character.gender==='F'?'#a855f7':'#4a90e2');
+    ctx.fillRect(0,0,400,560);
+    ctx.fillStyle='#fff'; ctx.font='bold 24px Arial'; ctx.textAlign='center';
+    ctx.fillText(character.name,200,500);
+    return new THREE.CanvasTexture(canvas);
+}
+
+// ---- FLOOR ----
+function createFloor(){
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.8, metalness:0.2}));
+    floor.rotation.x=-Math.PI/2;
+    floor.receiveShadow=true;
+    floor.userData.isFloor=true;
+    scene.add(floor);
+}
+
+// ---- INFO PANEL ----
+function createInfoPanel(){
+    const canvas = document.createElement('canvas');
+    canvas.width=500; canvas.height=600;
+    infoPanel = new THREE.Mesh(
+        new THREE.PlaneGeometry(5,6),
+        new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas), transparent:true, opacity:0.95})
+    );
+    infoPanel.position.set(-10,5,0);
+    infoPanel.visible=false;
+    scene.add(infoPanel);
+}
+
+function updateInfoPanel(char){
+    if(!infoPanel) return;
+    const canvas = infoPanel.material.map.image;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,500,600);
+    ctx.fillStyle='rgba(15,25,45,0.98)';
+    ctx.fillRect(0,0,500,600);
+    ctx.fillStyle='#fff'; ctx.font='bold 28px Arial'; ctx.textAlign='center';
+    ctx.fillText(char.name,250,60);
+    ctx.font='20px Arial'; ctx.fillStyle='#ddd';
+    ctx.fillText(char.years,250,90);
+    infoPanel.material.map.needsUpdate=true;
+    infoPanel.visible=true;
+}
+
+// ---- INTERACTIONS ----
+function onMouseClick(event){
+    mouse.x = (event.clientX/window.innerWidth)*2-1;
+    mouse.y = -(event.clientY/window.innerHeight)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    const intersects = raycaster.intersectObjects(characters,true);
+    if(intersects.length>0){
+        let group = intersects[0].object.parent;
+        while(group && !group.userData.character) group=group.parent;
+        if(group && group.userData.character){
+            selectedCharacter=group.userData.character;
+            updateInfoPanel(selectedCharacter);
+        }
+    }
+}
+
+// ---- ANIMATION ----
+function animate(){ renderer.setAnimationLoop(render); }
+function render(){
+    const time = Date.now()*0.001;
+    if(autoRotate){
+        camera.position.x=Math.cos(time*0.1)*12;
+        camera.position.z=Math.sin(time*0.1)*12;
+        camera.lookAt(0,2,0);
+    }
+    characters.forEach(c=>{
+        c.rotation.y+=0.003;
+        c.position.y = c.userData.originalY + (c.userData.hovered?0.5:Math.sin(time)*0.1);
+    });
+    renderer.render(scene,camera);
+}
+
+function onWindowResize(){
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+}
+
+// ---- CONTROLS ----
+function resetView(){ camera.position.set(0,1.6,5); if(infoPanel) infoPanel.visible=false; }
+function toggleAutoRotate(){ autoRotate=!autoRotate; }
+function randomSelection(){ if(characters.length>0){ const char = characters[Math.floor(Math.random()*characters.length)]; selectedCharacter=char.userData.character; updateInfoPanel(selectedCharacter); } }
+
+window.resetView = resetView;
+window.toggleAutoRotate = toggleAutoRotate;
+window.randomSelection = randomSelection;
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
