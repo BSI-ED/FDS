@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresque Chronologique VR - Quest 2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #000; font-family: Arial, sans-serif; overflow: hidden; color: white; }
+        #info { position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; max-width: 300px; }
+        #enterVR { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: linear-gradient(145deg, #ff6b35, #f7931e); color: white; border: none; padding: 15px 30px; border-radius: 25px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4); transition: all 0.3s ease; }
+        #enterVR:hover { transform: translateX(-50%) scale(1.05); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6); }
+        #controls { position: absolute; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.85); padding: 15px; border-radius: 10px; }
+        .control-btn { background: #333; color: white; border: none; padding: 8px 12px; margin: 2px; border-radius: 5px; cursor: pointer; }
+        .control-btn:hover { background: #555; }
+        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999; text-align: center; }
+        .progress-bar { width: 200px; height: 4px; background: #333; border-radius: 2px; margin: 10px auto; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff6b35, #f7931e); width: 0%; transition: width 0.3s; }
+        #vrStatus { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(0,0,0,0.9); padding: 10px 20px; border-radius: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="loading"><h2>Chargement VR...</h2><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><p id="loadingText">Initialisation...</p></div>
+    <div id="vrStatus"><p id="statusText"></p></div>
+    <div id="info"><h3>Fresque Chronologique VR</h3><p><strong>Clic:</strong> Info personnage</p><p><strong>Recto:</strong> Homme / <strong>Verso:</strong> Femme</p></div>
+    <div id="controls"><button class="control-btn" onclick="resetView()">Reset</button><button class="control-btn" onclick="toggleAutoRotate()">Auto</button><button class="control-btn" onclick="randomSelection()">Random</button></div>
+    <button id="enterVR">Entrer en VR</button>
+    <script>
+
+        // === DONNÉES DES PERSONNAGES (AVEC VRAIES IMAGES) ===
+  const items = [
+            {id:1, cat:'Ingénieur', name:`Léonard de Vinci`,years:`1452–1519`,year:1500,img:`proto/leonardo.jpg`,
+             short:`Polymathe de la Renaissance : peintre, ingénieur, inventeur.`,
+             bio:`Ses carnets mêlent études d'anatomie, d'ingénierie, d'hydraulique et d'optique. Œuvres majeures : la Joconde, La Cène. Esquisses d'hélicoptère et de chars.`},
+            {id:2, cat:'Ingénieur', name:`Sébastien Le Prestre de Vauban`,years:`1633–1707`,year:1670,img:`proto/Vauban.jpg`,
+             short:`Maréchal et maître des fortifications sous Louis XIV.`,
+             bio:`Refonda l'art du siège et des forteresses en Europe ; proposa aussi des réformes fiscales dans ses mémoires.`},
+            {id:3, cat:'Ingénieur', name:`Joseph et Étienne Montgolfier`,years:`1740–1810 & 1745–1799`,year:1783,img:`proto/montgolfier.jpg`,
+             short:`Cofondateurs de l'aérostation à air chaud.`,
+             bio:`En 1783, lancement des premiers ballons à air chaud habités ; débuts de l'ère des vols humains.`},
+            {id:4, cat:'Ingénieur', name:`Claude Chappe`,years:`1763–1805`,year:1794,img:`proto/chappe.jpg`,
+             short:`Inventeur du télégraphe optique (sémaphore).`,
+             bio:`Un réseau de tours sémaphores transmit rapidement des dépêches d'État avant l'ère électrique.`},
+            {id:5, cat:'Ingénieur', name:`Charles Babbage`,years:`1792–1871`,year:1837,img:`proto/Babbage.jpg`,
+             short:`Concepteur de la machine analytique (proto‑ordinateur).`,
+             bio:`Imagina une machine programmable à cartes, avec mémoire et unité de calcul, préfigurant l'ordinateur.`},
+            {id:6, cat:'Ingénieur', name:`Gustave Eiffel`,years:`1832–1923`,year:1889,img:`proto/Eiffel.jpg`,
+             short:`Ingénieur des structures métalliques, à l'origine de la tour Eiffel et la Statue de la Liberté.`,
+             bio:`La Tour Eiffel et le viaduc de Garabit ; travaux en aérodynamique et résistance des matériaux.`},
+            {id:7, cat:'Ingénieur', name:`Clément Ader`,years:`1841–1925`,year:1890,img:`proto/Ader.jpg`,
+             short:`Pionnier français de l'aviation (Éole).`,
+             bio:`Appareils expérimentaux et travaux d'aérodynamique avant les vols contrôlés.`},
+            {id:8, cat:'Ingénieur', name:`Thomas Edison`,years:`1847–1931`,year:1880,img:`proto/Edison.jpg`,
+             short:`Inventeur prolifique (lampe, phonographe, cinéma).`,
+             bio:`Menlo Park : R&D industrielle, plus d'un millier de brevets.`},
+            {id:9, cat:'Ingénieur', name:`George Eastman`,years:`1854–1932`,year:1900,img:`proto/Eastman.jpg`,
+             short:`Fondateur de Kodak ; popularise la photographie.`,
+             bio:`Films souples et appareils abordables ; démocratisation de la photo.`},
+            {id:10, cat:'Ingénieur', name:`Henry Ford`,years:`1863–1947`,year:1913,img:`proto/ford.jpg`,
+             short:`Production de masse automobile.`,
+             bio:`Chaîne de montage, Ford T ; transformation industrielle et sociale.`},
+            
+            // Savants
+            {id:20, cat:'Savant', name:`Galileo Galilei`,years:`1564–1642`,year:1610,img:`proto/galilee.jpg`,
+             short:`Fondateur de la physique moderne et de l'astronomie expérimentale.`,
+             bio:`Observations télescopiques (lunes de Jupiter), méthode expérimentale, défense de l'héliocentrisme.`},
+            {id:21, cat:'Savant', name:`Isaac Newton`,years:`1642–1727`,year:1687,img:`proto/newton.jpg`,
+             short:`Lois du mouvement et de la gravitation universelle.`,
+             bio:`Principia Mathematica ; optique et calcul infinitésimal.`},
+            {id:22, cat:'Savant', name:`William Herschel`,years:`1738–1822`,year:1781,img:`proto/william-herschel.jpg`,
+             short:`Découvreur d'Uranus ; pionnier de l'astronomie infrarouge.`,
+             bio:`Cartographie de la Voie lactée ; découverte du rayonnement infrarouge.`},
+            {id:23, cat:'Savant', name:`Blaise Pascal`,years:`1623–1662`,year:1654,img:`proto/pascal.jpg`,
+             short:`Mathématicien, physicien et philosophe.`,
+             bio:`Presse hydraulique, machine à calculer (Pascaline), probabilités.`},
+            {id:24, cat:'Savant', name:`Georg Simon Ohm`,years:`1789–1854`,year:1827,img:`proto/ohm.jpg`,
+             short:`Physicien, il formule la loi d'Ohm sur la résistance électrique`,
+             bio:`Relation U=RI, fondement de l'électrocinétique.`},
+            {id:25, cat:'Savant', name:`Sadi Carnot`,years:`1796–1832`,year:1824,img:`proto/carnot.jpg`,
+             short:`Fondateur de la thermodynamique.`,
+             bio:`Cycle de Carnot ; rendements des machines thermiques.`},
+            {id:26, cat:'Savant', name:`Charles Darwin`,years:`1809–1882`,year:1859,img:`proto/darwin.jpg`,
+             short:`Théorie de l'évolution par sélection naturelle.`,
+             bio:`« L'Origine des espèces » ; observations au cours du Beagle.`},
+            {id:27, cat:'Savant', name:`Marie Curie`,years:`1867–1934`,year:1903,img:`proto/marie-curie.jpg`,
+             short:`Radioactivité ; deux prix Nobel.`,
+             bio:`Découverte du polonium et du radium ; physique et chimie de la radioactivité.`},
+            {id:28, cat:'Savant', name:`Albert Einstein`,years:`1879–1955`,year:1915,img:`proto/einstein.jpg`,
+             short:`Relativité restreinte et générale.`,
+             bio:`Effet photoélectrique (Nobel), équivalence masse-énergie, espace-temps courbe.`},
+            {id:29, cat:'Savant', name:`Max Planck`,years:`1858–1947`,year:1900,img:`proto/planck.jpg`,
+             short:`Fondateur de la mécanique quantique.`,
+             bio:`Hypothèse de quantification de l'énergie ; constante de Planck.`}
+        ];
+
+
+        items.sort((a,b)=>a.year-b.year);
+        let scene,camera,renderer,characters=[],raycaster,mouse,isVRActive=false,autoRotate=false,xrSession=null,infoPanel=null,selectedCharacter=null,controllers=[],teleportMarker=null,dolly=null,textureCache=new Map();
+        
+        async function init(){try{updateProgress(10,"Config");scene=new THREE.Scene();scene.background=new THREE.Color(0x0b0c10);scene.fog=new THREE.Fog(0x0b0c10,30,50);camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);camera.position.set(0,1.6,8);renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(window.innerWidth,window.innerHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.xr.enabled=true;document.body.appendChild(renderer.domElement);updateProgress(30,"VR");setupVR();updateProgress(40,"Sol");createFloor();updateProgress(50,"Lumieres");createLights();updateProgress(70,"Personnages");createCharacters();updateProgress(80,"Teleport");createTeleportMarker();updateProgress(90,"UI");raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();renderer.domElement.addEventListener('click',onMouseClick);renderer.domElement.addEventListener('mousemove',onMouseMove);window.addEventListener('resize',onWindowResize);createInfoPanel();updateProgress(100,"Pret!");animate();setTimeout(()=>{document.getElementById('loading').style.display='none';},1000);}catch(e){console.error(e);}}
+        
+        function updateProgress(p,t){const f=document.getElementById('progressFill');const l=document.getElementById('loadingText');if(f)f.style.width=p+'%';if(l)l.textContent=t;}
+        function setupVR(){const b=document.getElementById('enterVR');if('xr'in navigator){navigator.xr.isSessionSupported('immersive-vr').then((s)=>{b.onclick=s?toggleVR:()=>showStatus('Desktop','info');}).catch(()=>{b.onclick=()=>showStatus('Desktop','info');});}else{b.onclick=()=>showStatus('Desktop','info');}}
+        async function toggleVR(){if(!isVRActive){try{const s=await navigator.xr.requestSession('immersive-vr',{optionalFeatures:['local-floor']});renderer.xr.setSession(s);xrSession=s;isVRActive=true;document.getElementById('enterVR').textContent='Quitter VR';showStatus('VR active','success');const c1=renderer.xr.getController(0);const c2=renderer.xr.getController(1);c1.addEventListener('selectstart',onSelectStart);c2.addEventListener('selectstart',onSelectStart);c1.addEventListener('selectend',onSelectEnd);c2.addEventListener('selectend',onSelectEnd);c1.addEventListener('squeezestart',onSqueezeStart);c2.addEventListener('squeezestart',onSqueezeStart);scene.add(c1,c2);controllers=[c1,c2];const rg=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,-5)]);c1.add(new THREE.Line(rg,new THREE.LineBasicMaterial({color:0xff6b35})));c2.add(new THREE.Line(rg,new THREE.LineBasicMaterial({color:0x9333ea})));dolly=new THREE.Group();dolly.add(camera);scene.add(dolly);s.addEventListener('end',()=>{isVRActive=false;document.getElementById('enterVR').textContent='Entrer en VR';});}catch(e){showStatus('Erreur: '+e.message,'error');}}else{if(xrSession)xrSession.end();}}
+        function showStatus(m,t='info'){const d=document.getElementById('vrStatus');const s=document.getElementById('statusText');if(s)s.textContent=m;if(d){d.style.display='block';d.style.color=t==='success'?'#4ade80':t==='error'?'#f87171':'#ffd700';setTimeout(()=>{d.style.display='none';},3000);}}
+        function createFloor(){const f=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x1a1a2e,roughness:0.8}));f.rotation.x=-Math.PI/2;f.receiveShadow=true;f.userData.isFloor=true;scene.add(f);scene.add(new THREE.GridHelper(100,50,0x666666,0x333333));}
+        function createLights(){scene.add(new THREE.AmbientLight(0x404040,1));const d=new THREE.DirectionalLight(0xffffff,1.5);d.position.set(10,15,5);d.castShadow=true;scene.add(d);const s1=new THREE.SpotLight(0xff6b35,0.8,50,Math.PI/4);s1.position.set(-20,10,0);scene.add(s1);const s2=new THREE.SpotLight(0x9333ea,0.8,50,Math.PI/4);s2.position.set(20,10,0);scene.add(s2);}
+        function createCharacters(){const r=15;for(let i=0;i<items.length;i++){const c=items[i];const a=(i/items.length)*Math.PI*2;createCharacterModel(c,Math.cos(a)*r,0,Math.sin(a)*r,i,a);}}
+        function createCharacterModel(c,x,y,z,i,a){const g=new THREE.Group();g.position.set(x,y,z);g.userData={character:c,index:i,originalY:y,hovered:false};const h=1.2;const p=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.4,h,32),new THREE.MeshStandardMaterial({color:c.cat==='Ingenieur'?0xff6b35:0x3b82f6,metalness:0.5,roughness:0.3}));p.position.y=h/2;p.castShadow=true;g.add(p);const tf=getTex(c,false);const tb=getTex(c,true);const pf=new THREE.Mesh(new THREE.PlaneGeometry(2.5,3.5),new THREE.MeshLambertMaterial({map:tf}));pf.position.set(0,h+2.8,0.01);g.add(pf);const pb=new THREE.Mesh(new THREE.PlaneGeometry(2.5,3.5),new THREE.MeshLambertMaterial({map:tb}));pb.position.set(0,h+2.8,-0.01);pb.rotation.y=Math.PI;g.add(pb);const l=new THREE.Mesh(new THREE.PlaneGeometry(4.5,1.4),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(createLabel(c)),transparent:true}));l.position.y=-0.5;g.add(l);const gl=new THREE.Mesh(new THREE.RingGeometry(1.8,2.2,32),new THREE.MeshBasicMaterial({color:c.cat==='Ingenieur'?0xff6b35:0x3b82f6,transparent:true,opacity:0.4,side:THREE.DoubleSide}));gl.position.y=0.1;gl.rotation.x=-Math.PI/2;g.add(gl);g.rotation.y=a;scene.add(g);characters.push(g);}
+        function getTex(c,m){const k=`${c.id}-${m}`;if(!textureCache.has(k)){textureCache.set(k,createTex(c,m));}return textureCache.get(k);}
+        function createLabel(c){const v=document.createElement('canvas');v.width=512;v.height=160;const x=v.getContext('2d');x.fillStyle='rgba(0,0,0,0.9)';x.fillRect(0,0,512,160);x.strokeStyle=c.cat==='Ingenieur'?'#ff6b35':'#3b82f6';x.lineWidth=4;x.strokeRect(2,2,508,156);x.fillStyle='#fff';x.font='Bold 28px Arial';x.textAlign='center';x.fillText(c.name,256,45);x.font='18px Arial';x.fillStyle='#ccc';x.fillText(c.years,256,75);x.fillStyle=c.cat==='Ingenieur'?'#ff6b35':'#3b82f6';x.font='Bold 24px Arial';x.fillText(c.cat,256,115);return v;}
+        function createTex(c,m){const k=`${c.id}-${m}`;if(!textureCache.has(k)){if(c.imageUrl&&!m){const l=new THREE.TextureLoader();const t=l.load(c.imageUrl,undefined,undefined,()=>{textureCache.set(k,createFallbackTexture(c,m));});textureCache.set(k,t);}else{textureCache.set(k,createFallbackTexture(c,m));}}return textureCache.get(k);}
+        function createFallbackTexture(c,m){const v=document.createElement('canvas');v.width=512;v.height=712;const x=v.getContext('2d');const n=m&&c.morphName?c.morphName:c.name;const y=m&&c.morphYears?c.morphYears:c.years;const f=m&&c.morphName;const g=x.createLinearGradient(0,0,0,712);if(f){g.addColorStop(0,'#c084fc');g.addColorStop(0.5,'#a855f7');g.addColorStop(1,'#7c3aed');}else if(c.cat==='Ingenieur'){g.addColorStop(0,'#ff8c42');g.addColorStop(0.5,'#ff6b35');g.addColorStop(1,'#f7931e');}else{g.addColorStop(0,'#60a5fa');g.addColorStop(0.5,'#3b82f6');g.addColorStop(1,'#1e40af');}x.fillStyle=g;x.fillRect(0,0,512,712);x.strokeStyle='#fff';x.lineWidth=16;x.strokeRect(8,8,496,696);x.fillStyle='rgba(255,255,255,0.95)';x.beginPath();x.arc(256,200,80,0,Math.PI*2);x.fill();x.beginPath();x.moveTo(256,280);x.lineTo(180,480);x.lineTo(200,500);x.lineTo(256,340);x.lineTo(312,500);x.lineTo(332,480);x.closePath();x.fill();x.beginPath();x.moveTo(256,310);x.lineTo(150,400);x.lineTo(160,420);x.lineTo(256,330);x.closePath();x.fill();x.beginPath();x.moveTo(256,310);x.lineTo(362,400);x.lineTo(352,420);x.lineTo(256,330);x.closePath();x.fill();if(f){x.fillStyle='#ff1493';x.beginPath();x.arc(400,120,45,0,Math.PI*2);x.fill();x.strokeStyle='white';x.lineWidth=10;x.stroke();x.fillStyle='white';x.font='Bold 70px Arial';x.textAlign='center';x.fillText('\u2640',400,120);}x.fillStyle='rgba(0,0,0,0.85)';x.fillRect(40,600,432,80);x.strokeStyle='#fff';x.lineWidth=3;x.strokeRect(40,600,432,80);x.fillStyle='#fff';x.font='Bold 22px Arial';x.textAlign='center';x.fillText(n,256,635);x.font='18px Arial';x.fillStyle='#ddd';x.fillText(y,256,665);return new THREE.CanvasTexture(v);}
+        function createTeleportMarker(){teleportMarker=new THREE.Mesh(new THREE.RingGeometry(0.3,0.5,32),new THREE.MeshBasicMaterial({color:0x00ff00,side:THREE.DoubleSide,transparent:true,opacity:0.8}));teleportMarker.rotation.x=-Math.PI/2;teleportMarker.visible=false;scene.add(teleportMarker);}
+        function createInfoPanel(){const c=document.createElement('canvas');c.width=500;c.height=600;infoPanel=new THREE.Mesh(new THREE.PlaneGeometry(5,6),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,opacity:0.95}));infoPanel.position.set(-10,5,0);infoPanel.visible=false;scene.add(infoPanel);}
+        function updateInfoPanel(c,m=false){if(!infoPanel)return;const cv=infoPanel.material.map.image;const x=cv.getContext('2d');const n=m&&c.morphName?c.morphName:c.name;const y=m&&c.morphYears?c.morphYears:c.years;const s=m&&c.morphShort?c.morphShort:c.short;const b=m&&c.morphBio?c.morphBio:c.bio;const f=m&&c.morphName;x.clearRect(0,0,500,600);x.fillStyle='rgba(15,25,45,0.98)';x.fillRect(0,0,500,600);x.strokeStyle=f?'#9333ea':(c.cat==='Ingenieur'?'#ff6b35':'#3b82f6');x.lineWidth=8;x.strokeRect(10,10,480,580);x.fillStyle='#fff';x.font='bold 26px Arial';x.textAlign='center';x.fillText(n,250,60);if(f){x.fillStyle='#ff69b4';x.font='bold 36px Arial';x.fillText('\u2640',60,60);}x.font='20px Arial';x.fillStyle='#ddd';x.fillText(y,250,90);x.font='16px Arial';x.textAlign='left';wrapText(x,s||'',30,130,440,22);x.font='14px Arial';x.fillStyle='#ccc';wrapText(x,b||'',30,220,440,20);infoPanel.material.map.needsUpdate=true;infoPanel.visible=true;positionPanel();}
+        function positionPanel(){if(!infoPanel||!selectedCharacter||!infoPanel.visible)return;const cg=characters.find(c=>c.userData.character===selectedCharacter);if(!cg)return;const cp=cg.position.clone();const cam=isVRActive&&renderer.xr.isPresenting?renderer.xr.getCamera(camera).position:camera.position;const d=new THREE.Vector3().subVectors(cam,cp).normalize();const r=new THREE.Vector3(-d.z,0,d.x);infoPanel.position.copy(cp);infoPanel.position.y=3;infoPanel.position.add(r.multiplyScalar(5));infoPanel.lookAt(cam);}
+        function wrapText(x,t,px,py,mw,lh){if(!t)return;const w=t.split(' ');let l='';let cy=py;for(let n=0;n<w.length;n++){const tl=l+w[n]+' ';if(x.measureText(tl).width>mw&&n>0){x.fillText(l,px,cy);l=w[n]+' ';cy+=lh;}else{l=tl;}}x.fillText(l,px,cy);}
+        function onSelectStart(e){const c=e.target;c.userData.isSelecting=true;checkInt(c,true);}
+        function onSelectEnd(e){e.target.userData.isSelecting=false;if(teleportMarker&&teleportMarker.visible&&dolly){dolly.position.set(teleportMarker.position.x,0,teleportMarker.position.z);showStatus('Teleporte','success');}if(teleportMarker)teleportMarker.visible=false;}
+        function onSqueezeStart(){if(infoPanel&&infoPanel.visible){infoPanel.visible=false;selectedCharacter=null;showStatus('Ferme','info');}}
+        function checkInt(c,sel){const m=new THREE.Matrix4();m.identity().extractRotation(c.matrixWorld);raycaster.ray.origin.setFromMatrixPosition(c.matrixWorld);raycaster.ray.direction.set(0,0,-1).applyMatrix4(m);const i=raycaster.intersectObjects(characters,true);if(i.length>0&&sel){let g=i[0].object.parent;while(g&&!g.userData.character)g=g.parent;if(g&&g.userData.character){selectedCharacter=g.userData.character;updateInfoPanel(selectedCharacter,false);showStatus(selectedCharacter.name,'success');return;}}const f=raycaster.intersectObjects(scene.children.filter(o=>o.userData.isFloor));if(f.length>0&&sel&&teleportMarker){teleportMarker.position.copy(f[0].point);teleportMarker.position.y=0.05;teleportMarker.visible=true;}}
+        function onMouseClick(e){if(isVRActive)return;mouse.x=(e.clientX/window.innerWidth)*2-1;mouse.y=-(e.clientY/window.innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);const i=raycaster.intersectObjects(characters,true);if(i.length>0){let g=i[0].object.parent;while(g&&!g.userData.character)g=g.parent;if(g&&g.userData.character){selectedCharacter=g.userData.character;updateInfoPanel(selectedCharacter,false);}}}
+        function onMouseMove(e){if(isVRActive)return;mouse.x=(e.clientX/window.innerWidth)*2-1;mouse.y=-(e.clientY/window.innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);const i=raycaster.intersectObjects(characters,true);characters.forEach(c=>c.userData.hovered=false);if(i.length>0){let g=i[0].object.parent;while(g&&!g.userData.character)g=g.parent;if(g)g.userData.hovered=true;}}
+        function resetView(){if(dolly)dolly.position.set(0,0,0);camera.position.set(0,1.6,8);camera.lookAt(0,2,0);if(infoPanel)infoPanel.visible=false;}
+        function toggleAutoRotate(){autoRotate=!autoRotate;}
+        function randomSelection(){if(characters.length>0){const c=characters[Math.floor(Math.random()*characters.length)];selectedCharacter=c.userData.character;updateInfoPanel(selectedCharacter,false);}}
+        function animate(){renderer.setAnimationLoop(render);}
+        function render(){const t=Date.now()*0.001;if(autoRotate&&!isVRActive){camera.position.x=Math.cos(t*0.1)*12;camera.position.z=Math.sin(t*0.1)*12;camera.lookAt(0,2,0);}if(isVRActive){controllers.forEach(c=>{if(c.userData.isSelecting){checkInt(c,false);}});}characters.forEach((c,i)=>{c.rotation.y+=0.003;if(c.userData.hovered){c.position.y=c.userData.originalY+0.5;c.scale.setScalar(1.1);}else{c.position.y=c.userData.originalY+Math.sin(t+i)*0.1;c.scale.setScalar(1);}});if(infoPanel&&infoPanel.visible){positionPanel();}if(teleportMarker&&teleportMarker.visible){teleportMarker.rotation.z=t*2;teleportMarker.material.opacity=0.5+Math.sin(t*5)*0.3;}renderer.render(scene,camera);}
+        function onWindowResize(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);}
+        window.resetView=resetView;window.toggleAutoRotate=toggleAutoRotate;window.randomSelection=randomSelection;
+        init();
+    </script>
+</body>
+</html>
