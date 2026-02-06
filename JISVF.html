@@ -1,0 +1,2574 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA Seniors - Version Améliorée 2026</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --morning-start: #FF6B6B;
+            --morning-mid: #FFD93D;
+            --morning-end: #6BCF7F;
+            --afternoon-start: #4A90E2;
+            --afternoon-mid: #7CB9E8;
+            --afternoon-end: #B0E0E6;
+            --evening-start: #2C3E50;
+            --evening-mid: #34495E;
+            --evening-end: #1A252F;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --primary: #8B5CF6;
+            --secondary: #EC4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            scroll-behavior: smooth;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            transition: background 1.5s ease;
+        }
+
+        .background.morning {
+            background: linear-gradient(135deg, var(--morning-start) 0%, var(--morning-mid) 50%, var(--morning-end) 100%);
+        }
+
+        .background.afternoon {
+            background: linear-gradient(135deg, var(--afternoon-start) 0%, var(--afternoon-mid) 50%, var(--afternoon-end) 100%);
+        }
+
+        .background.evening {
+            background: linear-gradient(135deg, var(--evening-start) 0%, var(--evening-mid) 50%, var(--evening-end) 100%);
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 15px;
+            padding: 15px;
+            min-height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .alert-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px;
+            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--glass-border);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            border-radius: 16px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-item i {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            overflow: visible;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .main-content {
+                grid-template-columns: 340px 1fr 400px;
+            }
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            overflow-y: auto;
+            animation: fadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 80vh;
+        }
+
+        @media (min-width: 1200px) {
+            .panel {
+                max-height: none;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .device-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(8px);
+        }
+
+        .device-item.active {
+            background: rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.6);
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .device-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .device-name i {
+            font-size: 28px;
+        }
+
+        .device-status {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .temp-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 12px;
+        }
+
+        .temp-value {
+            font-size: 32px;
+            font-weight: 800;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Nouveau style pour le slider de température */
+        .temp-slider {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #4A90E2, #FF6B6B);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .temp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .temp-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .temp-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .temp-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .voice-btn {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            margin: 0 auto;
+            display: block;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4);
+        }
+
+        .voice-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.6);
+        }
+
+        .voice-btn.listening {
+            animation: listening 1.5s infinite;
+        }
+
+        @keyframes listening {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 40px rgba(139, 92, 246, 0.4); }
+            50% { transform: scale(1.15); box-shadow: 0 15px 60px rgba(139, 92, 246, 0.8); }
+        }
+
+        .message-box {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+            font-size: 16px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .pill-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pill-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(8px);
+        }
+
+        .pill-item.low {
+            border-color: rgba(245, 158, 11, 0.6);
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .pill-item.empty {
+            border-color: rgba(239, 68, 68, 0.6);
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .pill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pill-name {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pill-count {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .pill-schedule {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .pill-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pill-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .pill-btn.take {
+            background: rgba(16, 185, 129, 0.8);
+            color: white;
+        }
+
+        .pill-btn.take:hover {
+            background: rgba(16, 185, 129, 1);
+            transform: translateY(-2px);
+        }
+
+        .pill-btn.add {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+        }
+
+        .pill-btn.add:hover {
+            background: rgba(59, 130, 246, 1);
+            transform: translateY(-2px);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .game-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .game-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .game-btn i {
+            font-size: 36px;
+        }
+
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .weather-temp {
+            font-size: 48px;
+            font-weight: 800;
+        }
+
+        .weather-icon {
+            font-size: 64px;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .clock-display {
+            text-align: center;
+            font-size: 56px;
+            font-weight: 900;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .date-display {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* Fenêtre de simulation d'heure draggable */
+        .time-simulator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            z-index: 10000;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            display: none;
+            cursor: move;
+            min-width: 300px;
+        }
+
+        .time-simulator.active {
+            display: block;
+        }
+
+        .time-simulator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: move;
+        }
+
+        .time-simulator-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .time-close-btn {
+            background: rgba(239, 68, 68, 0.8);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .time-close-btn:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: rotate(90deg);
+        }
+
+        .time-slider-container {
+            margin: 20px 0;
+        }
+
+        .time-slider-label {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        #timeSlider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #2C3E50, #4A90E2, #FFD93D, #FF6B6B, #2C3E50);
+            border-radius: 10px;
+            outline: none;
+        }
+
+        #timeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        #timeSlider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Notification de rappel */
+        .reminder-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 158, 11, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 350px;
+            z-index: 10001;
+            animation: slideInRight 0.5s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .reminder-notification.active {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .reminder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .reminder-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .reminder-content {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            color: white;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(239, 68, 68, 0.8);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: rotate(90deg);
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        .modal-btn.success {
+            background: rgba(16, 185, 129, 0.8);
+            color: white;
+        }
+
+        .modal-btn.success:hover {
+            background: rgba(16, 185, 129, 1);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .modal-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .memory-card.flipped {
+            background: rgba(139, 92, 246, 0.5);
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .memory-card.matched {
+            background: rgba(16, 185, 129, 0.5);
+            border-color: rgba(16, 185, 129, 0.8);
+        }
+
+        .word-search-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            margin: 20px 0;
+        }
+
+        .word-search-cell {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: clamp(12px, 2vw, 16px);
+        }
+
+        .word-search-cell:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .word-search-cell.selected {
+            background: rgba(139, 92, 246, 0.5);
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .word-search-cell.found {
+            background: rgba(16, 185, 129, 0.5);
+            border-color: rgba(16, 185, 129, 0.8);
+        }
+
+        .emergency-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+            animation: emergencyPulse 2s infinite;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 12px 48px rgba(239, 68, 68, 0.6); }
+        }
+
+        .emergency-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 48px rgba(239, 68, 68, 0.8);
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .contact-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .contact-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .contact-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .contact-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .contact-relation {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .breathing-container {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            transition: all 4s ease-in-out;
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.5);
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.5), rgba(236, 72, 153, 0.5));
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(1);
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+        }
+
+        .yoga-pose-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .yoga-pose {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .yoga-pose:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .yoga-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .yoga-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .yoga-duration {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .panel {
+                padding: 15px;
+            }
+
+            .panel-title {
+                font-size: 20px;
+            }
+
+            .clock-display {
+                font-size: 40px;
+            }
+
+            .date-display {
+                font-size: 14px;
+            }
+
+            .voice-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 32px;
+            }
+
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .word-search-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+
+            .reminder-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .time-simulator {
+                width: 90%;
+                max-width: 350px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .breathing-circle {
+                width: 150px;
+                height: 150px;
+                font-size: 18px;
+            }
+
+            .yoga-pose-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background" id="background"></div>
+    
+    <div class="container">
+        <div class="alert-banner" id="alertBanner" style="display: none;">
+            <div class="alert-item" id="alertItem">
+                <i class="fas fa-bell"></i>
+                <span id="alertText"></span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-home"></i>
+                    Contrôle Maison
+                </div>
+                <div id="devicesContainer"></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-robot"></i>
+                    Assistant Vocal
+                </div>
+                
+                <button class="voice-btn" id="voiceBtn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <div class="message-box" id="messageBox">
+                    Cliquez sur le micro et parlez...
+                </div>
+
+                <div class="weather-widget">
+                    <div class="weather-main">
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;" id="weatherLocation">Chargement...</div>
+                            <div class="weather-temp" id="weatherTemp">--°</div>
+                            <div style="font-size: 16px; margin-top: 5px;" id="weatherDesc">--</div>
+                        </div>
+                        <div class="weather-icon" id="weatherIcon">☁️</div>
+                    </div>
+                    <div class="weather-details">
+                        <div class="weather-detail">
+                            <i class="fas fa-wind"></i>
+                            <span id="weatherWind">-- km/h</span>
+                        </div>
+                        <div class="weather-detail">
+                            <i class="fas fa-tint"></i>
+                            <span id="weatherHumidity">--%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title" style="border: none; padding: 0;">
+                        <i class="fas fa-gamepad"></i>
+                        Jeux
+                    </div>
+                    <div class="game-grid">
+                        <button class="game-btn" onclick="memoryGame()">
+                            <i class="fas fa-brain"></i>
+                            Mémoire
+                        </button>
+                        <button class="game-btn" onclick="quizGame()">
+                            <i class="fas fa-question-circle"></i>
+                            Quiz
+                        </button>
+                        <button class="game-btn" onclick="wordSearchGame()">
+                            <i class="fas fa-search"></i>
+                            Mots Cachés
+                        </button>
+                        <button class="game-btn" onclick="sudokuGame()">
+                            <i class="fas fa-th"></i>
+                            Sudoku
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title" style="border: none; padding: 0;">
+                        <i class="fas fa-images"></i>
+                        Album Photo
+                    </div>
+                    <button class="game-btn" onclick="openPhotoAlbum()" style="width: 100%;">
+                        <i class="fas fa-camera"></i>
+                        Voir les photos
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title" style="border: none; padding: 0;">
+                        <i class="fas fa-phone"></i>
+                        Contacts
+                    </div>
+                    <button class="game-btn" onclick="openContacts()" style="width: 100%;">
+                        <i class="fas fa-address-book"></i>
+                        Appeler
+                    </button>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title" style="border: none; padding: 0;">
+                        <i class="fas fa-spa"></i>
+                        Bien-être
+                    </div>
+                    <div class="game-grid">
+                        <button class="game-btn" onclick="breathingExercise()">
+                            <i class="fas fa-wind"></i>
+                            Respiration
+                        </button>
+                        <button class="game-btn" onclick="yogaExercise()">
+                            <i class="fas fa-person-praying"></i>
+                            Yoga
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-clock"></i>
+                    Heure & Date
+                </div>
+                
+                <div class="clock-display" id="clockDisplay">00:00:00</div>
+                <div class="date-display" id="dateDisplay">--</div>
+
+                <div style="margin-top: 20px;">
+                    <button class="game-btn" onclick="toggleTimeSimulator()" style="width: 100%;">
+                        <i class="fas fa-sliders-h"></i>
+                        Simuler l'heure
+                    </button>
+                </div>
+
+                <button class="emergency-btn" onclick="emergencyCall()">
+                    <i class="fas fa-phone-volume"></i> APPEL D'URGENCE
+                </button>
+
+                <div style="margin-top: 20px;">
+                    <div class="panel-title" style="border: none; padding: 0;">
+                        <i class="fas fa-pills"></i>
+                        Médicaments
+                    </div>
+                    <div id="pillsContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fenêtre de simulation d'heure draggable -->
+    <div class="time-simulator" id="timeSimulator">
+        <div class="time-simulator-header" id="timeSimulatorHeader">
+            <div class="time-simulator-title">
+                <i class="fas fa-clock"></i> Simuler l'heure
+            </div>
+            <button class="time-close-btn" onclick="toggleTimeSimulator()">×</button>
+        </div>
+        <div class="time-slider-container">
+            <div class="time-slider-label">Déplacer pour changer l'heure</div>
+            <input type="range" id="timeSlider" min="0" max="24" step="0.25" value="12">
+        </div>
+    </div>
+
+    <!-- Notification de rappel -->
+    <div class="reminder-notification" id="reminderNotification">
+        <div class="reminder-header">
+            <div class="reminder-title">
+                <i class="fas fa-bell"></i>
+                Rappel
+            </div>
+            <button class="reminder-close" onclick="closeReminder()">×</button>
+        </div>
+        <div class="reminder-content" id="reminderContent"></div>
+    </div>
+
+    <!-- Modal pour les jeux -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
+        <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            devices: [
+                { id: 'salon_light', name: 'Lumière Salon', type: 'light', status: false, icon: '💡', room: 'salon' },
+                { id: 'chambre_light', name: 'Lumière Chambre', type: 'light', status: false, icon: '💡', room: 'chambre' },
+                { id: 'salon_shutter', name: 'Volets Salon', type: 'shutter', status: true, icon: '🪟', room: 'salon' },
+                { id: 'chambre_shutter', name: 'Volets Chambre', type: 'shutter', status: true, icon: '🪟', room: 'chambre' },
+                { id: 'heating', name: 'Chauffage', type: 'heating', status: true, temp: 20, icon: '🌡️' },
+                { id: 'alarm', name: 'Alarme', type: 'security', status: true, icon: '🔒' }
+            ],
+            pills: [
+                { name: 'Doliprane', count: 15, times: ['08:00', '20:00'] },
+                { name: 'Aspirine', count: 8, times: ['12:00'] },
+                { name: 'Vitamine D', count: 3, times: ['09:00'] }
+            ],
+            listening: false,
+            currentDate: new Date(),
+            dayIndex: 0,
+            time: 12,
+            simulatedMode: false,
+            voices: [],
+            recognition: null,
+            lastReminderTime: Date.now(),
+            reminderInterval: null
+        };
+
+        const reminders = [
+            "N'oubliez pas de prendre vos médicaments",
+            "Pensez à boire de l'eau régulièrement",
+            "Rendez-vous chez le médecin demain à 14h30",
+            "Il est temps de vérifier votre tension artérielle",
+            "Pensez à fermer les volets ce soir",
+            "Vérifiez que toutes les portes sont bien fermées",
+            "Rappel : Arrosage des plantes nécessaire"
+        ];
+
+        async function initVoices() {
+            return new Promise((resolve) => {
+                const loadVoices = () => {
+                    state.voices = speechSynthesis.getVoices();
+                    if (state.voices.length > 0) {
+                        resolve();
+                    }
+                };
+                
+                loadVoices();
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                }
+            });
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            // Recherche d'une voix masculine française
+            const maleVoice = state.voices.find(v => 
+                v.lang.startsWith('fr') && 
+                (v.name.toLowerCase().includes('male') || 
+                 v.name.toLowerCase().includes('homme') ||
+                 v.name.toLowerCase().includes('thomas') ||
+                 v.name.toLowerCase().includes('daniel'))
+            );
+            
+            // Si pas de voix masculine trouvée, prendre n'importe quelle voix française
+            const frenchVoice = maleVoice || state.voices.find(v => v.lang.startsWith('fr'));
+            
+            if (frenchVoice) utterance.voice = frenchVoice;
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 0.8; // Pitch plus bas pour son masculin
+            speechSynthesis.speak(utterance);
+            document.getElementById('messageBox').textContent = text;
+        }
+
+        function initVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.log('Reconnaissance vocale non supportée');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            state.recognition = new SpeechRecognition();
+            state.recognition.lang = 'fr-FR';
+            state.recognition.continuous = false;
+            state.recognition.interimResults = false;
+
+            state.recognition.onstart = () => {
+                state.listening = true;
+                document.getElementById('voiceBtn').classList.add('listening');
+                document.getElementById('messageBox').textContent = 'À l\'écoute...';
+            };
+
+            state.recognition.onresult = (event) => {
+                const command = event.results[0][0].transcript.toLowerCase();
+                console.log('Commande:', command);
+                processCommand(command);
+            };
+
+            state.recognition.onerror = (event) => {
+                console.error('Erreur reconnaissance vocale:', event.error);
+                state.listening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+                speak('Désolé, je n\'ai pas compris');
+            };
+
+            state.recognition.onend = () => {
+                state.listening = false;
+                document.getElementById('voiceBtn').classList.remove('listening');
+            };
+        }
+
+        document.getElementById('voiceBtn').addEventListener('click', () => {
+            if (!state.recognition) {
+                alert('La reconnaissance vocale n\'est pas supportée');
+                return;
+            }
+            
+            if (state.listening) {
+                state.recognition.stop();
+            } else {
+                state.recognition.start();
+            }
+        });
+
+        function processCommand(command) {
+            if (command.includes('lumière') || command.includes('lampe')) {
+                if (command.includes('salon')) {
+                    toggleDevice('salon_light');
+                    const device = state.devices.find(d => d.id === 'salon_light');
+                    speak(device.status ? 'La lumière du salon est allumée' : 'La lumière du salon est éteinte');
+                } else if (command.includes('chambre')) {
+                    toggleDevice('chambre_light');
+                    const device = state.devices.find(d => d.id === 'chambre_light');
+                    speak(device.status ? 'La lumière de la chambre est allumée' : 'La lumière de la chambre est éteinte');
+                } else if (command.includes('tout')) {
+                    const allOff = state.devices.filter(d => d.type === 'light').every(d => !d.status);
+                    state.devices.filter(d => d.type === 'light').forEach(d => d.status = allOff);
+                    renderDevices();
+                    speak(allOff ? 'Toutes les lumières sont allumées' : 'Toutes les lumières sont éteintes');
+                }
+            } else if (command.includes('volet')) {
+                if (command.includes('salon')) {
+                    toggleDevice('salon_shutter');
+                    const device = state.devices.find(d => d.id === 'salon_shutter');
+                    speak(device.status ? 'Volets du salon ouverts' : 'Volets du salon fermés');
+                } else if (command.includes('chambre')) {
+                    toggleDevice('chambre_shutter');
+                    const device = state.devices.find(d => d.id === 'chambre_shutter');
+                    speak(device.status ? 'Volets de la chambre ouverts' : 'Volets de la chambre fermés');
+                }
+            } else if (command.includes('chauffage') || command.includes('température')) {
+                const match = command.match(/(\d+)/);
+                if (match) {
+                    const temp = parseInt(match[1]);
+                    if (temp >= 15 && temp <= 30) {
+                        const heatingDevice = state.devices.find(d => d.id === 'heating');
+                        heatingDevice.temp = temp;
+                        renderDevices();
+                        speak(`Température réglée sur ${temp} degrés`);
+                    }
+                } else {
+                    const heatingDevice = state.devices.find(d => d.id === 'heating');
+                    speak(`La température est actuellement de ${heatingDevice.temp} degrés`);
+                }
+            } else if (command.includes('alarme') || command.includes('sécurité')) {
+                toggleDevice('alarm');
+                const device = state.devices.find(d => d.id === 'alarm');
+                speak(device.status ? 'Alarme activée' : 'Alarme désactivée');
+            } else if (command.includes('météo') || command.includes('temps')) {
+                const temp = document.getElementById('weatherTemp').textContent;
+                const desc = document.getElementById('weatherDesc').textContent;
+                speak(`Il fait ${temp} avec ${desc}`);
+            } else if (command.includes('heure')) {
+                const timeStr = document.getElementById('clockDisplay').textContent;
+                speak(`Il est ${timeStr}`);
+            } else if (command.includes('médicament')) {
+                const pillsInfo = state.pills.map(p => `${p.name}: ${p.count} comprimés`).join(', ');
+                speak(`Voici vos médicaments: ${pillsInfo}`);
+            } else if (command.includes('jeu') || command.includes('jouer')) {
+                if (command.includes('mémoire')) {
+                    memoryGame();
+                } else if (command.includes('quiz')) {
+                    quizGame();
+                } else if (command.includes('mot')) {
+                    wordSearchGame();
+                } else if (command.includes('sudoku')) {
+                    sudokuGame();
+                } else {
+                    speak('Quel jeu voulez-vous ? Mémoire, quiz, mots cachés ou sudoku ?');
+                }
+            } else {
+                speak('Désolé, je n\'ai pas compris. Essayez lumière, volet, chauffage, alarme, météo, heure ou médicaments.');
+            }
+        }
+
+        function toggleDevice(deviceId) {
+            const device = state.devices.find(d => d.id === deviceId);
+            if (device) {
+                device.status = !device.status;
+                renderDevices();
+                
+                // Annonce vocale pour chaque contrôle
+                if (device.type === 'light') {
+                    const room = device.room === 'salon' ? 'du salon' : 'de la chambre';
+                    speak(device.status ? 
+                        `La lumière ${room} est allumée` : 
+                        `La lumière ${room} est éteinte`);
+                } else if (device.type === 'shutter') {
+                    const room = device.room === 'salon' ? 'du salon' : 'de la chambre';
+                    speak(device.status ? 
+                        `Volets ${room} ouverts` : 
+                        `Volets ${room} fermés`);
+                } else if (device.type === 'security') {
+                    speak(device.status ? 
+                        'Alarme activée' : 
+                        'Alarme désactivée');
+                }
+            }
+        }
+
+        function updateTemperature(deviceId, value) {
+            const device = state.devices.find(d => d.id === deviceId);
+            if (device) {
+                device.temp = parseInt(value);
+                renderDevices();
+                
+                // Annonce vocale pour le changement de température
+                if (parseInt(value) % 1 === 0) { // Annoncer seulement aux valeurs entières
+                    speak(`Température réglée sur ${value} degrés`);
+                }
+            }
+        }
+
+        function renderDevices() {
+            const container = document.getElementById('devicesContainer');
+            container.innerHTML = state.devices.map(device => {
+                if (device.type === 'light') {
+                    return `
+                        <div class="device-item ${device.status ? 'active' : ''}" onclick="toggleDevice('${device.id}')">
+                            <div class="device-header">
+                                <div class="device-name">
+                                    <i class="fas fa-lightbulb" style="color: ${device.status ? '#FFD700' : '#cccccc'}"></i>
+                                    ${device.name}
+                                </div>
+                                <div class="device-status">${device.status ? 'ON' : 'OFF'}</div>
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">
+                                ${device.status ? 
+                                    `La lumière ${device.room === 'salon' ? 'du salon' : 'de la chambre'} est allumée` : 
+                                    `La lumière ${device.room === 'salon' ? 'du salon' : 'de la chambre'} est éteinte`}
+                            </div>
+                        </div>
+                    `;
+                } else if (device.type === 'shutter') {
+                    return `
+                        <div class="device-item ${!device.status ? 'active' : ''}" onclick="toggleDevice('${device.id}')">
+                            <div class="device-header">
+                                <div class="device-name">
+                                    <i class="fas fa-window-maximize" style="color: ${device.status ? '#4A90E2' : '#999999'}"></i>
+                                    ${device.name}
+                                </div>
+                                <div class="device-status">${device.status ? 'Ouverts' : 'Fermés'}</div>
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">
+                                Volets ${device.room === 'salon' ? 'du salon' : 'de la chambre'} ${device.status ? 'ouverts' : 'fermés'}
+                            </div>
+                        </div>
+                    `;
+                } else if (device.type === 'heating') {
+                    return `
+                        <div class="device-item active">
+                            <div class="device-header">
+                                <div class="device-name">
+                                    <i class="fas fa-temperature-high" style="color: #FF6B6B"></i>
+                                    ${device.name}
+                                </div>
+                                <div class="temp-value">${device.temp}°C</div>
+                            </div>
+                            <div class="temp-control">
+                                <input type="range" class="temp-slider" min="15" max="30" value="${device.temp}" 
+                                       oninput="updateTemperature('${device.id}', this.value)">
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.7; margin-top: 8px;">
+                                <span>15°C</span>
+                                <span>30°C</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (device.type === 'security') {
+                    return `
+                        <div class="device-item ${device.status ? 'active' : ''}" onclick="toggleDevice('${device.id}')">
+                            <div class="device-header">
+                                <div class="device-name">
+                                    <i class="fas fa-shield-alt" style="color: ${device.status ? '#10b981' : '#ef4444'}"></i>
+                                    ${device.name}
+                                </div>
+                                <div class="device-status">${device.status ? 'Active' : 'Inactive'}</div>
+                            </div>
+                            <div style="font-size: 14px; opacity: 0.9;">
+                                Alarme ${device.status ? 'activée' : 'désactivée'}
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function takePill(index) {
+            if (state.pills[index].count > 0) {
+                state.pills[index].count--;
+                renderPills();
+                speak(`${state.pills[index].name} pris. Il reste ${state.pills[index].count} comprimés.`);
+                
+                if (state.pills[index].count === 0) {
+                    showAlert('🚨 Stock épuisé !', '#ef4444');
+                } else if (state.pills[index].count <= 5) {
+                    showAlert('⚠️ Stock faible', '#f59e0b');
+                }
+            }
+        }
+
+        function addPill(index) {
+            state.pills[index].count += 10;
+            renderPills();
+            speak(`10 ${state.pills[index].name} ajoutés. Total: ${state.pills[index].count} comprimés.`);
+        }
+
+        function renderPills() {
+            const container = document.getElementById('pillsContainer');
+            container.innerHTML = state.pills.map((pill, index) => {
+                const pillClass = pill.count === 0 ? 'empty' : pill.count <= 5 ? 'low' : '';
+                return `
+                    <div class="pill-item ${pillClass}">
+                        <div class="pill-header">
+                            <div class="pill-name">
+                                <i class="fas fa-pills"></i>
+                                ${pill.name}
+                            </div>
+                            <div class="pill-count">${pill.count}</div>
+                        </div>
+                        <div class="pill-schedule">
+                            <i class="fas fa-clock"></i> ${pill.times.join(', ')}
+                        </div>
+                        <div class="pill-btns">
+                            <button class="pill-btn take" onclick="takePill(${index})" ${pill.count === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-check"></i> Prendre
+                            </button>
+                            <button class="pill-btn add" onclick="addPill(${index})">
+                                <i class="fas fa-plus"></i> +10
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateClock() {
+            let currentTime;
+            
+            if (state.simulatedMode) {
+                const hours = Math.floor(state.time);
+                const minutes = Math.floor((state.time - hours) * 60);
+                currentTime = new Date();
+                currentTime.setHours(hours, minutes, 0);
+            } else {
+                currentTime = new Date();
+                state.time = currentTime.getHours() + currentTime.getMinutes() / 60;
+            }
+
+            const timeStr = currentTime.toLocaleTimeString('fr-FR');
+            const dateStr = currentTime.toLocaleDateString('fr-FR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+            document.getElementById('clockDisplay').textContent = timeStr;
+            document.getElementById('dateDisplay').textContent = dateStr;
+
+            const hour = currentTime.getHours();
+            const bg = document.getElementById('background');
+            
+            if (hour >= 6 && hour < 12) {
+                bg.className = 'background morning';
+            } else if (hour >= 12 && hour < 18) {
+                bg.className = 'background afternoon';
+            } else {
+                bg.className = 'background evening';
+            }
+        }
+
+        async function fetchWeather() {
+            try {
+                const response = await fetch('https://wttr.in/Paris?format=j1');
+                const data = await response.json();
+                
+                const current = data.current_condition[0];
+                const temp = current.temp_C;
+                const desc = current.lang_fr?.[0]?.value || current.weatherDesc[0].value;
+                const wind = current.windspeedKmph;
+                const humidity = current.humidity;
+                
+                document.getElementById('weatherTemp').textContent = temp + '°C';
+                document.getElementById('weatherDesc').textContent = desc;
+                document.getElementById('weatherWind').textContent = wind + ' km/h';
+                document.getElementById('weatherHumidity').textContent = humidity + '%';
+                document.getElementById('weatherLocation').textContent = 'Paris';
+                
+                const weatherCode = parseInt(current.weatherCode);
+                let icon = '☁️';
+                if (weatherCode === 113) icon = '☀️';
+                else if (weatherCode >= 200 && weatherCode < 300) icon = '⛈️';
+                else if (weatherCode >= 300 && weatherCode < 600) icon = '🌧️';
+                else if (weatherCode >= 600 && weatherCode < 700) icon = '❄️';
+                
+                document.getElementById('weatherIcon').textContent = icon;
+            } catch (error) {
+                console.error('Erreur météo:', error);
+                document.getElementById('weatherTemp').textContent = '18°C';
+                document.getElementById('weatherDesc').textContent = 'Nuageux';
+                document.getElementById('weatherWind').textContent = '15 km/h';
+                document.getElementById('weatherHumidity').textContent = '65%';
+                document.getElementById('weatherLocation').textContent = 'Paris';
+            }
+        }
+
+        function showAlert(message, color) {
+            const banner = document.getElementById('alertBanner');
+            const item = document.getElementById('alertItem');
+            const text = document.getElementById('alertText');
+            
+            item.style.background = `${color}40`;
+            item.style.borderColor = `${color}99`;
+            text.textContent = message;
+            
+            banner.style.display = 'block';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fenêtre de simulation d'heure draggable
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const timeSimulator = document.getElementById('timeSimulator');
+        const timeSimulatorHeader = document.getElementById('timeSimulatorHeader');
+
+        timeSimulatorHeader.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+
+        timeSimulatorHeader.addEventListener('touchstart', startDrag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('touchend', stopDrag);
+
+        function startDrag(e) {
+            isDragging = true;
+            const rect = timeSimulator.getBoundingClientRect();
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            dragOffsetX = clientX - rect.left;
+            dragOffsetY = clientY - rect.top;
+            
+            timeSimulator.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+            
+            const left = clientX - dragOffsetX;
+            const top = clientY - dragOffsetY;
+            
+            timeSimulator.style.left = left + 'px';
+            timeSimulator.style.top = top + 'px';
+            timeSimulator.style.transform = 'none';
+            
+            e.preventDefault();
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            timeSimulator.style.cursor = 'move';
+        }
+
+        function toggleTimeSimulator() {
+            timeSimulator.classList.toggle('active');
+        }
+
+        // Système de rappels
+        function showReminder() {
+            const now = Date.now();
+            if (now - state.lastReminderTime < 3 * 60 * 1000) return; // Min 3 min entre rappels
+            
+            const reminder = reminders[Math.floor(Math.random() * reminders.length)];
+            const notification = document.getElementById('reminderNotification');
+            const content = document.getElementById('reminderContent');
+            
+            content.textContent = reminder;
+            notification.classList.add('active');
+            
+            speak(reminder);
+            state.lastReminderTime = now;
+            
+            setTimeout(() => {
+                notification.classList.remove('active');
+            }, 10000);
+        }
+
+        function closeReminder() {
+            document.getElementById('reminderNotification').classList.remove('active');
+        }
+
+        // Démarrer les rappels aléatoires
+        state.reminderInterval = setInterval(() => {
+            if (Math.random() < 0.3) { // 30% de chance toutes les 5 minutes
+                showReminder();
+            }
+        }, 5 * 60 * 1000);
+
+        // Premier rappel après 2 minutes
+        setTimeout(() => {
+            showReminder();
+        }, 2 * 60 * 1000);
+
+        // Modal
+        function showModal(content) {
+            document.getElementById('gameContent').innerHTML = content;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // JEUX COMPLETS
+
+        function memoryGame() {
+            speak('Jeu de mémoire');
+            
+            const emojis = ['🏠', '🌟', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸'];
+            const cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+            let flipped = [];
+            let matched = [];
+            
+            const html = `
+                <div style="text-align: center; max-width: 500px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-brain"></i> Jeu de Mémoire
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Trouvez les paires d'emojis identiques !
+                    </div>
+                    
+                    <div class="memory-grid">
+                        ${cards.map((emoji, i) => `
+                            <div class="memory-card" data-index="${i}" data-emoji="${emoji}" onclick="flipCard(${i})">
+                                ?
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.flipCard = function(index) {
+                const card = document.querySelector(`[data-index="${index}"]`);
+                if (card.classList.contains('matched') || card.classList.contains('flipped')) return;
+                if (flipped.length >= 2) return;
+                
+                card.classList.add('flipped');
+                card.textContent = card.dataset.emoji;
+                flipped.push(card);
+                
+                if (flipped.length === 2) {
+                    setTimeout(() => {
+                        if (flipped[0].dataset.emoji === flipped[1].dataset.emoji) {
+                            flipped.forEach(c => {
+                                c.classList.add('matched');
+                                c.classList.remove('flipped');
+                            });
+                            matched.push(...flipped);
+                            speak('Bonne paire !');
+                            
+                            if (matched.length === cards.length) {
+                                setTimeout(() => {
+                                    speak('Bravo ! Toutes les paires trouvées');
+                                    showAlert('🎉 Victoire !', '#10b981');
+                                }, 500);
+                            }
+                        } else {
+                            flipped.forEach(c => {
+                                c.classList.remove('flipped');
+                                c.textContent = '?';
+                            });
+                        }
+                        flipped = [];
+                    }, 1000);
+                }
+            };
+        }
+
+        function quizGame() {
+            speak('Quiz de culture générale');
+            
+            const questions = [
+                {
+                    q: 'Quelle est la capitale de la France ?',
+                    options: ['Lyon', 'Paris', 'Marseille', 'Bordeaux'],
+                    correct: 1
+                },
+                {
+                    q: 'Combien font 7 × 8 ?',
+                    options: ['54', '56', '58', '60'],
+                    correct: 1
+                },
+                {
+                    q: 'Quel est le plus grand océan ?',
+                    options: ['Atlantique', 'Indien', 'Pacifique', 'Arctique'],
+                    correct: 2
+                },
+                {
+                    q: 'En quelle année a eu lieu la Révolution française ?',
+                    options: ['1789', '1799', '1815', '1848'],
+                    correct: 0
+                },
+                {
+                    q: 'Quelle planète est la plus proche du Soleil ?',
+                    options: ['Vénus', 'Mercure', 'Mars', 'Terre'],
+                    correct: 1
+                }
+            ];
+            
+            let currentQ = 0;
+            let score = 0;
+            
+            function displayQuestion() {
+                const q = questions[currentQ];
+                return `
+                    <div style="text-align: center; max-width: 500px;">
+                        <h2 style="font-size: 36px; margin-bottom: 20px;">
+                            <i class="fas fa-question-circle"></i> Quiz
+                        </h2>
+                        
+                        <div style="font-size: 18px; margin-bottom: 20px; font-weight: 700; color: var(--primary);">
+                            Question ${currentQ + 1}/${questions.length} - Score: ${score}/${questions.length}
+                        </div>
+                        
+                        <div style="font-size: 20px; margin-bottom: 30px; font-weight: 600;">
+                            ${q.q}
+                        </div>
+                        
+                        <div style="display: grid; gap: 12px;">
+                            ${q.options.map((opt, i) => `
+                                <button class="modal-btn secondary" onclick="checkAnswer(${i})" 
+                                        style="font-size: 18px; padding: 16px; text-align: left;">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showModal(displayQuestion());
+            
+            window.checkAnswer = function(selected) {
+                const q = questions[currentQ];
+                const buttons = document.querySelectorAll('.modal-btn.secondary');
+                
+                if (selected === q.correct) {
+                    score++;
+                    buttons[selected].style.background = 'rgba(16, 185, 129, 0.8)';
+                    speak('Bonne réponse !');
+                } else {
+                    buttons[selected].style.background = 'rgba(239, 68, 68, 0.8)';
+                    buttons[q.correct].style.background = 'rgba(16, 185, 129, 0.8)';
+                    speak('Mauvaise réponse');
+                }
+                
+                buttons.forEach(btn => btn.disabled = true);
+                
+                setTimeout(() => {
+                    currentQ++;
+                    if (currentQ < questions.length) {
+                        document.getElementById('gameContent').innerHTML = displayQuestion();
+                    } else {
+                        speak(`Quiz terminé ! Votre score est de ${score} sur ${questions.length}`);
+                        showAlert(`🎉 Score: ${score}/${questions.length}`, '#10b981');
+                        closeModal();
+                    }
+                }, 2000);
+            };
+        }
+
+        function wordSearchGame() {
+            speak('Jeu de mots cachés');
+            
+            const words = ['MAISON', 'LUMIERE', 'VOLET', 'ALARME', 'CHAUFFAGE'];
+            const grid = Array(10).fill().map(() => Array(10).fill(''));
+            let selected = [];
+            let found = [];
+            
+            // Placer les mots
+            words.forEach(word => {
+                let placed = false;
+                while (!placed) {
+                    const dir = Math.floor(Math.random() * 3);
+                    const row = Math.floor(Math.random() * 10);
+                    const col = Math.floor(Math.random() * 10);
+                    
+                    let canPlace = true;
+                    if (dir === 0 && col + word.length <= 10) { // horizontal
+                        for (let i = 0; i < word.length; i++) {
+                            if (grid[row][col + i] && grid[row][col + i] !== word[i]) {
+                                canPlace = false;
+                                break;
+                            }
+                        }
+                        if (canPlace) {
+                            for (let i = 0; i < word.length; i++) {
+                                grid[row][col + i] = word[i];
+                            }
+                            placed = true;
+                        }
+                    } else if (dir === 1 && row + word.length <= 10) { // vertical
+                        for (let i = 0; i < word.length; i++) {
+                            if (grid[row + i][col] && grid[row + i][col] !== word[i]) {
+                                canPlace = false;
+                                break;
+                            }
+                        }
+                        if (canPlace) {
+                            for (let i = 0; i < word.length; i++) {
+                                grid[row + i][col] = word[i];
+                            }
+                            placed = true;
+                        }
+                    } else if (dir === 2 && row + word.length <= 10 && col + word.length <= 10) { // diagonal
+                        for (let i = 0; i < word.length; i++) {
+                            if (grid[row + i][col + i] && grid[row + i][col + i] !== word[i]) {
+                                canPlace = false;
+                                break;
+                            }
+                        }
+                        if (canPlace) {
+                            for (let i = 0; i < word.length; i++) {
+                                grid[row + i][col + i] = word[i];
+                            }
+                            placed = true;
+                        }
+                    }
+                }
+            });
+            
+            // Remplir les cases vides
+            for (let i = 0; i < 10; i++) {
+                for (let j = 0; j < 10; j++) {
+                    if (!grid[i][j]) {
+                        grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    }
+                }
+            }
+            
+            const html = `
+                <div style="text-align: center; max-width: 600px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-search"></i> Mots Cachés
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 15px; opacity: 0.9;">
+                        Trouvez ces mots dans la grille :
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        ${words.map(word => `
+                            <span id="word-${word}" style="padding: 8px 16px; background: rgba(255,255,255,0.2); 
+                                  border-radius: 8px; font-weight: 600;">
+                                ${word}
+                            </span>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="word-search-grid">
+                        ${grid.map((row, i) => row.map((cell, j) => `
+                            <div class="word-search-cell" data-row="${i}" data-col="${j}" 
+                                 onclick="selectCell(${i}, ${j})">
+                                ${cell}
+                            </div>
+                        `).join('')).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.selectCell = function(row, col) {
+                const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                const key = `${row}-${col}`;
+                
+                if (cell.classList.contains('found')) return;
+                
+                if (cell.classList.contains('selected')) {
+                    cell.classList.remove('selected');
+                    selected = selected.filter(s => s !== key);
+                } else {
+                    cell.classList.add('selected');
+                    selected.push(key);
+                }
+                
+                const selectedLetters = selected.map(s => {
+                    const [r, c] = s.split('-').map(Number);
+                    return grid[r][c];
+                }).join('');
+                
+                words.forEach(word => {
+                    if (!found.includes(word) && (selectedLetters === word || selectedLetters === word.split('').reverse().join(''))) {
+                        found.push(word);
+                        speak(`Mot trouvé: ${word}`);
+                        
+                        selected.forEach(s => {
+                            const [r, c] = s.split('-').map(Number);
+                            const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                            cell.classList.remove('selected');
+                            cell.classList.add('found');
+                        });
+                        
+                        document.getElementById(`word-${word}`).style.background = 'rgba(16, 185, 129, 0.5)';
+                        selected = [];
+                        
+                        if (found.length === words.length) {
+                            setTimeout(() => {
+                                speak('Bravo ! Tous les mots sont trouvés');
+                                showAlert('🎉 Tous les mots trouvés !', '#10b981');
+                            }, 500);
+                        }
+                    }
+                });
+            };
+        }
+
+        function sudokuGame() {
+            speak('Sudoku facile');
+            
+            const solution = [
+                [1, 2, 3, 4],
+                [3, 4, 1, 2],
+                [2, 3, 4, 1],
+                [4, 1, 2, 3]
+            ];
+            
+            const puzzle = [
+                [1, 0, 0, 4],
+                [0, 4, 1, 0],
+                [2, 0, 0, 1],
+                [0, 1, 2, 0]
+            ];
+            
+            const html = `
+                <div style="text-align: center; max-width: 500px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-th"></i> Sudoku 4x4
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Remplissez la grille avec les chiffres 1 à 4.<br>
+                        Chaque ligne et colonne doit contenir tous les chiffres.
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); 
+                                gap: 4px; background: rgba(255,255,255,0.3); padding: 4px; 
+                                border-radius: 12px; margin-bottom: 20px;">
+                        ${puzzle.map((row, i) => row.map((cell, j) => `
+                            <div style="aspect-ratio: 1; display: flex; align-items: center; 
+                                        justify-content: center; background: ${cell !== 0 ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.2)'}; 
+                                        border-radius: 4px;">
+                                ${cell !== 0 ? 
+                                    `<div style="font-size: 24px; font-weight: 700;">${cell}</div>` :
+                                    `<input type="number" min="1" max="4" 
+                                            id="cell-${i}-${j}"
+                                            style="width: 100%; height: 100%; border: none; 
+                                                   background: transparent; 
+                                                   color: white; text-align: center; 
+                                                   font-size: 24px; font-weight: 700; 
+                                                   border-radius: 4px;">`
+                                }
+                            </div>
+                        `).join('')).join('')}
+                    </div>
+                    
+                    <button onclick="verifySudoku()" class="modal-btn success">
+                        <i class="fas fa-check"></i> Vérifier
+                    </button>
+                    <button onclick="closeModal()" class="modal-btn secondary">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.verifySudoku = function() {
+                let correct = true;
+                
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        if (puzzle[i][j] === 0) {
+                            const input = document.getElementById(`cell-${i}-${j}`);
+                            const value = parseInt(input.value);
+                            
+                            if (!value || value !== solution[i][j]) {
+                                correct = false;
+                                input.style.background = 'rgba(239, 68, 68, 0.4)';
+                            } else {
+                                input.style.background = 'rgba(16, 185, 129, 0.4)';
+                            }
+                        }
+                    }
+                }
+                
+                if (correct) {
+                    speak('Bravo ! Sudoku résolu correctement');
+                    showAlert('🎉 Sudoku résolu !', '#10b981');
+                } else {
+                    speak('Il y a des erreurs. Essayez encore');
+                    showAlert('❌ Il y a des erreurs', '#ef4444');
+                }
+            };
+        }
+
+        // Album photo
+        function openPhotoAlbum() {
+            speak('Album photo de famille');
+            
+            const photos = [
+                { emoji: '👨‍👩‍👧‍👦', caption: 'Famille' },
+                { emoji: '🎂', caption: 'Anniversaire' },
+                { emoji: '🏖️', caption: 'Vacances' },
+                { emoji: '🎄', caption: 'Noël' },
+                { emoji: '👶', caption: 'Petit-fils' },
+                { emoji: '🌸', caption: 'Printemps' },
+                { emoji: '🎓', caption: 'Diplôme' },
+                { emoji: '💑', caption: 'Mariage' },
+                { emoji: '🐕', caption: 'Notre chien' }
+            ];
+            
+            const html = `
+                <div style="text-align: center; max-width: 600px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-images"></i> Album Photo
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Souvenirs de famille
+                    </div>
+                    
+                    <div class="photo-grid">
+                        ${photos.map((photo, i) => `
+                            <div class="photo-item" onclick="viewPhoto(${i})">
+                                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));">
+                                    ${photo.emoji}
+                                </div>
+                                <div class="photo-caption">${photo.caption}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.viewPhoto = function(index) {
+                const photo = photos[index];
+                speak(`Photo: ${photo.caption}`);
+            };
+        }
+
+        // Contacts famille et amis
+        function openContacts() {
+            speak('Liste des contacts');
+            
+            const contacts = [
+                { name: 'Marie', relation: 'Fille', icon: '👩', number: '06 12 34 56 78' },
+                { name: 'Pierre', relation: 'Fils', icon: '👨', number: '06 23 45 67 89' },
+                { name: 'Sophie', relation: 'Petite-fille', icon: '👧', number: '06 34 56 78 90' },
+                { name: 'Jean', relation: 'Ami proche', icon: '👨‍🦳', number: '06 45 67 89 01' },
+                { name: 'Docteur Martin', relation: 'Médecin', icon: '⚕️', number: '01 23 45 67 89' },
+                { name: 'Hélène', relation: 'Voisine', icon: '👵', number: '06 56 78 90 12' }
+            ];
+            
+            const html = `
+                <div style="text-align: center; max-width: 600px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-address-book"></i> Contacts
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Famille et amis
+                    </div>
+                    
+                    <div class="contact-grid">
+                        ${contacts.map((contact, i) => `
+                            <div class="contact-btn" onclick="callContact(${i})">
+                                <div class="contact-icon">${contact.icon}</div>
+                                <div class="contact-name">${contact.name}</div>
+                                <div class="contact-relation">${contact.relation}</div>
+                                <div style="font-size: 12px; margin-top: 8px; opacity: 0.7;">
+                                    <i class="fas fa-phone"></i> ${contact.number}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.callContact = function(index) {
+                const contact = contacts[index];
+                speak(`Appel en cours vers ${contact.name}, ${contact.relation}`);
+                showAlert(`📞 Appel: ${contact.name}`, '#10b981');
+                
+                setTimeout(() => {
+                    speak(`Communication établie avec ${contact.name}`);
+                }, 2000);
+            };
+        }
+
+        // Exercices de respiration
+        function breathingExercise() {
+            speak('Exercice de respiration. Préparez-vous.');
+            
+            const html = `
+                <div class="breathing-container">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-wind"></i> Respiration Guidée
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Suivez le cercle et respirez calmement
+                    </div>
+                    
+                    <div id="breathingCircle" class="breathing-circle">
+                        Inspirez
+                    </div>
+                    
+                    <div style="font-size: 16px; margin-bottom: 20px;">
+                        Cycle: <span id="breathingCycle">0</span> / 5
+                    </div>
+                    
+                    <button onclick="stopBreathing()" class="modal-btn secondary">
+                        <i class="fas fa-stop"></i> Arrêter
+                    </button>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            let cycle = 0;
+            let breathingInterval;
+            
+            window.stopBreathing = function() {
+                clearInterval(breathingInterval);
+                speak('Exercice de respiration terminé. Bien joué !');
+            };
+            
+            setTimeout(() => {
+                breathingInterval = setInterval(() => {
+                    const circle = document.getElementById('breathingCircle');
+                    const cycleDisplay = document.getElementById('breathingCycle');
+                    
+                    if (!circle) {
+                        clearInterval(breathingInterval);
+                        return;
+                    }
+                    
+                    // Phase d'inspiration
+                    circle.classList.add('inhale');
+                    circle.classList.remove('exhale');
+                    circle.textContent = 'Inspirez';
+                    speak('Inspirez');
+                    
+                    setTimeout(() => {
+                        // Phase d'expiration
+                        circle.classList.remove('inhale');
+                        circle.classList.add('exhale');
+                        circle.textContent = 'Expirez';
+                        speak('Expirez');
+                        
+                        cycle++;
+                        cycleDisplay.textContent = cycle;
+                        
+                        if (cycle >= 5) {
+                            clearInterval(breathingInterval);
+                            setTimeout(() => {
+                                speak('Exercice terminé. Vous vous sentez détendu.');
+                                showAlert('✅ Exercice terminé !', '#10b981');
+                            }, 4000);
+                        }
+                    }, 4000);
+                }, 8000);
+            }, 1000);
+        }
+
+        // Exercices de yoga
+        function yogaExercise() {
+            speak('Exercices de yoga doux');
+            
+            const poses = [
+                { name: 'Arbre', icon: '🌳', duration: '30 sec', description: 'Équilibre sur une jambe' },
+                { name: 'Chat-Vache', icon: '🐱', duration: '1 min', description: 'Assouplissement du dos' },
+                { name: 'Enfant', icon: '🧘', duration: '1 min', description: 'Relaxation et étirement' },
+                { name: 'Guerrier', icon: '⚔️', duration: '30 sec', description: 'Force et équilibre' },
+                { name: 'Cobra', icon: '🐍', duration: '30 sec', description: 'Ouverture de la poitrine' },
+                { name: 'Papillon', icon: '🦋', duration: '1 min', description: 'Ouverture des hanches' }
+            ];
+            
+            const html = `
+                <div style="text-align: center; max-width: 600px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px;">
+                        <i class="fas fa-spa"></i> Yoga Doux
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.9;">
+                        Choisissez une posture
+                    </div>
+                    
+                    <div class="yoga-pose-grid">
+                        ${poses.map((pose, i) => `
+                            <div class="yoga-pose" onclick="startYogaPose(${i})">
+                                <div class="yoga-icon">${pose.icon}</div>
+                                <div class="yoga-name">${pose.name}</div>
+                                <div class="yoga-duration">${pose.duration}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.startYogaPose = function(index) {
+                const pose = poses[index];
+                speak(`Posture ${pose.name}. ${pose.description}. Maintenez la position.`);
+                showAlert(`🧘 ${pose.name} - ${pose.duration}`, '#8B5CF6');
+                
+                const duration = parseInt(pose.duration) * 1000;
+                setTimeout(() => {
+                    speak('Posture terminée. Bien joué !');
+                    showAlert('✅ Posture terminée !', '#10b981');
+                }, duration);
+            };
+        }
+
+        // Appel d'urgence
+        function emergencyCall() {
+            speak('APPEL D\'URGENCE EN COURS. Connexion aux services d\'urgence.');
+            
+            const html = `
+                <div style="text-align: center; max-width: 500px;">
+                    <div style="font-size: 80px; margin-bottom: 20px; animation: pulse 1s infinite;">
+                        🚨
+                    </div>
+                    
+                    <h2 style="font-size: 36px; margin-bottom: 20px; color: #ef4444;">
+                        APPEL D'URGENCE
+                    </h2>
+                    
+                    <div style="font-size: 20px; margin-bottom: 30px; font-weight: 700;">
+                        Connexion en cours...
+                    </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.6); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <div style="font-size: 18px; margin-bottom: 10px;">
+                            <i class="fas fa-phone"></i> SAMU: 15
+                        </div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">
+                            <i class="fas fa-ambulance"></i> Pompiers: 18
+                        </div>
+                        <div style="font-size: 18px;">
+                            <i class="fas fa-phone-volume"></i> Urgence EU: 112
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 16px; margin-bottom: 20px; opacity: 0.9;">
+                        Votre localisation et vos informations médicales ont été transmises.
+                    </div>
+                    
+                    <button onclick="cancelEmergency()" class="modal-btn" style="background: rgba(239, 68, 68, 0.8); width: 100%; font-size: 18px;">
+                        <i class="fas fa-times"></i> ANNULER L'APPEL
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            showAlert('🚨 APPEL D\'URGENCE ACTIVÉ', '#ef4444');
+            
+            // Simulation d'appel aux urgences
+            setTimeout(() => {
+                speak('Services d\'urgence contactés. Aide en route.');
+            }, 3000);
+            
+            window.cancelEmergency = function() {
+                speak('Appel d\'urgence annulé');
+                closeModal();
+                showAlert('❌ Appel annulé', '#f59e0b');
+            };
+        }
+
+        document.getElementById('timeSlider').addEventListener('input', function(e) {
+            state.time = parseFloat(e.target.value);
+            state.simulatedMode = true;
+            updateClock();
+        });
+
+        async function init() {
+            console.log('🚀 Initialisation du système...');
+            
+            await initVoices();
+            initVoiceRecognition();
+            
+            state.currentDate = new Date();
+            state.dayIndex = state.currentDate.getDay();
+            
+            renderDevices();
+            renderPills();
+            updateClock();
+            fetchWeather();
+            
+            setInterval(updateClock, 1000);
+            
+            setTimeout(() => {
+                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel. Je suis prêt à vous aider.`;
+                speak(msg);
+                showAlert(`👋 Bienvenue ! ${days[state.dayIndex]}`, '#10b981');
+                
+                const emptyPills = state.pills.filter(p => p.count <= 0);
+                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                
+                if (emptyPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont épuisés.');
+                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                    }, 3000);
+                } else if (lowPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                        showAlert('⚠️ Stock faible', '#f59e0b');
+                    }, 3000);
+                }
+            }, 1500);
+            
+            console.log('✅ Système initialisé !');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
