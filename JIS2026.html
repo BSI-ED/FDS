@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA Seniors - Interface Corrigée</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --morning-start: #FFA07A;
+            --morning-mid: #FFD700;
+            --morning-end: #87CEEB;
+            --afternoon-start: #4A90E2;
+            --afternoon-mid: #7CB9E8;
+            --afternoon-end: #B0E0E6;
+            --evening-start: #1a1a2e;
+            --evening-mid: #16213e;
+            --evening-end: #0f3460;
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Hide scrollbars but keep smooth scrolling */
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            transition: background 1.5s ease;
+        }
+
+        .background.morning {
+            background: linear-gradient(135deg, var(--morning-start) 0%, var(--morning-mid) 50%, var(--morning-end) 100%);
+        }
+
+        .background.afternoon {
+            background: linear-gradient(135deg, var(--afternoon-start) 0%, var(--afternoon-mid) 50%, var(--afternoon-end) 100%);
+        }
+
+        .background.evening {
+            background: linear-gradient(135deg, var(--evening-start) 0%, var(--evening-mid) 50%, var(--evening-end) 100%);
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 18px;
+            padding: 18px;
+            height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 20px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px 28px;
+            background: rgba(59, 130, 246, 0.4);
+            border: 3px solid rgba(59, 130, 246, 0.7);
+            border-radius: 16px;
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .alert-item i {
+            font-size: 28px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Main Content Grid */
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            gap: 18px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 24px;
+            color: white;
+            overflow-y: auto;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center;
+            padding-bottom: 18px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        /* Domotique Panel */
+        .device-item {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateX(4px);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .device-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .device-name i {
+            font-size: 24px;
+            width: 32px;
+            text-align: center;
+        }
+
+        .device-status {
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .device-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .device-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .device-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .device-btn:active {
+            transform: translateY(0);
+        }
+
+        .device-btn.on {
+            background: linear-gradient(135deg, var(--success), #34d399);
+        }
+
+        .device-btn.off {
+            background: linear-gradient(135deg, var(--danger), #f87171);
+        }
+
+        /* Center Panel */
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto;
+        }
+
+        .clock-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 36px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 36px;
+            align-items: center;
+        }
+
+        .date-display {
+            text-align: center;
+        }
+
+        .day-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .full-date {
+            font-size: 26px;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+
+        .digital-time {
+            font-family: 'Poppins', sans-serif;
+            font-size: 82px;
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.4);
+            animation: timeGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes timeGlow {
+            0%, 100% {
+                text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.4);
+            }
+            50% {
+                text-shadow: 3px 3px 20px rgba(255, 255, 255, 0.6);
+            }
+        }
+
+        .period-indicator {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .info-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .card-header i {
+            font-size: 28px;
+            width: 36px;
+            text-align: center;
+        }
+
+        /* Activities Sidebar */
+        .activity-btn {
+            width: 100%;
+            padding: 22px 28px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: left;
+        }
+
+        .activity-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.25));
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .activity-btn:active {
+            transform: translateX(8px) scale(0.98);
+        }
+
+        .activity-btn i {
+            font-size: 28px;
+            min-width: 40px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        /* Pill Tracker */
+        .pill-tracker {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .pill-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .pill-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .pill-info {
+            flex: 1;
+        }
+
+        .pill-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .pill-schedule {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .pill-count {
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 12px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+        }
+
+        .pill-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, var(--success), #34d399);
+            transition: all 0.3s ease;
+        }
+
+        .pill-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .pill-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+        }
+
+        .quick-info {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quick-info:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .info-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        /* Floating Controls */
+        .floating-btn {
+            position: fixed;
+            bottom: 24px;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            border: 4px solid white;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .floating-btn:active {
+            transform: scale(1.05) rotate(-5deg);
+        }
+
+        .floating-btn i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .voice-control {
+            right: 24px;
+            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
+        }
+
+        .voice-control.listening {
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-gender-btn {
+            right: 120px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+        }
+
+        .emergency-btn {
+            right: 216px;
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Time Control */
+        .time-control {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 18px;
+            color: white;
+            z-index: 900;
+            width: 280px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .time-control-label {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .time-slider::-moz-range-thumb {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
+            padding: 48px;
+            border-radius: 24px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            box-shadow: 0 24px 72px rgba(0, 0, 0, 0.6);
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-btn {
+            padding: 16px 42px;
+            font-size: 19px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-btn:active {
+            transform: scale(1.02);
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--success), #34d399);
+        }
+
+        .modal-btn.danger {
+            background: linear-gradient(135deg, var(--danger), #f87171);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, var(--info), #60a5fa);
+        }
+
+        /* Memory Card */
+        .memory-card {
+            width: 100%;
+            aspect-ratio: 1;
+            font-size: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .memory-card.flipped {
+            background: linear-gradient(135deg, #10b981, #34d399) !important;
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(135deg, #059669, #10b981) !important;
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        /* Word Search */
+        .word-cell {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word-cell.selected {
+            background: rgba(59, 130, 246, 0.6);
+            transform: scale(1.1);
+        }
+
+        .word-cell.found {
+            background: rgba(16, 185, 129, 0.6);
+            cursor: default;
+        }
+
+        .word-badge {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .word-badge.found {
+            background: rgba(16, 185, 129, 0.6);
+            text-decoration: line-through;
+        }
+
+        /* Breathing animation */
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.4);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 280px 1fr 340px;
+            }
+            
+            .digital-time {
+                font-size: 68px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .clock-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .footer-info {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+                gap: 12px;
+            }
+            
+            .floating-btn {
+                width: 64px;
+                height: 64px;
+            }
+            
+            .voice-control {
+                right: 16px;
+            }
+            
+            .voice-gender-btn {
+                right: 96px;
+            }
+            
+            .emergency-btn {
+                right: 176px;
+            }
+            
+            .footer-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background morning" id="bg"></div>
+    
+    <div class="container">
+        <!-- Alert Banner -->
+        <div class="alert-banner">
+            <div class="alert-item" id="alert">
+                <i class="fas fa-check-circle"></i>
+                <span>Système initialisé</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Domotique Panel -->
+            <div class="panel domotique-panel">
+                <div class="panel-title">
+                    <i class="fas fa-home"></i>
+                    <span>Domotique</span>
+                </div>
+                <div id="devices"></div>
+            </div>
+
+            <!-- Center Panel -->
+            <div class="center-panel">
+                <!-- Clock Section -->
+                <div class="clock-section">
+                    <div class="date-display">
+                        <div class="day-name" id="dayName">Jeudi</div>
+                        <div class="full-date" id="fullDate">29 janvier 2026</div>
+                    </div>
+                    
+                    <div>
+                        <div class="digital-time" id="time">14:30</div>
+                        <div class="period-indicator" id="period">Après-midi</div>
+                    </div>
+                    
+                    <div class="date-display">
+                        <div style="font-size: 64px; margin-bottom: 12px;">☀️</div>
+                        <div style="font-size: 22px; font-weight: 600;">Beau temps</div>
+                    </div>
+                </div>
+
+                <!-- Health Info -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Santé & Bien-être</span>
+                    </div>
+                    <div id="pillsContainer" class="pill-tracker"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Activité du jour</span>
+                    </div>
+                    <div id="statsContent" style="font-size: 18px; line-height: 1.8;">
+                        <p>🚶 <strong>2,450</strong> pas aujourd'hui</p>
+                        <p>💧 <strong>4/8</strong> verres d'eau</p>
+                        <p>⏰ <strong>3/3</strong> médicaments pris</p>
+                        <p>😊 Humeur : <strong>Excellente</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities Sidebar -->
+            <div class="panel activities-sidebar">
+                <div class="panel-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <span>Activités</span>
+                </div>
+                <button class="activity-btn" onclick="reminders()">
+                    <i class="fas fa-bell"></i>
+                    <span>Rappels</span>
+                </button>
+                <button class="activity-btn" onclick="memoryGame()">
+                    <i class="fas fa-brain"></i>
+                    <span>Mémoire</span>
+                </button>
+                <button class="activity-btn" onclick="quiz()">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quiz</span>
+                </button>
+                <button class="activity-btn" onclick="wordSearch()">
+                    <i class="fas fa-search"></i>
+                    <span>Mots Cachés</span>
+                </button>
+                <button class="activity-btn" onclick="music()">
+                    <i class="fas fa-music"></i>
+                    <span>Musicothérapie</span>
+                </button>
+                <button class="activity-btn" onclick="breathing()">
+                    <i class="fas fa-wind"></i>
+                    <span>Respiration</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="footer-info">
+            <div class="quick-info">
+                <div class="info-icon">🌡️</div>
+                <div class="info-label">Température</div>
+                <div class="info-value" id="temp">22°C</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">💧</div>
+                <div class="info-label">Humidité</div>
+                <div class="info-value" id="humidity">55%</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">🌅</div>
+                <div class="info-label">Lever</div>
+                <div class="info-value" id="sunrise">07:45</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">🌇</div>
+                <div class="info-label">Coucher</div>
+                <div class="info-value" id="sunset">17:30</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">📅</div>
+                <div class="info-label">Rendez-vous</div>
+                <div class="info-value">2</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">🎂</div>
+                <div class="info-label">Anniversaires</div>
+                <div class="info-value">1</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">✉️</div>
+                <div class="info-label">Messages</div>
+                <div class="info-value">3</div>
+            </div>
+            <div class="quick-info">
+                <div class="info-icon">📞</div>
+                <div class="info-label">Appels</div>
+                <div class="info-value">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Controls -->
+    <div class="floating-btn voice-control" id="voiceBtn" onclick="toggleVoice()">
+        <i class="fas fa-microphone"></i>
+    </div>
+    
+    <div class="floating-btn voice-gender-btn" onclick="toggleGender()">
+        <i class="fas fa-venus" id="genderIcon"></i>
+    </div>
+    
+    <div class="floating-btn emergency-btn" onclick="emergency()">
+        <i class="fas fa-phone-volume"></i>
+    </div>
+
+    <!-- Time Control -->
+    <div class="time-control">
+        <div class="time-control-label">⏰ Simuler l'heure</div>
+        <input type="range" class="time-slider" id="timeSlider" min="0" max="23.99" step="0.01" value="14.5">
+        <div style="text-align: center; margin-top: 8px; font-size: 14px; opacity: 0.85;" id="sliderDisplay">14:30</div>
+    </div>
+
+    <script>
+        // Global State
+        const state = {
+            time: 14.5,
+            currentDate: new Date(),
+            dayIndex: new Date().getDay(),
+            voiceGender: 'female',
+            listening: false,
+            devices: [
+                { name: 'Salon', icon: '💡', type: 'light', status: true, room: 'salon' },
+                { name: 'Chambre', icon: '💡', type: 'light', status: false, room: 'chambre' },
+                { name: 'Chauffage', icon: '🔥', type: 'heating', status: true, temp: 22 },
+                { name: 'Volets', icon: '🪟', type: 'shutters', status: true }
+            ],
+            pills: [
+                { name: 'Aspirine', schedule: '8h - 20h', count: 15, taken: false },
+                { name: 'Vitamine D', schedule: '12h', count: 8, taken: true },
+                { name: 'Paracétamol', schedule: 'Si douleur', count: 0, taken: false }
+            ],
+            activityCount: 0,
+            lastActivity: Date.now()
+        };
+
+        // Speech Synthesis
+        const synth = window.speechSynthesis;
+        let currentVoice = null;
+        let voicesLoaded = false;
+
+        function loadVoices() {
+            return new Promise((resolve) => {
+                let voices = synth.getVoices();
+                if (voices.length > 0) {
+                    voicesLoaded = true;
+                    resolve(voices);
+                } else {
+                    synth.onvoiceschanged = () => {
+                        voices = synth.getVoices();
+                        voicesLoaded = true;
+                        resolve(voices);
+                    };
+                }
+            });
+        }
+
+        async function initVoices() {
+            const voices = await loadVoices();
+            console.log('🎤 Voix disponibles:', voices.map(v => `${v.name} (${v.lang})`));
+            
+            const frenchVoices = voices.filter(v => v.lang.startsWith('fr'));
+            console.log('🇫🇷 Voix françaises:', frenchVoices.map(v => v.name));
+            
+            if (state.voiceGender === 'male') {
+                // Recherche prioritaire de voix masculine
+                currentVoice = frenchVoices.find(v => {
+                    const name = v.name.toLowerCase();
+                    return name.includes('thomas') || 
+                           name.includes('henri') || 
+                           name.includes('male') && !name.includes('female') ||
+                           name.includes('homme');
+                });
+                
+                // Si pas de voix explicitement masculine, prendre une voix qui n'est PAS féminine
+                if (!currentVoice) {
+                    currentVoice = frenchVoices.find(v => {
+                        const name = v.name.toLowerCase();
+                        return !name.includes('female') && 
+                               !name.includes('femme') && 
+                               !name.includes('amelie') && 
+                               !name.includes('marie') &&
+                               !name.includes('pauline') &&
+                               !name.includes('audrey');
+                    });
+                }
+            } else {
+                // Recherche de voix féminine
+                currentVoice = frenchVoices.find(v => {
+                    const name = v.name.toLowerCase();
+                    return name.includes('amelie') || 
+                           name.includes('marie') || 
+                           name.includes('female') ||
+                           name.includes('femme');
+                });
+            }
+            
+            // Fallback sur la première voix française
+            if (!currentVoice && frenchVoices.length > 0) {
+                currentVoice = frenchVoices[0];
+            }
+            
+            // Ultime fallback
+            if (!currentVoice && voices.length > 0) {
+                currentVoice = voices.find(v => v.lang.startsWith('fr')) || voices[0];
+            }
+            
+            console.log('✅ Voix sélectionnée:', currentVoice ? currentVoice.name : 'Aucune', 'pour genre:', state.voiceGender);
+        }
+
+        function speak(text) {
+            // Annuler toute parole en cours
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            // Attendre un petit peu pour être sûr que la cancellation est effective
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.volume = 1.0;
+                
+                // Ajuster le pitch selon le genre
+                if (state.voiceGender === 'male') {
+                    utterance.pitch = 0.7;  // Plus grave pour homme
+                } else {
+                    utterance.pitch = 1.1;  // Plus aigu pour femme
+                }
+                
+                if (currentVoice) {
+                    utterance.voice = currentVoice;
+                }
+                
+                utterance.onerror = function(event) {
+                    console.error('❌ Erreur synthèse vocale:', event);
+                };
+                
+                utterance.onend = function() {
+                    console.log('✅ Synthèse vocale terminée');
+                };
+                
+                synth.speak(utterance);
+            }, 100);
+        }
+
+        // Update Clock
+        function updateClock() {
+            const hours = Math.floor(state.time);
+            const minutes = Math.round((state.time % 1) * 60);
+            const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            
+            document.getElementById('time').textContent = timeStr;
+            document.getElementById('sliderDisplay').textContent = timeStr;
+            
+            // Update period
+            let period, bgClass;
+            if (state.time >= 6 && state.time < 12) {
+                period = 'Matin';
+                bgClass = 'morning';
+            } else if (state.time >= 12 && state.time < 18) {
+                period = 'Après-midi';
+                bgClass = 'afternoon';
+            } else {
+                period = 'Soir';
+                bgClass = 'evening';
+            }
+            
+            document.getElementById('period').textContent = period;
+            const bg = document.getElementById('bg');
+            bg.className = 'background ' + bgClass;
+            
+            // Update date
+            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
+                          'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+            
+            const date = state.currentDate;
+            document.getElementById('dayName').textContent = days[state.dayIndex];
+            document.getElementById('fullDate').textContent = 
+                `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        // Render Devices
+        function renderDevices() {
+            const container = document.getElementById('devices');
+            container.innerHTML = state.devices.map((device, index) => `
+                <div class="device-item">
+                    <div class="device-header">
+                        <div class="device-name">
+                            <span>${device.icon}</span>
+                            <span>${device.name}</span>
+                        </div>
+                        <div class="device-status">
+                            ${device.status ? '✓ Actif' : '✗ Inactif'}
+                        </div>
+                    </div>
+                    ${device.type === 'heating' ? `
+                        <div style="margin: 12px 0; font-size: 18px; font-weight: 600;">
+                            🌡️ ${device.temp}°C
+                        </div>
+                    ` : ''}
+                    <div class="device-controls">
+                        <button class="device-btn on" onclick="toggleDevice(${index}, true)">
+                            Allumer
+                        </button>
+                        <button class="device-btn off" onclick="toggleDevice(${index}, false)">
+                            Éteindre
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleDevice(index, turnOn) {
+            state.devices[index].status = turnOn;
+            renderDevices();
+            
+            const device = state.devices[index];
+            const action = turnOn ? 'allumé' : 'éteint';
+            speak(`${device.name} ${action}`);
+            showAlert(`${device.icon} ${device.name} ${action}`, turnOn ? '#10b981' : '#ef4444');
+            trackActivity();
+        }
+
+        // Render Pills
+        function renderPills() {
+            const container = document.getElementById('pillsContainer');
+            container.innerHTML = state.pills.map((pill, index) => `
+                <div class="pill-item">
+                    <div class="pill-info">
+                        <div class="pill-name">💊 ${pill.name}</div>
+                        <div class="pill-schedule">${pill.schedule}</div>
+                    </div>
+                    <span class="pill-count">×${pill.count}</span>
+                    <button class="pill-btn" 
+                            onclick="takePill(${index})" 
+                            ${pill.count <= 0 || pill.taken ? 'disabled' : ''}>
+                        ${pill.taken ? '✓ Pris' : 'Prendre'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function takePill(index) {
+            if (state.pills[index].count > 0 && !state.pills[index].taken) {
+                state.pills[index].count--;
+                state.pills[index].taken = true;
+                renderPills();
+                
+                const pill = state.pills[index];
+                speak(`${pill.name} pris. Il en reste ${pill.count}`);
+                showAlert(`✓ ${pill.name} pris`, '#10b981');
+                trackActivity();
+                
+                if (pill.count <= 3 && pill.count > 0) {
+                    setTimeout(() => {
+                        speak(`Attention, il ne reste que ${pill.count} ${pill.name}`);
+                        showAlert(`⚠️ Stock faible: ${pill.name}`, '#f59e0b');
+                    }, 2000);
+                } else if (pill.count === 0) {
+                    setTimeout(() => {
+                        speak(`Stock de ${pill.name} épuisé`);
+                        showAlert(`🚨 ${pill.name} épuisé`, '#ef4444');
+                    }, 2000);
+                }
+            }
+        }
+
+        // Alert System
+        function showAlert(message, color = '#3b82f6') {
+            const alert = document.getElementById('alert');
+            const icon = alert.querySelector('i');
+            const text = alert.querySelector('span');
+            
+            // Choose icon based on message
+            if (message.includes('✓') || message.includes('Bienvenue')) {
+                icon.className = 'fas fa-check-circle';
+            } else if (message.includes('⚠️')) {
+                icon.className = 'fas fa-exclamation-triangle';
+            } else if (message.includes('🚨')) {
+                icon.className = 'fas fa-exclamation-circle';
+            } else {
+                icon.className = 'fas fa-info-circle';
+            }
+            
+            text.textContent = message;
+            alert.style.background = color + '66';
+            alert.style.borderColor = color;
+            
+            alert.style.animation = 'none';
+            setTimeout(() => {
+                alert.style.animation = 'slideDown 0.6s ease-out';
+            }, 10);
+        }
+
+        // Voice Control
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            state.listening = !state.listening;
+            
+            if (state.listening) {
+                btn.classList.add('listening');
+                speak('Je vous écoute');
+                setTimeout(() => {
+                    state.listening = false;
+                    btn.classList.remove('listening');
+                }, 5000);
+            } else {
+                btn.classList.remove('listening');
+            }
+            
+            trackActivity();
+        }
+
+        function toggleGender() {
+            state.voiceGender = state.voiceGender === 'female' ? 'male' : 'female';
+            
+            // Réinitialiser les voix
+            initVoices().then(() => {
+                const icon = document.getElementById('genderIcon');
+                icon.className = state.voiceGender === 'female' ? 'fas fa-venus' : 'fas fa-mars';
+                
+                const message = state.voiceGender === 'female' ? 'Voix féminine activée' : 'Voix masculine activée';
+                speak(message);
+                showAlert(state.voiceGender === 'female' ? '♀️ Voix féminine' : '♂️ Voix masculine', '#8b5cf6');
+            });
+            
+            trackActivity();
+        }
+
+        function emergency() {
+            speak('Appel d\'urgence. Contactez les secours immédiatement.');
+            showAlert('🚨 URGENCE - Appel des secours', '#ef4444');
+            trackActivity();
+            
+            setTimeout(() => {
+                showModal(`
+                    <div style="text-align: center;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">🚨</div>
+                        <h2 style="font-size: 36px; margin-bottom: 24px;">Urgence</h2>
+                        <p style="font-size: 20px; line-height: 1.6; margin-bottom: 32px;">
+                            Un appel d'urgence va être déclenché.<br>
+                            Souhaitez-vous continuer ?
+                        </p>
+                        <button onclick="confirmEmergency()" class="modal-btn danger" style="margin-right: 12px;">
+                            <i class="fas fa-phone"></i> Appeler les secours
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary">
+                            Annuler
+                        </button>
+                    </div>
+                `);
+            }, 500);
+        }
+
+        function confirmEmergency() {
+            speak('Appel des services d\'urgence en cours');
+            showAlert('📞 Appel en cours...', '#ef4444');
+            closeModal();
+        }
+
+        // Activities - REMINDERS
+        function reminders() {
+            trackActivity();
+            speak('Vos rappels du jour');
+            
+            if (!window.remindersState) {
+                window.remindersState = [
+                    { time: '09:00', text: 'Prendre le petit-déjeuner', done: true, icon: '🍳' },
+                    { time: '14:00', text: 'Rendez-vous médecin', done: false, icon: '🏥' },
+                    { time: '18:00', text: 'Appeler Marie', done: false, icon: '📞' },
+                    { time: '20:00', text: 'Médicament du soir', done: false, icon: '💊' }
+                ];
+            }
+            
+            const reminders = window.remindersState;
+            const doneCount = reminders.filter(r => r.done).length;
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 72px; margin-bottom: 20px;">📋</div>
+                    <h2 style="font-size: 32px; margin-bottom: 28px;">Rappels du jour</h2>
+                    <div style="text-align: left; max-height: 450px; overflow-y: auto;">
+                        ${reminders.map((r, i) => `
+                            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; 
+                                        margin-bottom: 16px; border-left: 4px solid ${r.done ? '#10b981' : '#3b82f6'};">
+                                <div style="display: flex; align-items: center; gap: 16px;">
+                                    <span style="font-size: 36px;">${r.icon}</span>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 6px; 
+                                                    ${r.done ? 'text-decoration: line-through; opacity: 0.7;' : ''}">
+                                            ${r.text}
+                                        </div>
+                                        <div style="font-size: 16px; opacity: 0.85;">
+                                            ⏰ ${r.time}
+                                        </div>
+                                    </div>
+                                    <button onclick="toggleReminder(${i})" 
+                                            style="padding: 12px 20px; background: ${r.done ? '#10b981' : '#3b82f6'}; 
+                                                   border: none; border-radius: 10px; color: white; cursor: pointer; 
+                                                   font-weight: 700; font-size: 16px; transition: all 0.3s;"
+                                            onmouseover="this.style.transform='scale(1.05)'"
+                                            onmouseout="this.style.transform='scale(1)'">
+                                        ${r.done ? '✓ Fait' : 'Marquer'}
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid rgba(255,255,255,0.2);">
+                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">
+                            ✅ ${doneCount} / ${reminders.length} terminés
+                        </div>
+                        <button onclick="closeModal()" class="modal-btn danger">
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        window.toggleReminder = function(index) {
+            if (!window.remindersState) return;
+            
+            window.remindersState[index].done = !window.remindersState[index].done;
+            const reminder = window.remindersState[index];
+            
+            if (reminder.done) {
+                speak(`${reminder.text} marqué comme fait`);
+                showAlert(`✓ ${reminder.text}`, '#10b981');
+            } else {
+                speak(`${reminder.text} marqué comme non fait`);
+            }
+            
+            reminders();
+        };
+
+        // Activities - MEMORY GAME
+        function memoryGame() {
+            trackActivity();
+            speak('Jeu de mémoire. Trouvez les paires');
+            
+            const emojis = ['🍎', '🍌', '🍊', '🍇', '🍓', '🍑', '🍒', '🥝'];
+            const cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🧠</div>
+                    <h2 style="font-size: 32px; margin-bottom: 24px;">Jeu de Mémoire</h2>
+                    <p style="font-size: 18px; margin-bottom: 24px; opacity: 0.9;">
+                        Trouvez toutes les paires !
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; 
+                                max-width: 600px; margin: 0 auto 28px;">
+                        ${cards.map((emoji, i) => `
+                            <div class="memory-card" id="card${i}" onclick="flipCard(${i}, '${emoji}')">
+                                ?
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="font-size: 20px; font-weight: 700; margin-bottom: 20px;">
+                        Paires trouvées: <span id="pairsFound">0</span>/8
+                    </div>
+                    <button onclick="closeModal()" class="modal-btn danger">
+                        Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            window.memoryState = { flipped: [], matched: [], pairsFound: 0 };
+        }
+
+        window.flipCard = function(index, emoji) {
+            const card = document.getElementById(`card${index}`);
+            const state = window.memoryState;
+            
+            if (!state || state.flipped.length >= 2 || state.matched.includes(index) || state.flipped.includes(index)) {
+                return;
+            }
+            
+            card.textContent = emoji;
+            card.classList.add('flipped');
+            state.flipped.push(index);
+            
+            if (state.flipped.length === 2) {
+                const card1 = document.getElementById(`card${state.flipped[0]}`);
+                const card2 = document.getElementById(`card${state.flipped[1]}`);
+                
+                if (card1.textContent === card2.textContent) {
+                    setTimeout(() => {
+                        card1.classList.add('matched');
+                        card2.classList.add('matched');
+                        state.matched.push(state.flipped[0], state.flipped[1]);
+                        state.pairsFound++;
+                        document.getElementById('pairsFound').textContent = state.pairsFound;
+                        state.flipped = [];
+                        
+                        if (state.pairsFound === 8) {
+                            setTimeout(() => {
+                                speak('Bravo ! Vous avez trouvé toutes les paires');
+                                showAlert('🎉 Félicitations !', '#10b981');
+                            }, 500);
+                        }
+                    }, 500);
+                } else {
+                    setTimeout(() => {
+                        card1.textContent = '?';
+                        card2.textContent = '?';
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        state.flipped = [];
+                    }, 1000);
+                }
+            }
+        };
+
+        // Activities - QUIZ
+        function quiz() {
+            trackActivity();
+            speak('Quiz de culture générale');
+            
+            const questions = [
+                {
+                    q: 'Quelle est la capitale de la France ?',
+                    options: ['Lyon', 'Paris', 'Marseille', 'Toulouse'],
+                    correct: 1
+                },
+                {
+                    q: 'En quelle année a eu lieu la Révolution française ?',
+                    options: ['1789', '1799', '1804', '1815'],
+                    correct: 0
+                },
+                {
+                    q: 'Qui a peint La Joconde ?',
+                    options: ['Monet', 'Van Gogh', 'Léonard de Vinci', 'Picasso'],
+                    correct: 2
+                },
+                {
+                    q: 'Quelle est la plus haute montagne du monde ?',
+                    options: ['Mont Blanc', 'K2', 'Everest', 'Kilimandjaro'],
+                    correct: 2
+                },
+                {
+                    q: 'Combien de jours compte une année bissextile ?',
+                    options: ['364', '365', '366', '367'],
+                    correct: 2
+                }
+            ];
+            
+            let currentQ = 0;
+            let score = 0;
+            
+            function showQuestion() {
+                if (currentQ >= questions.length) {
+                    // Quiz terminé
+                    speak(`Quiz terminé. Vous avez ${score} bonnes réponses sur ${questions.length}`);
+                    showModal(`
+                        <div style="text-align: center;">
+                            <div style="font-size: 80px; margin-bottom: 20px;">🎉</div>
+                            <h2 style="font-size: 36px; margin-bottom: 24px;">Quiz Terminé !</h2>
+                            <p style="font-size: 32px; font-weight: 700; margin-bottom: 32px;">
+                                Score: ${score} / ${questions.length}
+                            </p>
+                            <p style="font-size: 20px; margin-bottom: 32px;">
+                                ${score === questions.length ? 'Parfait ! 🏆' : 
+                                  score >= questions.length * 0.7 ? 'Très bien ! 👏' : 
+                                  score >= questions.length * 0.5 ? 'Pas mal ! 👍' : 
+                                  'Continuez à vous entraîner ! 💪'}
+                            </p>
+                            <button onclick="closeModal()" class="modal-btn primary">
+                                Fermer
+                            </button>
+                        </div>
+                    `);
+                    return;
+                }
+                
+                const q = questions[currentQ];
+                const html = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 64px; margin-bottom: 16px;">🎯</div>
+                        <h2 style="font-size: 32px; margin-bottom: 20px;">Quiz</h2>
+                        <div style="font-size: 18px; margin-bottom: 28px; opacity: 0.85;">
+                            Question ${currentQ + 1} / ${questions.length}
+                        </div>
+                        <div style="font-size: 24px; font-weight: 700; margin-bottom: 32px; line-height: 1.5;">
+                            ${q.q}
+                        </div>
+                        <div style="display: grid; gap: 16px; margin-bottom: 28px;">
+                            ${q.options.map((opt, i) => `
+                                <button onclick="checkAnswer(${i})" 
+                                        style="padding: 20px; background: rgba(255,255,255,0.15); 
+                                               border: 2px solid rgba(255,255,255,0.3); border-radius: 14px; 
+                                               color: white; font-size: 20px; font-weight: 600; cursor: pointer; 
+                                               transition: all 0.3s;"
+                                        onmouseover="this.style.background='rgba(255,255,255,0.25)'"
+                                        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="closeModal()" class="modal-btn danger">
+                            Quitter
+                        </button>
+                    </div>
+                `;
+                showModal(html);
+            }
+            
+            window.checkAnswer = function(answer) {
+                const q = questions[currentQ];
+                if (answer === q.correct) {
+                    score++;
+                    speak('Bonne réponse !');
+                    showAlert('✓ Bonne réponse !', '#10b981');
+                } else {
+                    speak('Mauvaise réponse. La bonne réponse était ' + q.options[q.correct]);
+                    showAlert('✗ Mauvaise réponse', '#ef4444');
+                }
+                
+                currentQ++;
+                setTimeout(showQuestion, 1500);
+            };
+            
+            showQuestion();
+        }
+
+        // Activities - WORD SEARCH
+        function wordSearch() {
+            trackActivity();
+            speak('Mots cachés. Trouvez les mots dans la grille');
+            
+            const words = ['CHAT', 'SOLEIL', 'FLEUR', 'LIVRE'];
+            const gridSize = 8;
+            const grid = Array(gridSize).fill(0).map(() => Array(gridSize).fill(''));
+            
+            // Place words horizontally
+            grid[0][0] = 'C'; grid[0][1] = 'H'; grid[0][2] = 'A'; grid[0][3] = 'T';
+            grid[2][1] = 'S'; grid[2][2] = 'O'; grid[2][3] = 'L'; grid[2][4] = 'E'; grid[2][5] = 'I'; grid[2][6] = 'L';
+            grid[4][0] = 'F'; grid[4][1] = 'L'; grid[4][2] = 'E'; grid[4][3] = 'U'; grid[4][4] = 'R';
+            grid[6][2] = 'L'; grid[6][3] = 'I'; grid[6][4] = 'V'; grid[6][5] = 'R'; grid[6][6] = 'E';
+            
+            // Fill empty cells
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i][j] === '') {
+                        grid[i][j] = letters[Math.floor(Math.random() * letters.length)];
+                    }
+                }
+            }
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🔍</div>
+                    <h2 style="font-size: 32px; margin-bottom: 20px;">Mots Cachés</h2>
+                    <p style="font-size: 18px; margin-bottom: 24px; opacity: 0.9;">
+                        Trouvez les mots suivants dans la grille
+                    </p>
+                    <div id="wordBadges" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap;">
+                        ${words.map((w, i) => `<span class="word-badge" id="word${i}">${w}</span>`).join('')}
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; 
+                                max-width: 550px; margin: 0 auto 28px; padding: 20px; 
+                                background: rgba(255,255,255,0.1); border-radius: 16px;">
+                        ${grid.map((row, i) => row.map((cell, j) => 
+                            `<div class="word-cell" onclick="selectCell(${i}, ${j})" id="cell-${i}-${j}">${cell}</div>`
+                        ).join('')).join('')}
+                    </div>
+                    <div style="font-size: 18px; margin-bottom: 20px; font-weight: 700;">
+                        Mots trouvés: <span id="wordsFound">0</span> / ${words.length}
+                    </div>
+                    <button onclick="closeModal()" class="modal-btn danger">
+                        Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.wordSearchState = {
+                words: words,
+                grid: grid,
+                selected: [],
+                found: [],
+                wordsPositions: [
+                    [[0,0], [0,1], [0,2], [0,3]],
+                    [[2,1], [2,2], [2,3], [2,4], [2,5], [2,6]],
+                    [[4,0], [4,1], [4,2], [4,3], [4,4]],
+                    [[6,2], [6,3], [6,4], [6,5], [6,6]]
+                ]
+            };
+        }
+
+        window.selectCell = function(row, col) {
+            const state = window.wordSearchState;
+            if (!state) return;
+            
+            const cellId = `cell-${row}-${col}`;
+            const cell = document.getElementById(cellId);
+            const index = state.selected.findIndex(s => s.row === row && s.col === col);
+            
+            if (index >= 0) {
+                state.selected.splice(index, 1);
+                cell.classList.remove('selected');
+            } else {
+                state.selected.push({row, col, letter: state.grid[row][col]});
+                cell.classList.add('selected');
+                checkWord();
+            }
+        };
+
+        function checkWord() {
+            const state = window.wordSearchState;
+            if (!state || state.selected.length < 3) return;
+            
+            const selectedWord = state.selected.map(s => s.letter).join('');
+            const wordIndex = state.words.findIndex(w => w === selectedWord);
+            
+            if (wordIndex >= 0 && !state.found.includes(wordIndex)) {
+                state.found.push(wordIndex);
+                
+                state.selected.forEach(s => {
+                    const cell = document.getElementById(`cell-${s.row}-${s.col}`);
+                    cell.classList.remove('selected');
+                    cell.classList.add('found');
+                });
+                
+                const badge = document.getElementById(`word${wordIndex}`);
+                if (badge) badge.classList.add('found');
+                
+                const counter = document.getElementById('wordsFound');
+                if (counter) counter.textContent = state.found.length;
+                
+                speak(`Bravo ! Vous avez trouvé ${state.words[wordIndex]}`);
+                state.selected = [];
+                
+                if (state.found.length === state.words.length) {
+                    setTimeout(() => {
+                        speak('Félicitations ! Vous avez trouvé tous les mots');
+                        showAlert('🎉 Tous les mots trouvés !', '#10b981');
+                    }, 1000);
+                }
+            }
+        }
+
+        // Activities - MUSIC THERAPY
+        function music() {
+            trackActivity();
+            speak('Musicothérapie. Choisissez votre playlist préférée');
+            
+            const playlists = [
+                {
+                    name: 'Musique Classique',
+                    icon: '🎻',
+                    desc: 'Mozart, Beethoven, Chopin, Vivaldi',
+                    tracks: [
+                        { title: 'Clair de Lune - Debussy', url: 'https://www.youtube.com/watch?v=CvFH_6DNRCY' },
+                        { title: 'Les Quatre Saisons - Vivaldi', url: 'https://www.youtube.com/watch?v=GRxofEmo3HA' },
+                        { title: 'Pour Élise - Beethoven', url: 'https://www.youtube.com/watch?v=_mVW8tgGY_w' },
+                        { title: 'Nocturne Op.9 No.2 - Chopin', url: 'https://www.youtube.com/watch?v=9E6b3swbnWg' }
+                    ]
+                },
+                {
+                    name: 'Chansons Françaises',
+                    icon: '🎤',
+                    desc: 'Édith Piaf, Jacques Brel, Charles Aznavour',
+                    tracks: [
+                        { title: 'La Vie en Rose - Édith Piaf', url: 'https://www.youtube.com/watch?v=kFzViYkZAz4' },
+                        { title: 'Ne Me Quitte Pas - Jacques Brel', url: 'https://www.youtube.com/watch?v=M1L-RlyVXaQ' },
+                        { title: 'La Bohème - Charles Aznavour', url: 'https://www.youtube.com/watch?v=Q05yhaRpr64' },
+                        { title: 'Les Champs-Élysées - Joe Dassin', url: 'https://www.youtube.com/watch?v=d9V_vMBIF2o' }
+                    ]
+                },
+                {
+                    name: 'Jazz Doux',
+                    icon: '🎺',
+                    desc: 'Jazz relaxant et apaisant',
+                    tracks: [
+                        { title: 'Take Five - Dave Brubeck', url: 'https://www.youtube.com/watch?v=vmDDOFXSgAs' },
+                        { title: 'Blue in Green - Miles Davis', url: 'https://www.youtube.com/watch?v=PoPL7BExSQU' },
+                        { title: 'Autumn Leaves - Bill Evans', url: 'https://www.youtube.com/watch?v=r-Z8KuwI7Gc' },
+                        { title: 'Summertime - Ella Fitzgerald', url: 'https://www.youtube.com/watch?v=P4KXAYqAMcI' }
+                    ]
+                },
+                {
+                    name: 'Nature et Sons Zen',
+                    icon: '🌿',
+                    desc: 'Sons de la nature, relaxation',
+                    tracks: [
+                        { title: 'Sons de Forêt Relaxants', url: 'https://www.youtube.com/watch?v=eKFTSSKCzWA' },
+                        { title: 'Chants d\'Oiseaux', url: 'https://www.youtube.com/watch?v=muSaJGXquE4' },
+                        { title: 'Pluie Douce', url: 'https://www.youtube.com/watch?v=q76bMs-NwRk' },
+                        { title: 'Vagues Océan', url: 'https://www.youtube.com/watch?v=bn9F19Hi1Lk' }
+                    ]
+                }
+            ];
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 72px; margin-bottom: 20px;">🎵</div>
+                    <h2 style="font-size: 36px; margin-bottom: 24px;">Musicothérapie</h2>
+                    <p style="font-size: 19px; margin-bottom: 28px; opacity: 0.9;">
+                        Choisissez votre playlist favorite
+                    </p>
+                    <div style="display: grid; gap: 16px; max-height: 500px; overflow-y: auto; margin-bottom: 28px;">
+                        ${playlists.map((p, i) => `
+                            <div onclick="showPlaylist(${i})" 
+                                 style="background: rgba(255,255,255,0.1); padding: 24px; border-radius: 14px; 
+                                        cursor: pointer; transition: all 0.3s; text-align: left; 
+                                        border: 2px solid rgba(255,255,255,0.2);"
+                                 onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateX(8px)'"
+                                 onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateX(0)'">
+                                <div style="display: flex; align-items: center; gap: 20px;">
+                                    <div style="font-size: 56px;">${p.icon}</div>
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 24px; margin-bottom: 8px; font-weight: 700;">
+                                            ${p.name}
+                                        </h3>
+                                        <p style="font-size: 17px; opacity: 0.85; line-height: 1.5;">
+                                            ${p.desc}
+                                        </p>
+                                        <p style="font-size: 15px; opacity: 0.7; margin-top: 8px;">
+                                            ${p.tracks.length} morceaux
+                                        </p>
+                                    </div>
+                                    <div style="font-size: 36px;">▶️</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="closeModal()" class="modal-btn danger">
+                        Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            window.musicPlaylists = playlists;
+        }
+
+        window.showPlaylist = function(index) {
+            const playlist = window.musicPlaylists[index];
+            speak(`Playlist ${playlist.name} sélectionnée`);
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 72px; margin-bottom: 16px;">${playlist.icon}</div>
+                    <h2 style="font-size: 32px; margin-bottom: 16px;">${playlist.name}</h2>
+                    <p style="font-size: 18px; opacity: 0.9; margin-bottom: 28px;">${playlist.desc}</p>
+                    
+                    <div style="max-height: 450px; overflow-y: auto; margin-bottom: 24px;">
+                        ${playlist.tracks.map((track, i) => `
+                            <div style="background: rgba(255,255,255,0.1); padding: 18px; border-radius: 12px; 
+                                        margin-bottom: 12px; display: flex; justify-content: space-between; 
+                                        align-items: center; border: 1px solid rgba(255,255,255,0.2);">
+                                <div style="text-align: left; flex: 1;">
+                                    <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">
+                                        ${i + 1}. ${track.title}
+                                    </div>
+                                </div>
+                                <a href="${track.url}" target="_blank" 
+                                   onclick="speak('Ouverture de ${track.title.replace(/'/g, ' ')}')"
+                                   style="text-decoration: none;">
+                                    <button class="modal-btn primary" 
+                                            style="padding: 12px 20px; font-size: 16px;">
+                                        <i class="fas fa-play"></i> Écouter
+                                    </button>
+                                </a>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="music()" class="modal-btn secondary" style="margin-right: 12px;">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </button>
+                    <button onclick="closeModal()" class="modal-btn danger">
+                        Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        };
+
+        // Activities - BREATHING
+        function breathing() {
+            trackActivity();
+            speak('Exercice de respiration. Suivez le cercle et respirez profondément');
+            
+            const html = `
+                <div style="text-align: center;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">🌬️</div>
+                    <h2 style="font-size: 36px; margin-bottom: 24px;">Respiration Guidée</h2>
+                    <p style="font-size: 19px; margin-bottom: 12px; opacity: 0.9;">
+                        Suivez le cercle et respirez profondément
+                    </p>
+                    <p style="font-size: 16px; margin-bottom: 32px; opacity: 0.75;">
+                        Inspirez pendant 4 secondes, puis expirez pendant 4 secondes
+                    </p>
+                    
+                    <div style="width: 280px; height: 280px; margin: 0 auto 32px; 
+                                background: rgba(255,255,255,0.2); border-radius: 50%; 
+                                display: flex; align-items: center; justify-content: center; 
+                                animation: breathe 8s infinite ease-in-out;
+                                box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);">
+                        <div style="font-size: 36px; font-weight: 800;" id="breathText">
+                            Inspirez
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.85;">
+                        <div style="margin-bottom: 8px;">⏱️ Durée du cycle: 8 secondes</div>
+                        <div id="breathCounter" style="font-size: 24px; font-weight: 700; margin-top: 12px;">
+                            Cycle: <span id="cycleCount">1</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; 
+                                margin-bottom: 24px; text-align: left; max-width: 500px; margin-left: auto; 
+                                margin-right: auto;">
+                        <h3 style="font-size: 20px; margin-bottom: 12px; font-weight: 700;">
+                            💡 Bienfaits de la respiration:
+                        </h3>
+                        <ul style="font-size: 16px; line-height: 1.8; opacity: 0.9; list-style-position: inside;">
+                            <li>Réduit le stress et l'anxiété</li>
+                            <li>Améliore la concentration</li>
+                            <li>Favorise le sommeil</li>
+                            <li>Apaise le système nerveux</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="stopBreathing()" class="modal-btn danger">
+                        Terminer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            let phase = 0;
+            let cycleCount = 1;
+            
+            window.breathingInterval = setInterval(() => {
+                const text = document.getElementById('breathText');
+                const counter = document.getElementById('cycleCount');
+                
+                if (!text) {
+                    clearInterval(window.breathingInterval);
+                    return;
+                }
+                
+                phase = (phase + 1) % 2;
+                
+                if (phase === 0) {
+                    text.textContent = 'Inspirez';
+                    speak('Inspirez');
+                    cycleCount++;
+                    if (counter) counter.textContent = cycleCount;
+                } else {
+                    text.textContent = 'Expirez';
+                    speak('Expirez');
+                }
+            }, 4000);
+            
+            setTimeout(() => speak('Inspirez profondément par le nez'), 100);
+        }
+
+        window.stopBreathing = function() {
+            if (window.breathingInterval) {
+                clearInterval(window.breathingInterval);
+                window.breathingInterval = null;
+            }
+            speak('Exercice de respiration terminé. Bien joué.');
+            closeModal();
+        };
+
+        // Modal System
+        function showModal(content) {
+            const existing = document.getElementById('modal');
+            if (existing) existing.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'modal';
+            overlay.className = 'modal-overlay';
+            overlay.onclick = function(e) {
+                if (e.target === overlay) closeModal();
+            };
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            modalContent.onclick = function(e) {
+                e.stopPropagation();
+            };
+            modalContent.innerHTML = content;
+            
+            overlay.appendChild(modalContent);
+            document.body.appendChild(overlay);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            if (modal) modal.remove();
+            
+            if (window.breathingInterval) {
+                clearInterval(window.breathingInterval);
+                window.breathingInterval = null;
+            }
+            
+            synth.cancel();
+            window.memoryState = null;
+            window.wordSearchState = null;
+        }
+
+        // Activity Tracking
+        function trackActivity() {
+            state.activityCount++;
+            state.lastActivity = Date.now();
+        }
+
+        // Simulation
+        function simulate() {
+            state.time += 0.0001;
+            if (state.time >= 24) {
+                state.time = 0;
+                state.dayIndex = (state.dayIndex + 1) % 7;
+            }
+            updateClock();
+        }
+
+        // Time Slider
+        document.getElementById('timeSlider').addEventListener('input', function(e) {
+            state.time = parseFloat(e.target.value);
+            updateClock();
+        });
+
+        // Event Listeners
+        document.addEventListener('click', trackActivity);
+        document.addEventListener('keypress', trackActivity);
+
+        // Initialization
+        async function init() {
+            console.log('🚀 Initialisation du système...');
+            
+            // Initialize speech synthesis
+            await initVoices();
+            
+            // Load initial state
+            state.currentDate = new Date();
+            state.dayIndex = state.currentDate.getDay();
+            
+            // Render UI
+            renderDevices();
+            renderPills();
+            updateClock();
+            
+            // Start simulation
+            setInterval(simulate, 1000);
+            
+            // Welcome message
+            setTimeout(() => {
+                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel. Je suis là pour vous accompagner.`;
+                speak(msg);
+                showAlert(`Bienvenue ! ${days[state.dayIndex]} 👋`, '#10b981');
+                
+                // Check medication stock
+                const emptyPills = state.pills.filter(p => p.count <= 0);
+                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                
+                if (emptyPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont épuisés.');
+                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                    }, 3000);
+                } else if (lowPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                        showAlert('⚠️ Stock faible', '#f59e0b');
+                    }, 3000);
+                }
+            }, 1500);
+            
+            console.log('✅ Système initialisé !');
+        }
+
+        // Start when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
