@@ -1,0 +1,2545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA Seniors - Version Améliorée 2026</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --morning-start: #FF6B6B;
+            --morning-mid: #FFD93D;
+            --morning-end: #6BCF7F;
+            --afternoon-start: #4A90E2;
+            --afternoon-mid: #7CB9E8;
+            --afternoon-end: #B0E0E6;
+            --evening-start: #2C3E50;
+            --evening-mid: #34495E;
+            --evening-end: #1A252F;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --primary: #8B5CF6;
+            --secondary: #EC4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            scroll-behavior: smooth;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            transition: background 1.5s ease;
+        }
+
+        .background.morning {
+            background: linear-gradient(135deg, var(--morning-start) 0%, var(--morning-mid) 50%, var(--morning-end) 100%);
+        }
+
+        .background.afternoon {
+            background: linear-gradient(135deg, var(--afternoon-start) 0%, var(--afternoon-mid) 50%, var(--afternoon-end) 100%);
+        }
+
+        .background.evening {
+            background: linear-gradient(135deg, var(--evening-start) 0%, var(--evening-mid) 50%, var(--evening-end) 100%);
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            padding: 20px;
+            height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* Modern Alert Banner */
+        .alert-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--glass-border);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 30px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            border-radius: 16px;
+            color: white;
+            font-size: 22px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-item i {
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        /* Main Content Grid */
+        .main-content {
+            display: grid;
+            grid-template-columns: 340px 1fr 400px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 28px;
+            color: white;
+            overflow-y: auto;
+            animation: fadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 28px;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        /* Modern Device Panel */
+        .device-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 18px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .device-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .device-item:hover::before {
+            opacity: 1;
+        }
+
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .device-name {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 700;
+            font-size: 19px;
+        }
+
+        .device-name i {
+            font-size: 28px;
+            width: 36px;
+            text-align: center;
+        }
+
+        .device-status {
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .device-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        /* Modern Buttons with UX/UI Effects */
+        .device-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 17px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .device-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .device-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .device-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .device-btn.on {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .device-btn.off {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        /* Medication Panel */
+        .pill-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pill-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .pill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .pill-name {
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pill-count {
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-count.empty {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .pill-count.low {
+            background: rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+
+        .pill-count.ok {
+            background: rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .pill-schedule {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pill-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .pill-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .pill-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .pill-btn.take {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .pill-btn.edit {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .pill-btn.delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Central Activities Grid */
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .activity-card:hover::before {
+            opacity: 1;
+        }
+
+        .activity-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .activity-card:active {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .activity-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .activity-card:hover .activity-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .activity-label {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Voice Control Button */
+        .voice-control {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.5);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-control:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.7);
+        }
+
+        .voice-control:active {
+            transform: scale(1.05);
+        }
+
+        .voice-control.listening {
+            animation: voicePulse 1.5s infinite;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 30px rgba(239, 68, 68, 0.5);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 12px 50px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-item {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .footer-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .footer-item i {
+            font-size: 24px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.95) 0%, rgba(20, 20, 40, 0.98) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 28px;
+            padding: 40px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            color: white;
+            margin: 8px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        .modal-btn.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .modal-btn.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Photo Gallery */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .photo-item:hover .photo-delete {
+            opacity: 1;
+        }
+
+        .photo-delete:hover {
+            background: #dc2626;
+            transform: scale(1.2) rotate(90deg);
+        }
+
+        /* Contact List */
+        .contact-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .contact-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(8px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .contact-name {
+            font-weight: 700;
+            font-size: 19px;
+        }
+
+        .contact-phone {
+            opacity: 0.8;
+            font-size: 16px;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .contact-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .contact-btn.call {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .contact-btn.edit {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .contact-btn.delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* RDV List */
+        .rdv-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .rdv-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .rdv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .rdv-title {
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rdv-date {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .rdv-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        /* Time slider */
+        .time-slider-container {
+            margin-top: 10px;
+        }
+
+        .time-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .time-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 300px 1fr 350px;
+            }
+            .activities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            .activities-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background morning" id="background"></div>
+    
+    <div class="container">
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alertBanner" style="display: none;">
+            <div class="alert-item" id="alertContent"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Domotique -->
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-home"></i>
+                    Domotique
+                </div>
+                <div id="devicesList"></div>
+            </div>
+
+            <!-- Center Panel - Activities -->
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-star"></i>
+                    Activités
+                </div>
+                <div class="activities-grid">
+                    <div class="activity-card" onclick="showWeather()">
+                        <div class="activity-icon"><i class="fas fa-cloud-sun"></i></div>
+                        <div class="activity-label">Météo</div>
+                    </div>
+                    <div class="activity-card" onclick="showContacts()">
+                        <div class="activity-icon"><i class="fas fa-address-book"></i></div>
+                        <div class="activity-label">Contacts</div>
+                    </div>
+                    <div class="activity-card" onclick="showRDV()">
+                        <div class="activity-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="activity-label">Rendez-vous</div>
+                    </div>
+                    <div class="activity-card" onclick="showPhotoAlbum()">
+                        <div class="activity-icon"><i class="fas fa-images"></i></div>
+                        <div class="activity-label">Album Photo</div>
+                    </div>
+                    <div class="activity-card" onclick="music()">
+                        <div class="activity-icon"><i class="fas fa-music"></i></div>
+                        <div class="activity-label">Musique</div>
+                    </div>
+                    <div class="activity-card" onclick="games()">
+                        <div class="activity-icon"><i class="fas fa-gamepad"></i></div>
+                        <div class="activity-label">Jeux</div>
+                    </div>
+                    <div class="activity-card" onclick="news()">
+                        <div class="activity-icon"><i class="fas fa-newspaper"></i></div>
+                        <div class="activity-label">Actualités</div>
+                    </div>
+                    <div class="activity-card" onclick="breathing()">
+                        <div class="activity-icon"><i class="fas fa-wind"></i></div>
+                        <div class="activity-label">Respiration</div>
+                    </div>
+                    <div class="activity-card" onclick="meditation()">
+                        <div class="activity-icon"><i class="fas fa-spa"></i></div>
+                        <div class="activity-label">Méditation</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Médicaments -->
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-pills"></i>
+                    Médicaments
+                </div>
+                <button onclick="addMedication()" class="modal-btn primary" style="width: 100%; margin-bottom: 20px;">
+                    <i class="fas fa-plus"></i> Ajouter un médicament
+                </button>
+                <div id="pillsList"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-item">
+                <i class="fas fa-clock"></i>
+                <span id="currentTime">12:00</span>
+            </div>
+            <div class="footer-item">
+                <i class="fas fa-calendar"></i>
+                <span id="currentDate">Lundi 1 Janvier</span>
+            </div>
+            <div class="footer-item">
+                <i class="fas fa-thermometer-half"></i>
+                <span id="temperature">22°C</span>
+            </div>
+            <div class="time-slider-container" style="flex: 1; max-width: 300px; margin: 0 20px;">
+                <input type="range" id="timeSlider" class="time-slider" min="0" max="24" step="0.1" value="12">
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Control Button -->
+    <button class="voice-control" id="voiceBtn" onclick="toggleVoice()">
+        <i class="fas fa-microphone"></i>
+    </button>
+
+    <script>
+        // State Management
+        const state = {
+            time: 12,
+            dayIndex: 1,
+            currentDate: new Date(),
+            activityCount: 0,
+            lastActivity: Date.now(),
+            devices: [
+                { id: 1, name: 'Lumière Salon', icon: 'fa-lightbulb', status: 'off', type: 'light' },
+                { id: 2, name: 'Chauffage', icon: 'fa-fire', status: 'off', type: 'heater', temp: 20 },
+                { id: 3, name: 'Volets', icon: 'fa-window-maximize', status: 'fermés', type: 'blinds' },
+                { id: 4, name: 'Porte', icon: 'fa-door-closed', status: 'verrouillée', type: 'door' }
+            ],
+            pills: [
+                { id: 1, name: 'Doliprane', icon: 'fa-capsules', times: ['08:00', '14:00', '20:00'], count: 15 },
+                { id: 2, name: 'Aspirine', icon: 'fa-pills', times: ['09:00'], count: 8 },
+                { id: 3, name: 'Vitamine D', icon: 'fa-tablet', times: ['08:00'], count: 3 }
+            ],
+            contacts: [
+                { id: 1, name: 'Marie (Fille)', phone: '06 12 34 56 78', icon: 'fa-user' },
+                { id: 2, name: 'Dr. Martin', phone: '01 23 45 67 89', icon: 'fa-user-md' },
+                { id: 3, name: 'Pierre (Fils)', phone: '06 98 76 54 32', icon: 'fa-user' },
+                { id: 4, name: 'Urgences', phone: '15', icon: 'fa-ambulance' }
+            ],
+            rdv: [
+                { id: 1, title: 'Médecin généraliste', date: '15 Janvier 2026', time: '10:00', icon: 'fa-stethoscope' },
+                { id: 2, title: 'Coiffeur', date: '18 Janvier 2026', time: '14:30', icon: 'fa-cut' },
+                { id: 3, title: 'Dentiste', date: '22 Janvier 2026', time: '09:00', icon: 'fa-tooth' }
+            ],
+            photos: [
+                { id: 1, url: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400', caption: 'Famille' },
+                { id: 2, url: 'https://images.unsplash.com/photo-1476900543704-4312b78632f8?w=400', caption: 'Vacances' },
+                { id: 3, url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400', caption: 'Nature' },
+                { id: 4, url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400', caption: 'Montagne' },
+                { id: 5, url: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400', caption: 'Coucher de soleil' },
+                { id: 6, url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400', caption: 'Forêt' }
+            ]
+        };
+
+        // Speech Synthesis
+        const synth = window.speechSynthesis;
+        let voices = [];
+        let recognition = null;
+        let isListening = false;
+
+        function initVoices() {
+            return new Promise((resolve) => {
+                voices = synth.getVoices();
+                if (voices.length > 0) {
+                    resolve();
+                } else {
+                    synth.onvoiceschanged = () => {
+                        voices = synth.getVoices();
+                        resolve();
+                    };
+                }
+            });
+        }
+
+        function speak(text) {
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            const frenchVoice = voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            synth.speak(utterance);
+        }
+
+        // Voice Recognition
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'fr-FR';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    console.log('Commande vocale:', transcript);
+                    processVoiceCommand(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Erreur reconnaissance vocale:', event.error);
+                    stopListening();
+                };
+
+                recognition.onend = () => {
+                    stopListening();
+                };
+            } else {
+                console.warn('Reconnaissance vocale non supportée');
+            }
+        }
+
+        function toggleVoice() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            if (!recognition) {
+                speak('Désolé, la reconnaissance vocale n\'est pas disponible sur ce navigateur');
+                return;
+            }
+            
+            isListening = true;
+            document.getElementById('voiceBtn').classList.add('listening');
+            speak('Je vous écoute');
+            
+            setTimeout(() => {
+                recognition.start();
+            }, 1500);
+        }
+
+        function stopListening() {
+            isListening = false;
+            document.getElementById('voiceBtn').classList.remove('listening');
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        function processVoiceCommand(command) {
+            console.log('Traitement commande:', command);
+
+            // Météo
+            if (command.includes('météo') || command.includes('temps qu\'il fait') || command.includes('température')) {
+                showWeather();
+                return;
+            }
+
+            // Heure
+            if (command.includes('heure') || command.includes('quelle heure')) {
+                const hours = Math.floor(state.time);
+                const minutes = Math.floor((state.time % 1) * 60);
+                speak(`Il est ${hours} heures ${minutes}`);
+                return;
+            }
+
+            // Date
+            if (command.includes('date') || command.includes('jour') || command.includes('quel jour')) {
+                const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+                const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+                speak(`Nous sommes ${days[state.dayIndex]} ${state.currentDate.getDate()} ${months[state.currentDate.getMonth()]}`);
+                return;
+            }
+
+            // Médicaments
+            if (command.includes('médicament') || command.includes('pilule') || command.includes('traitement')) {
+                if (command.includes('prendre') || command.includes('pris')) {
+                    speak('Voici la liste de vos médicaments. Lequel souhaitez-vous prendre ?');
+                } else if (command.includes('ajouter')) {
+                    addMedication();
+                } else {
+                    speak(`Vous avez ${state.pills.length} médicaments dans votre traitement`);
+                }
+                return;
+            }
+
+            // Contacts
+            if (command.includes('contact') || command.includes('appeler') || command.includes('téléphone')) {
+                showContacts();
+                return;
+            }
+
+            // Rendez-vous
+            if (command.includes('rendez-vous') || command.includes('rdv') || command.includes('rendez vous')) {
+                showRDV();
+                return;
+            }
+
+            // Album photo
+            if (command.includes('photo') || command.includes('album') || command.includes('image')) {
+                showPhotoAlbum();
+                return;
+            }
+
+            // Lumières
+            if (command.includes('lumière') || command.includes('éclairage')) {
+                const device = state.devices.find(d => d.type === 'light');
+                if (command.includes('allume') || command.includes('ouvre')) {
+                    device.status = 'on';
+                    speak('J\'allume la lumière');
+                } else if (command.includes('éteins') || command.includes('ferme')) {
+                    device.status = 'off';
+                    speak('J\'éteins la lumière');
+                }
+                renderDevices();
+                return;
+            }
+
+            // Chauffage
+            if (command.includes('chauffage') || command.includes('température')) {
+                const device = state.devices.find(d => d.type === 'heater');
+                if (command.includes('monte') || command.includes('augmente')) {
+                    device.temp += 1;
+                    speak(`Je monte le chauffage à ${device.temp} degrés`);
+                } else if (command.includes('baisse') || command.includes('diminue')) {
+                    device.temp -= 1;
+                    speak(`Je baisse le chauffage à ${device.temp} degrés`);
+                } else if (command.includes('allume')) {
+                    device.status = 'on';
+                    speak('J\'allume le chauffage');
+                } else if (command.includes('éteins')) {
+                    device.status = 'off';
+                    speak('J\'éteins le chauffage');
+                }
+                renderDevices();
+                return;
+            }
+
+            // Volets
+            if (command.includes('volet')) {
+                const device = state.devices.find(d => d.type === 'blinds');
+                if (command.includes('ouvre')) {
+                    device.status = 'ouverts';
+                    speak('J\'ouvre les volets');
+                } else if (command.includes('ferme')) {
+                    device.status = 'fermés';
+                    speak('Je ferme les volets');
+                }
+                renderDevices();
+                return;
+            }
+
+            // Activités
+            if (command.includes('musique')) {
+                music();
+                return;
+            }
+            if (command.includes('jeu') || command.includes('jouer')) {
+                games();
+                return;
+            }
+            if (command.includes('actualité') || command.includes('nouvelles') || command.includes('info')) {
+                news();
+                return;
+            }
+            if (command.includes('respiration') || command.includes('respirer')) {
+                breathing();
+                return;
+            }
+            if (command.includes('méditation') || command.includes('méditer')) {
+                meditation();
+                return;
+            }
+
+            // Commande non reconnue
+            speak('Désolé, je n\'ai pas compris votre demande. Pouvez-vous répéter ?');
+        }
+
+        // Alert System
+        function showAlert(message, color = '#3b82f6') {
+            const banner = document.getElementById('alertBanner');
+            const content = document.getElementById('alertContent');
+            content.innerHTML = `<i class="fas fa-bell"></i> ${message}`;
+            content.style.background = `${color}40`;
+            content.style.borderColor = `${color}70`;
+            banner.style.display = 'block';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update Clock
+        function updateClock() {
+            const hours = Math.floor(state.time);
+            const minutes = Math.floor((state.time % 1) * 60);
+            const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            document.getElementById('currentTime').textContent = timeStr;
+
+            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            const dateStr = `${days[state.dayIndex]} ${state.currentDate.getDate()} ${months[state.currentDate.getMonth()]}`;
+            document.getElementById('currentDate').textContent = dateStr;
+
+            // Update background
+            const bg = document.getElementById('background');
+            bg.className = 'background';
+            if (hours >= 6 && hours < 12) {
+                bg.classList.add('morning');
+            } else if (hours >= 12 && hours < 19) {
+                bg.classList.add('afternoon');
+            } else {
+                bg.classList.add('evening');
+            }
+        }
+
+        // Render Devices
+        function renderDevices() {
+            const container = document.getElementById('devicesList');
+            container.innerHTML = state.devices.map(device => `
+                <div class="device-item">
+                    <div class="device-header">
+                        <div class="device-name">
+                            <i class="fas ${device.icon}"></i>
+                            ${device.name}
+                        </div>
+                        <div class="device-status">${device.status}</div>
+                    </div>
+                    ${device.type === 'heater' ? `
+                        <div style="margin-top: 12px; font-size: 16px;">
+                            <i class="fas fa-thermometer-half"></i> ${device.temp}°C
+                        </div>
+                    ` : ''}
+                    <div class="device-controls">
+                        ${getDeviceButtons(device)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getDeviceButtons(device) {
+            switch (device.type) {
+                case 'light':
+                    return `
+                        <button class="device-btn ${device.status === 'on' ? 'on' : 'off'}" 
+                                onclick="toggleDevice(${device.id})">
+                            ${device.status === 'on' ? 'Éteindre' : 'Allumer'}
+                        </button>
+                    `;
+                case 'heater':
+                    return `
+                        <button class="device-btn ${device.status === 'on' ? 'on' : 'off'}" 
+                                onclick="toggleDevice(${device.id})">
+                            ${device.status === 'on' ? 'Éteindre' : 'Allumer'}
+                        </button>
+                        <button class="device-btn on" onclick="changeTemp(${device.id}, -1)">-</button>
+                        <button class="device-btn on" onclick="changeTemp(${device.id}, 1)">+</button>
+                    `;
+                case 'blinds':
+                    return `
+                        <button class="device-btn ${device.status === 'ouverts' ? 'on' : 'off'}" 
+                                onclick="toggleBlinds(${device.id})">
+                            ${device.status === 'ouverts' ? 'Fermer' : 'Ouvrir'}
+                        </button>
+                    `;
+                case 'door':
+                    return `
+                        <button class="device-btn ${device.status === 'déverrouillée' ? 'on' : 'off'}" 
+                                onclick="toggleDoor(${device.id})">
+                            ${device.status === 'déverrouillée' ? 'Verrouiller' : 'Déverrouiller'}
+                        </button>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        function toggleDevice(id) {
+            const device = state.devices.find(d => d.id === id);
+            device.status = device.status === 'on' ? 'off' : 'on';
+            speak(`${device.name} ${device.status === 'on' ? 'allumé' : 'éteint'}`);
+            renderDevices();
+        }
+
+        function changeTemp(id, delta) {
+            const device = state.devices.find(d => d.id === id);
+            device.temp += delta;
+            speak(`Température réglée à ${device.temp} degrés`);
+            renderDevices();
+        }
+
+        function toggleBlinds(id) {
+            const device = state.devices.find(d => d.id === id);
+            device.status = device.status === 'ouverts' ? 'fermés' : 'ouverts';
+            speak(`Volets ${device.status}`);
+            renderDevices();
+        }
+
+        function toggleDoor(id) {
+            const device = state.devices.find(d => d.id === id);
+            device.status = device.status === 'verrouillée' ? 'déverrouillée' : 'verrouillée';
+            speak(`Porte ${device.status}`);
+            renderDevices();
+        }
+
+        // Render Pills
+        function renderPills() {
+            const container = document.getElementById('pillsList');
+            container.innerHTML = state.pills.map(pill => {
+                const countClass = pill.count <= 0 ? 'empty' : pill.count <= 5 ? 'low' : 'ok';
+                return `
+                    <div class="pill-item">
+                        <div class="pill-header">
+                            <div class="pill-name">
+                                <i class="fas ${pill.icon}"></i>
+                                ${pill.name}
+                            </div>
+                            <div class="pill-count ${countClass}">
+                                ${pill.count} ${pill.count <= 1 ? 'comprimé' : 'comprimés'}
+                            </div>
+                        </div>
+                        <div class="pill-schedule">
+                            <i class="fas fa-clock"></i>
+                            ${pill.times.join(', ')}
+                        </div>
+                        <div class="pill-actions">
+                            <button class="pill-btn take" onclick="takePill(${pill.id})">
+                                <i class="fas fa-check"></i> Prendre
+                            </button>
+                            <button class="pill-btn edit" onclick="editMedication(${pill.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="pill-btn delete" onclick="deleteMedication(${pill.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function takePill(id) {
+            const pill = state.pills.find(p => p.id === id);
+            if (pill.count > 0) {
+                pill.count--;
+                speak(`${pill.name} pris. Il reste ${pill.count} comprimés`);
+                renderPills();
+                
+                if (pill.count <= 0) {
+                    showAlert(`⚠️ Plus de ${pill.name} !`, '#ef4444');
+                } else if (pill.count <= 5) {
+                    showAlert(`⚠️ Stock faible de ${pill.name}`, '#f59e0b');
+                }
+            } else {
+                speak(`Plus de ${pill.name} disponible`);
+                showAlert(`⚠️ Plus de ${pill.name} !`, '#ef4444');
+            }
+        }
+
+        function addMedication() {
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-pills"></i> Ajouter un médicament
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom du médicament</label>
+                        <input type="text" id="medName" class="form-input" placeholder="Ex: Doliprane">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Horaires de prise (séparés par des virgules)</label>
+                        <input type="text" id="medTimes" class="form-input" placeholder="Ex: 08:00, 14:00, 20:00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nombre de comprimés</label>
+                        <input type="number" id="medCount" class="form-input" placeholder="Ex: 30" value="30">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Icône</label>
+                        <select id="medIcon" class="form-input">
+                            <option value="fa-capsules">Gélules</option>
+                            <option value="fa-pills">Pilules</option>
+                            <option value="fa-tablet">Comprimés</option>
+                            <option value="fa-syringe">Injection</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="saveMedication()" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveMedication() {
+            const name = document.getElementById('medName').value;
+            const times = document.getElementById('medTimes').value.split(',').map(t => t.trim());
+            const count = parseInt(document.getElementById('medCount').value);
+            const icon = document.getElementById('medIcon').value;
+
+            if (!name || times.length === 0) {
+                speak('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newId = Math.max(...state.pills.map(p => p.id), 0) + 1;
+            state.pills.push({
+                id: newId,
+                name: name,
+                icon: icon,
+                times: times,
+                count: count
+            });
+
+            speak(`${name} ajouté à votre traitement`);
+            renderPills();
+            closeModal();
+        }
+
+        function editMedication(id) {
+            const pill = state.pills.find(p => p.id === id);
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-edit"></i> Modifier ${pill.name}
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom du médicament</label>
+                        <input type="text" id="medName" class="form-input" value="${pill.name}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Horaires de prise</label>
+                        <input type="text" id="medTimes" class="form-input" value="${pill.times.join(', ')}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nombre de comprimés</label>
+                        <input type="number" id="medCount" class="form-input" value="${pill.count}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Icône</label>
+                        <select id="medIcon" class="form-input">
+                            <option value="fa-capsules" ${pill.icon === 'fa-capsules' ? 'selected' : ''}>Gélules</option>
+                            <option value="fa-pills" ${pill.icon === 'fa-pills' ? 'selected' : ''}>Pilules</option>
+                            <option value="fa-tablet" ${pill.icon === 'fa-tablet' ? 'selected' : ''}>Comprimés</option>
+                            <option value="fa-syringe" ${pill.icon === 'fa-syringe' ? 'selected' : ''}>Injection</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="updateMedication(${id})" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function updateMedication(id) {
+            const pill = state.pills.find(p => p.id === id);
+            pill.name = document.getElementById('medName').value;
+            pill.times = document.getElementById('medTimes').value.split(',').map(t => t.trim());
+            pill.count = parseInt(document.getElementById('medCount').value);
+            pill.icon = document.getElementById('medIcon').value;
+
+            speak(`${pill.name} modifié`);
+            renderPills();
+            closeModal();
+        }
+
+        function deleteMedication(id) {
+            const pill = state.pills.find(p => p.id === id);
+            if (confirm(`Voulez-vous vraiment supprimer ${pill.name} ?`)) {
+                state.pills = state.pills.filter(p => p.id !== id);
+                speak(`${pill.name} supprimé`);
+                renderPills();
+            }
+        }
+
+        // Weather Activity
+        function showWeather() {
+            trackActivity();
+            speak('Voici la météo du jour');
+            
+            const html = `
+                <div style="text-align: center; max-width: 700px;">
+                    <h2 style="font-size: 42px; margin-bottom: 24px;">
+                        <i class="fas fa-cloud-sun"></i> Météo
+                    </h2>
+                    
+                    <div style="background: rgba(255,255,255,0.1); border-radius: 20px; padding: 40px; margin-bottom: 24px;">
+                        <div style="font-size: 72px; margin-bottom: 20px;">☀️</div>
+                        <div style="font-size: 64px; font-weight: 800; margin-bottom: 16px;">22°C</div>
+                        <div style="font-size: 28px; margin-bottom: 24px;">Ensoleillé</div>
+                        <div style="font-size: 20px; opacity: 0.9;">
+                            <i class="fas fa-wind"></i> Vent: 15 km/h<br>
+                            <i class="fas fa-tint"></i> Humidité: 65%<br>
+                            <i class="fas fa-sun"></i> UV: 3/10
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; text-align: left;">
+                        <h3 style="font-size: 24px; margin-bottom: 16px; text-align: center;">
+                            <i class="fas fa-calendar-week"></i> Prévisions
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="font-weight: 700; margin-bottom: 8px;">Demain</div>
+                                <div style="font-size: 36px; margin: 12px 0;">🌤️</div>
+                                <div style="font-size: 24px; font-weight: 700;">20°C</div>
+                            </div>
+                            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="font-weight: 700; margin-bottom: 8px;">Lundi</div>
+                                <div style="font-size: 36px; margin: 12px 0;">⛅</div>
+                                <div style="font-size: 24px; font-weight: 700;">18°C</div>
+                            </div>
+                            <div style="text-align: center; padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                <div style="font-weight: 700; margin-bottom: 8px;">Mardi</div>
+                                <div style="font-size: 36px; margin: 12px 0;">🌧️</div>
+                                <div style="font-size: 24px; font-weight: 700;">16°C</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn primary" style="margin-top: 24px;">
+                        <i class="fas fa-check"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        // Contacts Activity
+        function showContacts() {
+            trackActivity();
+            speak('Voici vos contacts');
+            
+            const html = `
+                <div style="max-width: 800px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-address-book"></i> Mes Contacts
+                    </h2>
+                    
+                    <button onclick="addContact()" class="modal-btn primary" style="width: 100%; margin-bottom: 24px;">
+                        <i class="fas fa-plus"></i> Ajouter un contact
+                    </button>
+                    
+                    <div>
+                        ${state.contacts.map(contact => `
+                            <div class="contact-item">
+                                <div class="contact-info">
+                                    <div class="contact-icon">
+                                        <i class="fas ${contact.icon}"></i>
+                                    </div>
+                                    <div class="contact-details">
+                                        <div class="contact-name">${contact.name}</div>
+                                        <div class="contact-phone">${contact.phone}</div>
+                                    </div>
+                                </div>
+                                <div class="contact-actions">
+                                    <button class="contact-btn call" onclick="callContact('${contact.name}', '${contact.phone}')">
+                                        <i class="fas fa-phone"></i> Appeler
+                                    </button>
+                                    <button class="contact-btn edit" onclick="editContact(${contact.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="contact-btn delete" onclick="deleteContact(${contact.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function callContact(name, phone) {
+            speak(`Appel de ${name} au ${phone}`);
+            showAlert(`📞 Appel de ${name}...`, '#10b981');
+        }
+
+        function addContact() {
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-user-plus"></i> Ajouter un contact
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" id="contactName" class="form-input" placeholder="Ex: Marie Dupont">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" id="contactPhone" class="form-input" placeholder="Ex: 06 12 34 56 78">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="contactIcon" class="form-input">
+                            <option value="fa-user">Personne</option>
+                            <option value="fa-user-md">Médecin</option>
+                            <option value="fa-ambulance">Urgence</option>
+                            <option value="fa-users">Famille</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="saveContact()" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="showContacts()" class="modal-btn secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveContact() {
+            const name = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+            const icon = document.getElementById('contactIcon').value;
+
+            if (!name || !phone) {
+                speak('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newId = Math.max(...state.contacts.map(c => c.id), 0) + 1;
+            state.contacts.push({
+                id: newId,
+                name: name,
+                phone: phone,
+                icon: icon
+            });
+
+            speak(`Contact ${name} ajouté`);
+            showContacts();
+        }
+
+        function editContact(id) {
+            const contact = state.contacts.find(c => c.id === id);
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-edit"></i> Modifier ${contact.name}
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" id="contactName" class="form-input" value="${contact.name}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" id="contactPhone" class="form-input" value="${contact.phone}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="contactIcon" class="form-input">
+                            <option value="fa-user" ${contact.icon === 'fa-user' ? 'selected' : ''}>Personne</option>
+                            <option value="fa-user-md" ${contact.icon === 'fa-user-md' ? 'selected' : ''}>Médecin</option>
+                            <option value="fa-ambulance" ${contact.icon === 'fa-ambulance' ? 'selected' : ''}>Urgence</option>
+                            <option value="fa-users" ${contact.icon === 'fa-users' ? 'selected' : ''}>Famille</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="updateContact(${id})" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="showContacts()" class="modal-btn secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function updateContact(id) {
+            const contact = state.contacts.find(c => c.id === id);
+            contact.name = document.getElementById('contactName').value;
+            contact.phone = document.getElementById('contactPhone').value;
+            contact.icon = document.getElementById('contactIcon').value;
+
+            speak(`Contact ${contact.name} modifié`);
+            showContacts();
+        }
+
+        function deleteContact(id) {
+            const contact = state.contacts.find(c => c.id === id);
+            if (confirm(`Voulez-vous vraiment supprimer ${contact.name} ?`)) {
+                state.contacts = state.contacts.filter(c => c.id !== id);
+                speak(`Contact ${contact.name} supprimé`);
+                showContacts();
+            }
+        }
+
+        // RDV Activity
+        function showRDV() {
+            trackActivity();
+            speak('Voici vos rendez-vous');
+            
+            const html = `
+                <div style="max-width: 800px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-calendar-check"></i> Mes Rendez-vous
+                    </h2>
+                    
+                    <button onclick="addRDV()" class="modal-btn primary" style="width: 100%; margin-bottom: 24px;">
+                        <i class="fas fa-plus"></i> Ajouter un rendez-vous
+                    </button>
+                    
+                    <div>
+                        ${state.rdv.map(rdv => `
+                            <div class="rdv-item">
+                                <div class="rdv-header">
+                                    <div class="rdv-title">
+                                        <i class="fas ${rdv.icon}"></i>
+                                        ${rdv.title}
+                                    </div>
+                                </div>
+                                <div class="rdv-date">
+                                    <i class="fas fa-calendar"></i> ${rdv.date} à ${rdv.time}
+                                </div>
+                                <div class="rdv-actions">
+                                    <button class="pill-btn edit" onclick="editRDV(${rdv.id})">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </button>
+                                    <button class="pill-btn delete" onclick="deleteRDV(${rdv.id})">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function addRDV() {
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-calendar-plus"></i> Ajouter un rendez-vous
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Titre</label>
+                        <input type="text" id="rdvTitle" class="form-input" placeholder="Ex: Médecin généraliste">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="text" id="rdvDate" class="form-input" placeholder="Ex: 15 Janvier 2026">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Heure</label>
+                        <input type="text" id="rdvTime" class="form-input" placeholder="Ex: 10:00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="rdvIcon" class="form-input">
+                            <option value="fa-stethoscope">Médecin</option>
+                            <option value="fa-tooth">Dentiste</option>
+                            <option value="fa-cut">Coiffeur</option>
+                            <option value="fa-user-tie">Administratif</option>
+                            <option value="fa-heart">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="saveRDV()" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="showRDV()" class="modal-btn secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveRDV() {
+            const title = document.getElementById('rdvTitle').value;
+            const date = document.getElementById('rdvDate').value;
+            const time = document.getElementById('rdvTime').value;
+            const icon = document.getElementById('rdvIcon').value;
+
+            if (!title || !date || !time) {
+                speak('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newId = Math.max(...state.rdv.map(r => r.id), 0) + 1;
+            state.rdv.push({
+                id: newId,
+                title: title,
+                date: date,
+                time: time,
+                icon: icon
+            });
+
+            speak(`Rendez-vous ${title} ajouté`);
+            showRDV();
+        }
+
+        function editRDV(id) {
+            const rdv = state.rdv.find(r => r.id === id);
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-edit"></i> Modifier le rendez-vous
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Titre</label>
+                        <input type="text" id="rdvTitle" class="form-input" value="${rdv.title}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="text" id="rdvDate" class="form-input" value="${rdv.date}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Heure</label>
+                        <input type="text" id="rdvTime" class="form-input" value="${rdv.time}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select id="rdvIcon" class="form-input">
+                            <option value="fa-stethoscope" ${rdv.icon === 'fa-stethoscope' ? 'selected' : ''}>Médecin</option>
+                            <option value="fa-tooth" ${rdv.icon === 'fa-tooth' ? 'selected' : ''}>Dentiste</option>
+                            <option value="fa-cut" ${rdv.icon === 'fa-cut' ? 'selected' : ''}>Coiffeur</option>
+                            <option value="fa-user-tie" ${rdv.icon === 'fa-user-tie' ? 'selected' : ''}>Administratif</option>
+                            <option value="fa-heart" ${rdv.icon === 'fa-heart' ? 'selected' : ''}>Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="updateRDV(${id})" class="modal-btn success">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="showRDV()" class="modal-btn secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function updateRDV(id) {
+            const rdv = state.rdv.find(r => r.id === id);
+            rdv.title = document.getElementById('rdvTitle').value;
+            rdv.date = document.getElementById('rdvDate').value;
+            rdv.time = document.getElementById('rdvTime').value;
+            rdv.icon = document.getElementById('rdvIcon').value;
+
+            speak(`Rendez-vous modifié`);
+            showRDV();
+        }
+
+        function deleteRDV(id) {
+            const rdv = state.rdv.find(r => r.id === id);
+            if (confirm(`Voulez-vous vraiment supprimer ce rendez-vous ?`)) {
+                state.rdv = state.rdv.filter(r => r.id !== id);
+                speak(`Rendez-vous supprimé`);
+                showRDV();
+            }
+        }
+
+        // Photo Album Activity
+        function showPhotoAlbum() {
+            trackActivity();
+            speak('Voici votre album photo');
+            
+            const html = `
+                <div style="max-width: 1200px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-images"></i> Album Photo
+                    </h2>
+                    
+                    <button onclick="addPhoto()" class="modal-btn primary" style="width: 100%; margin-bottom: 24px;">
+                        <i class="fas fa-plus"></i> Ajouter une photo
+                    </button>
+                    
+                    <div class="photo-grid">
+                        ${state.photos.map(photo => `
+                            <div class="photo-item" onclick="viewPhoto(${photo.id})">
+                                <img src="${photo.url}" alt="${photo.caption}">
+                                <button class="photo-delete" onclick="event.stopPropagation(); deletePhoto(${photo.id})">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function addPhoto() {
+            const html = `
+                <div style="max-width: 600px;">
+                    <h2 style="font-size: 32px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-camera"></i> Ajouter une photo
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">URL de la photo</label>
+                        <input type="text" id="photoUrl" class="form-input" placeholder="https://...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Légende</label>
+                        <input type="text" id="photoCaption" class="form-input" placeholder="Ex: Vacances d'été">
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="savePhoto()" class="modal-btn success">
+                            <i class="fas fa-save"></i> Ajouter
+                        </button>
+                        <button onclick="showPhotoAlbum()" class="modal-btn secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function savePhoto() {
+            const url = document.getElementById('photoUrl').value;
+            const caption = document.getElementById('photoCaption').value;
+
+            if (!url) {
+                speak('Veuillez entrer une URL');
+                return;
+            }
+
+            const newId = Math.max(...state.photos.map(p => p.id), 0) + 1;
+            state.photos.push({
+                id: newId,
+                url: url,
+                caption: caption || 'Sans titre'
+            });
+
+            speak('Photo ajoutée');
+            showPhotoAlbum();
+        }
+
+        function viewPhoto(id) {
+            const photo = state.photos.find(p => p.id === id);
+            const html = `
+                <div style="max-width: 900px; text-align: center;">
+                    <h2 style="font-size: 32px; margin-bottom: 24px;">${photo.caption}</h2>
+                    <img src="${photo.url}" style="max-width: 100%; max-height: 70vh; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="margin-top: 24px;">
+                        <button onclick="showPhotoAlbum()" class="modal-btn primary">
+                            <i class="fas fa-arrow-left"></i> Retour à l'album
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function deletePhoto(id) {
+            if (confirm('Voulez-vous vraiment supprimer cette photo ?')) {
+                state.photos = state.photos.filter(p => p.id !== id);
+                speak('Photo supprimée');
+                showPhotoAlbum();
+            }
+        }
+
+        // Music Activity
+        function music() {
+            trackActivity();
+            speak('Voici quelques playlists pour vous');
+            
+            const playlists = [
+                { name: 'Classique', icon: '🎻', songs: ['Beethoven - Für Elise', 'Mozart - Eine kleine Nachtmusik', 'Chopin - Nocturne Op.9 No.2'] },
+                { name: 'Jazz', icon: '🎷', songs: ['Louis Armstrong - What a Wonderful World', 'Ella Fitzgerald - Summertime', 'Miles Davis - So What'] },
+                { name: 'Français', icon: '🇫🇷', songs: ['Édith Piaf - La Vie en Rose', 'Charles Aznavour - La Bohème', 'Jacques Brel - Ne me quitte pas'] }
+            ];
+            
+            const html = `
+                <div style="max-width: 800px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-music"></i> Musique
+                    </h2>
+                    
+                    <div style="display: grid; gap: 20px;">
+                        ${playlists.map((playlist, idx) => `
+                            <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.3s ease;"
+                                 onmouseover="this.style.background='rgba(255,255,255,0.2)'"
+                                 onmouseout="this.style.background='rgba(255,255,255,0.1)'"
+                                 onclick="playPlaylist(${idx})">
+                                <div style="font-size: 48px; text-align: center; margin-bottom: 16px;">${playlist.icon}</div>
+                                <h3 style="font-size: 28px; text-align: center; margin-bottom: 16px;">${playlist.name}</h3>
+                                <div style="opacity: 0.9;">
+                                    ${playlist.songs.map(song => `
+                                        <div style="padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 16px;">
+                                            <i class="fas fa-play" style="margin-right: 12px;"></i>${song}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function playPlaylist(idx) {
+            const playlists = ['Classique', 'Jazz', 'Français'];
+            speak(`Lecture de la playlist ${playlists[idx]}`);
+            showAlert(`🎵 Lecture: ${playlists[idx]}`, '#10b981');
+        }
+
+        // Games Activity
+        function games() {
+            trackActivity();
+            speak('Voici quelques jeux pour vous divertir');
+            
+            const html = `
+                <div style="max-width: 800px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-gamepad"></i> Jeux
+                    </h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="activity-card" onclick="playMemory()">
+                            <div class="activity-icon"><i class="fas fa-brain"></i></div>
+                            <div class="activity-label">Mémoire</div>
+                        </div>
+                        <div class="activity-card" onclick="playQuiz()">
+                            <div class="activity-icon"><i class="fas fa-question-circle"></i></div>
+                            <div class="activity-label">Quiz</div>
+                        </div>
+                        <div class="activity-card" onclick="playWordSearch()">
+                            <div class="activity-icon"><i class="fas fa-search"></i></div>
+                            <div class="activity-label">Mots Mêlés</div>
+                        </div>
+                        <div class="activity-card" onclick="playSudoku()">
+                            <div class="activity-icon"><i class="fas fa-th"></i></div>
+                            <div class="activity-label">Sudoku</div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function playMemory() {
+            speak('Jeu de mémoire');
+            showAlert('🧠 Jeu de mémoire bientôt disponible', '#3b82f6');
+        }
+
+        function playQuiz() {
+            speak('Quiz de culture générale');
+            showAlert('❓ Quiz bientôt disponible', '#3b82f6');
+        }
+
+        function playWordSearch() {
+            speak('Jeu de mots mêlés');
+            showAlert('🔍 Mots mêlés bientôt disponible', '#3b82f6');
+        }
+
+        function playSudoku() {
+            speak('Sudoku');
+            showAlert('🔢 Sudoku bientôt disponible', '#3b82f6');
+        }
+
+        // News Activity
+        function news() {
+            trackActivity();
+            speak('Voici les dernières actualités');
+            
+            const newsItems = [
+                { title: 'Météo: Beau temps prévu cette semaine', category: 'Météo', icon: 'fa-cloud-sun' },
+                { title: 'Nouvelle technologie pour les seniors', category: 'Technologie', icon: 'fa-microchip' },
+                { title: 'Santé: Les bienfaits de la marche', category: 'Santé', icon: 'fa-heartbeat' },
+                { title: 'Culture: Exposition au musée', category: 'Culture', icon: 'fa-palette' }
+            ];
+            
+            const html = `
+                <div style="max-width: 900px;">
+                    <h2 style="font-size: 36px; margin-bottom: 32px; text-align: center;">
+                        <i class="fas fa-newspaper"></i> Actualités
+                    </h2>
+                    
+                    <div style="display: grid; gap: 20px;">
+                        ${newsItems.map(news => `
+                            <div style="background: rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; cursor: pointer; transition: all 0.3s ease;"
+                                 onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateX(8px)'"
+                                 onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='translateX(0)'">
+                                <div style="display: flex; align-items: center; gap: 20px;">
+                                    <div style="font-size: 36px; width: 60px; text-align: center;">
+                                        <i class="fas ${news.icon}"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">${news.category}</div>
+                                        <div style="font-size: 22px; font-weight: 700;">${news.title}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 24px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        // Breathing Activity
+        function breathing() {
+            trackActivity();
+            speak('Exercice de respiration. Suivez le cercle et respirez profondément');
+            
+            const html = `
+                <div style="text-align: center; max-width: 700px;">
+                    <h2 style="font-size: 42px; margin-bottom: 24px;">
+                        <i class="fas fa-wind"></i> Respiration Guidée
+                    </h2>
+                    
+                    <p style="font-size: 20px; margin-bottom: 32px; opacity: 0.9;">
+                        Suivez le cercle et respirez profondément
+                    </p>
+                    
+                    <div style="width: 300px; height: 300px; margin: 0 auto 40px; 
+                                background: rgba(255,255,255,0.2); border-radius: 50%; 
+                                display: flex; align-items: center; justify-content: center; 
+                                animation: breathe 8s infinite ease-in-out;
+                                box-shadow: 0 0 60px rgba(255, 255, 255, 0.4);">
+                        <div style="font-size: 42px; font-weight: 800;" id="breathText">
+                            Inspirez
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 20px; margin-bottom: 24px; opacity: 0.9;">
+                        <div style="margin-bottom: 10px;">⏱️ Durée du cycle: 8 secondes</div>
+                        <div id="breathCounter" style="font-size: 28px; font-weight: 700; margin-top: 16px;">
+                            Cycle: <span id="cycleCount">1</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 24px; border-radius: 16px; 
+                                margin-bottom: 32px; text-align: left; max-width: 500px; margin-left: auto; 
+                                margin-right: auto;">
+                        <h3 style="font-size: 24px; margin-bottom: 16px; font-weight: 700;">
+                            💡 Bienfaits:
+                        </h3>
+                        <ul style="font-size: 18px; line-height: 2; opacity: 0.95; list-style-position: inside;">
+                            <li>Réduit le stress et l'anxiété</li>
+                            <li>Améliore la concentration</li>
+                            <li>Favorise le sommeil</li>
+                            <li>Apaise le système nerveux</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="stopBreathing()" class="modal-btn danger">
+                        <i class="fas fa-stop"></i> Terminer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            let phase = 0;
+            let cycleCount = 1;
+            
+            window.breathingInterval = setInterval(() => {
+                const text = document.getElementById('breathText');
+                const counter = document.getElementById('cycleCount');
+                
+                if (!text) {
+                    clearInterval(window.breathingInterval);
+                    return;
+                }
+                
+                phase = (phase + 1) % 2;
+                
+                if (phase === 0) {
+                    text.textContent = 'Inspirez';
+                    speak('Inspirez');
+                    cycleCount++;
+                    if (counter) counter.textContent = cycleCount;
+                } else {
+                    text.textContent = 'Expirez';
+                    speak('Expirez');
+                }
+            }, 4000);
+            
+            setTimeout(() => speak('Inspirez profondément par le nez'), 100);
+        }
+
+        window.stopBreathing = function() {
+            if (window.breathingInterval) {
+                clearInterval(window.breathingInterval);
+                window.breathingInterval = null;
+            }
+            speak('Exercice terminé. Bien joué.');
+            closeModal();
+        };
+
+        // Meditation Activity
+        function meditation() {
+            trackActivity();
+            speak('Séance de méditation guidée');
+            
+            const html = `
+                <div style="text-align: center; max-width: 700px;">
+                    <h2 style="font-size: 42px; margin-bottom: 24px;">
+                        <i class="fas fa-spa"></i> Méditation Guidée
+                    </h2>
+                    
+                    <div style="font-size: 64px; margin: 40px 0;">🧘</div>
+                    
+                    <p style="font-size: 22px; margin-bottom: 32px; opacity: 0.95; line-height: 1.6;">
+                        Installez-vous confortablement.<br>
+                        Fermez les yeux.<br>
+                        Respirez naturellement.
+                    </p>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 32px; border-radius: 16px; margin-bottom: 32px;">
+                        <h3 style="font-size: 24px; margin-bottom: 20px; font-weight: 700;">
+                            ✨ Durées disponibles:
+                        </h3>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <button onclick="startMeditation(5)" class="modal-btn primary">5 min</button>
+                            <button onclick="startMeditation(10)" class="modal-btn primary">10 min</button>
+                            <button onclick="startMeditation(15)" class="modal-btn primary">15 min</button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.08); padding: 24px; border-radius: 16px; text-align: left;">
+                        <h3 style="font-size: 22px; margin-bottom: 16px; font-weight: 700;">
+                            🌟 Bienfaits de la méditation:
+                        </h3>
+                        <ul style="font-size: 18px; line-height: 2; opacity: 0.95; list-style-position: inside;">
+                            <li>Réduit le stress</li>
+                            <li>Améliore le sommeil</li>
+                            <li>Renforce la concentration</li>
+                            <li>Apporte la sérénité</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 32px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function startMeditation(minutes) {
+            speak(`Méditation de ${minutes} minutes. Installez-vous confortablement`);
+            showAlert(`🧘 Méditation ${minutes} min commencée`, '#10b981');
+            
+            setTimeout(() => {
+                speak('La méditation est terminée. Prenez votre temps pour revenir doucement');
+                showAlert('✨ Méditation terminée', '#10b981');
+            }, minutes * 60000);
+        }
+
+        // Modal System
+        function showModal(content) {
+            const existing = document.getElementById('modal');
+            if (existing) existing.remove();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'modal';
+            overlay.className = 'modal-overlay';
+            overlay.onclick = function(e) {
+                if (e.target === overlay) closeModal();
+            };
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            modalContent.onclick = function(e) {
+                e.stopPropagation();
+            };
+            modalContent.innerHTML = content;
+            
+            overlay.appendChild(modalContent);
+            document.body.appendChild(overlay);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            if (modal) modal.remove();
+            
+            if (window.breathingInterval) {
+                clearInterval(window.breathingInterval);
+                window.breathingInterval = null;
+            }
+            
+            synth.cancel();
+        }
+
+        // Activity Tracking
+        function trackActivity() {
+            state.activityCount++;
+            state.lastActivity = Date.now();
+        }
+
+        // Simulation
+        function simulate() {
+            state.time += 0.0001;
+            if (state.time >= 24) {
+                state.time = 0;
+                state.dayIndex = (state.dayIndex + 1) % 7;
+            }
+            updateClock();
+        }
+
+        // Time Slider
+        document.getElementById('timeSlider').addEventListener('input', function(e) {
+            state.time = parseFloat(e.target.value);
+            updateClock();
+        });
+
+        // Event Listeners
+        document.addEventListener('click', trackActivity);
+        document.addEventListener('keypress', trackActivity);
+
+        // Initialization
+        async function init() {
+            console.log('🚀 Initialisation du système...');
+            
+            await initVoices();
+            initVoiceRecognition();
+            
+            state.currentDate = new Date();
+            state.dayIndex = state.currentDate.getDay();
+            
+            renderDevices();
+            renderPills();
+            updateClock();
+            
+            setInterval(simulate, 1000);
+            
+            setTimeout(() => {
+                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel. Je suis prêt à vous aider.`;
+                speak(msg);
+                showAlert(`👋 Bienvenue ! ${days[state.dayIndex]}`, '#10b981');
+                
+                const emptyPills = state.pills.filter(p => p.count <= 0);
+                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                
+                if (emptyPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont épuisés.');
+                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                    }, 3000);
+                } else if (lowPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                        showAlert('⚠️ Stock faible', '#f59e0b');
+                    }, 3000);
+                }
+            }, 1500);
+            
+            console.log('✅ Système initialisé !');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
