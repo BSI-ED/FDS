@@ -1,0 +1,4372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA Seniors - BSI 2026</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --morning-start: #FF6B6B;
+            --morning-mid: #FFD93D;
+            --morning-end: #6BCF7F;
+            --afternoon-start: #4A90E2;
+            --afternoon-mid: #7CB9E8;
+            --afternoon-end: #B0E0E6;
+            --evening-start: #2C3E50;
+            --evening-mid: #34495E;
+            --evening-end: #1A252F;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --primary: #667eea;
+            --secondary: #764ba2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            padding-bottom: 80px;
+        }
+
+        /* Masquer les scrollbars */
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        *::-webkit-scrollbar {
+            display: none;
+        }
+
+        * {
+            scroll-behavior: smooth;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            transition: background 1.5s ease;
+            overflow: hidden;
+        }
+
+        /* Particules animées en arrière-plan */
+        .background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+            animation: particleFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(50px, -50px) scale(1.1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-30px, 30px) scale(0.9);
+                opacity: 0.4;
+            }
+            75% {
+                transform: translate(30px, 50px) scale(1.05);
+                opacity: 0.6;
+            }
+        }
+
+        .background.morning {
+            background: linear-gradient(135deg, var(--morning-start) 0%, var(--morning-mid) 50%, var(--morning-end) 100%);
+        }
+
+        .background.afternoon {
+            background: linear-gradient(135deg, var(--afternoon-start) 0%, var(--afternoon-mid) 50%, var(--afternoon-end) 100%);
+        }
+
+        .background.evening {
+            background: linear-gradient(135deg, var(--evening-start) 0%, var(--evening-mid) 50%, var(--evening-end) 100%);
+        }
+
+        /* BOUTONS FIXES EN BAS À DROITE - TOUJOURS VISIBLES */
+        .fixed-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10000;
+        }
+
+        .fixed-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .fixed-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .fixed-btn:active {
+            transform: scale(0.95);
+        }
+
+        .voice-assistant-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .emergency-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse-emergency 2s infinite;
+        }
+
+        .accessibility-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 48px rgba(102, 126, 234, 0.8);
+            }
+        }
+
+        @keyframes pulse-emergency {
+            0%, 100% {
+                box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 48px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .fixed-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            .fixed-buttons {
+                bottom: 15px;
+                right: 15px;
+                gap: 12px;
+            }
+        }
+
+        .container {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 15px;
+            padding: 15px;
+            min-height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .alert-banner {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px;
+            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--glass-border);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            border-radius: 16px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-item i {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            overflow: visible;
+        }
+
+        @media (min-width: 1025px) and (max-width: 1199px) {
+            .main-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            /* Sur petits desktops, on veut Maison en haut, puis le reste */
+            .panel:nth-child(1) { grid-column: 1 / -1; }
+        }
+
+        @media (min-width: 1200px) {
+            .main-content {
+                display: grid;
+                grid-template-columns: 380px 1fr 380px;
+                grid-template-rows: auto auto auto auto;
+                gap: 15px;
+            }
+            
+            /* Maison à gauche - occupe toutes les lignes */
+            .panel:nth-child(1) { 
+                grid-column: 1; 
+                grid-row: 1 / 5;
+            }
+            
+            /* Info au centre ligne 1 */
+            .panel:nth-child(2) { 
+                grid-column: 2; 
+                grid-row: 1; 
+            }
+            
+            /* Activités au centre ligne 2 */
+            .panel:nth-child(3) { 
+                grid-column: 2; 
+                grid-row: 2; 
+            }
+            
+            /* Lecture au centre ligne 3 */
+            .panel:nth-child(4) { 
+                grid-column: 2; 
+                grid-row: 3; 
+            }
+            
+            /* Jeux au centre ligne 4 */
+            .panel:nth-child(5) { 
+                grid-column: 2; 
+                grid-row: 4; 
+            }
+            
+            /* Pilulier à droite - occupe toutes les lignes */
+            .panel:nth-child(6) { 
+                grid-column: 3; 
+                grid-row: 1 / 5;
+            }
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            color: white;
+            overflow-y: auto;
+            animation: fadeIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-height: 80vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(139, 92, 246, 0.05) 0%,
+                rgba(236, 72, 153, 0.05) 50%,
+                rgba(59, 130, 246, 0.05) 100%);
+            border-radius: 24px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .panel:hover::before {
+            opacity: 1;
+        }
+
+        .panel:hover {
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.2);
+        }
+
+        /* RESPONSIVE - PANELS COLLAPSIBLES SUR MOBILE ET TABLETTE */
+        @media (max-width: 1024px) {
+            /* Affiche JIS en plein écran */
+            .header {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100vw !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 15px !important;
+                z-index: 1000;
+                border-radius: 0 !important;
+            }
+            
+            .container {
+                padding-top: 180px;
+            }
+            
+            .panel {
+                max-height: none;
+            }
+            
+            .panel-header {
+                cursor: pointer;
+                user-select: none;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+                margin: -20px -20px 0 -20px;
+                border-radius: 24px 24px 0 0;
+                background: rgba(255, 255, 255, 0.05);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .panel-header:active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .panel-toggle-icon {
+                font-size: 20px;
+                transition: transform 0.3s ease;
+            }
+            
+            .panel-toggle-icon.open {
+                transform: rotate(180deg);
+            }
+            
+            .panel-content {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease, padding 0.4s ease;
+                padding: 0 20px;
+            }
+            
+            .panel-content.open {
+                max-height: 3000px;
+                padding: 20px;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .panel-header {
+                cursor: default;
+            }
+            
+            .panel-toggle-icon {
+                display: none;
+            }
+            
+            .panel-content {
+                max-height: none !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .panel {
+                max-height: none;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .panel-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        @media (max-width: 1024px) {
+            .panel-title {
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+                font-size: 20px;
+                color: #4a5568;
+                text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .device-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .device-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .device-item:active {
+            transform: scale(0.98);
+        }
+
+        .device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .device-icon {
+            font-size: 28px;
+        }
+
+        .device-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status-on {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.6);
+        }
+
+        .status-off {
+            background: rgba(107, 114, 128, 0.3);
+            border: 1px solid rgba(107, 114, 128, 0.6);
+        }
+
+        .device-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .pill-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .pill-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .pill-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .pill-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pill-icon {
+            font-size: 32px;
+        }
+
+        .pill-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .pill-dosage {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .pill-count {
+            font-size: 28px;
+            font-weight: 800;
+            padding: 8px 16px;
+            border-radius: 12px;
+        }
+
+        .count-ok {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid rgba(16, 185, 129, 0.6);
+            color: #10b981;
+        }
+
+        .count-low {
+            background: rgba(245, 158, 11, 0.3);
+            border: 2px solid rgba(245, 158, 11, 0.6);
+            color: #f59e0b;
+        }
+
+        .count-empty {
+            background: rgba(239, 68, 68, 0.3);
+            border: 2px solid rgba(239, 68, 68, 0.6);
+            color: #ef4444;
+        }
+
+        .pill-schedule {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .schedule-time {
+            padding: 6px 12px;
+            border-radius: 10px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .schedule-time.active {
+            background: rgba(16, 185, 129, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.6);
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+            }
+        }
+
+        .pill-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .pill-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .pill-btn.take {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .pill-btn.refill {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .pill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .pill-btn:active {
+            transform: translateY(0);
+        }
+
+        .pill-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .action-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-card:active {
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .action-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .action-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        /* Nouveaux styles pour les cartes visuelles */
+        .visual-card {
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            position: relative;
+            animation: cardFadeIn 0.6s ease-out backwards;
+        }
+
+        /* Effet de brillance qui traverse la carte */
+        .visual-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+
+        .visual-card:hover::after {
+            transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+
+        /* Styles pour toutes les cartes avec images (devices, pills, activités) */
+        div[onclick]:has(img[style*="height: 140px"]) {
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        div[onclick]:has(img[style*="height: 140px"]):hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        div[onclick]:has(img[style*="height: 140px"]):hover img {
+            transform: scale(1.1);
+        }
+
+        div[onclick]:has(img[style*="height: 140px"]):active {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .visual-card:nth-child(1) { animation-delay: 0.1s; }
+        .visual-card:nth-child(2) { animation-delay: 0.2s; }
+        .visual-card:nth-child(3) { animation-delay: 0.3s; }
+        .visual-card:nth-child(4) { animation-delay: 0.4s; }
+        .visual-card:nth-child(5) { animation-delay: 0.5s; }
+        .visual-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .visual-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        }
+
+        .visual-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .visual-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        .visual-card img {
+            transition: transform 0.4s ease;
+        }
+
+        .visual-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+
+        .visual-card-content {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .visual-card:hover .visual-card-content {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Animation de pulsation pour les cartes actives */
+        @keyframes cardPulse {
+            0%, 100% {
+                box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            }
+            50% {
+                box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+            }
+        }
+
+        .reading-section {
+            margin-top: 30px;
+        }
+
+        .reading-section > div {
+            animation: cardFadeIn 0.8s ease-out backwards;
+        }
+
+        .clock-widget {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 0;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clock-image-container {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            overflow: hidden;
+        }
+
+        .clock-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease;
+        }
+
+        .clock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+        }
+
+        .time-on-image {
+            font-family: 'Poppins', sans-serif;
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .date-on-image {
+            font-size: 20px;
+            font-weight: 600;
+            opacity: 0.95;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .time-period-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .time-display {
+            font-family: 'Poppins', sans-serif;
+            font-size: 72px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .date-display {
+            font-size: 24px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .time-slider {
+            margin-top: 20px;
+        }
+
+        .time-slider input[type="range"] {
+            width: 100%;
+            height: 12px;
+            border-radius: 10px;
+            background: linear-gradient(to right, 
+                #1a252f 0%, 
+                #ff6b6b 8.33%, 
+                #ffd93d 25%, 
+                #6bcf7f 33.33%, 
+                #4a90e2 50%, 
+                #7cb9e8 66.67%, 
+                #2c3e50 83.33%, 
+                #1a252f 100%
+            );
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .time-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid rgba(139, 92, 246, 0.8);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(139, 92, 246, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .time-slider input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(139, 92, 246, 0.3);
+        }
+
+        .time-slider input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 8px rgba(139, 92, 246, 0.4);
+        }
+
+        .time-slider input[type="range"]::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid rgba(139, 92, 246, 0.8);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(139, 92, 246, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .time-slider input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(139, 92, 246, 0.3);
+        }
+
+        .time-slider input[type="range"]::-moz-range-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 8px rgba(139, 92, 246, 0.4);
+        }
+
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .weather-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .weather-temp {
+            font-size: 56px;
+            font-weight: 900;
+        }
+
+        .weather-icon {
+            font-size: 64px;
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .weather-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(59, 130, 246, 0.95) 100%);
+            border-radius: 32px;
+            padding: 40px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        /* Style spécial pour les modales de jeux avec image de fond harmonisée */
+        .game-modal-content {
+            background-image: 
+                linear-gradient(135deg, rgba(16, 185, 129, 0.92) 0%, rgba(34, 197, 94, 0.92) 50%, rgba(59, 130, 246, 0.92) 100%),
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            background-size: cover;
+            background-position: center;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-family: 'Sora', sans-serif;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            color: #8B5CF6;
+            margin: 10px;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Contact Cards avec vraies images */
+        .contact-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .contact-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .contact-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .contact-relation {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .contact-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .video-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Photo Album avec vraies images */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .album-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            aspect-ratio: 1;
+        }
+
+        .album-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .album-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .album-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 10px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Lecture à haute voix */
+        .reading-section {
+            margin-top: 20px;
+        }
+
+        .book-excerpt {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .book-excerpt:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .book-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .book-cover {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .book-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .book-info p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .book-excerpt-text {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .reading-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .reading-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reading-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .reading-progress {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .reading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #8B5CF6 0%, #EC4899 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Yoga poses */
+        .yoga-pose-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .yoga-pose {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .yoga-pose:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .yoga-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .yoga-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .yoga-duration {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Breathing circle */
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.8), rgba(236, 72, 153, 0.8));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            font-size: 24px;
+            font-weight: 700;
+            transition: all 4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.5);
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.8);
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(1);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.8);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .time-display {
+                font-size: 48px;
+            }
+
+            .date-display {
+                font-size: 18px;
+            }
+
+            .weather-temp {
+                font-size: 40px;
+            }
+
+            .weather-icon {
+                font-size: 48px;
+            }
+
+            .album-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .book-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .reading-controls {
+                flex-direction: column;
+            }
+
+            .reading-progress {
+                width: 100%;
+            }
+        }
+    
+        /* AMÉLIORATION DES FENÊTRES AVEC BELLES IMAGES */
+        .window-image {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .window-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 100%);
+        }
+
+        /* Images spécifiques pour chaque fenêtre */
+        /* Images avec palette naturelle et harmonieuse */
+        .contact-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+        
+        .contact-image::after {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .photo-image {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            position: relative;
+        }
+        
+        .photo-image::after {
+            content: '📷';
+            position: absolute;
+            font-size: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        .breathing-image {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            position: relative;
+        }
+        
+        .breathing-image::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            animation: breathePulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathePulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.4;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        .yoga-image {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+        
+        .yoga-image::after {
+            content: '🧘';
+            position: absolute;
+            font-size: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        .quiz-image {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            position: relative;
+        }
+        
+        .quiz-image::after {
+            content: '?';
+            position: absolute;
+            font-size: 150px;
+            font-weight: 900;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.3);
+            font-family: Arial Black, sans-serif;
+        }
+
+        .hidden-word-image {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            position: relative;
+        }
+        
+        .hidden-word-image::after {
+            content: 'ABC';
+            position: absolute;
+            font-size: 90px;
+            font-weight: 900;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.25);
+            font-family: monospace;
+            letter-spacing: 10px;
+        }
+
+        .mental-calc-image {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            position: relative;
+        }
+        
+        .mental-calc-image::after {
+            content: '123';
+            position: absolute;
+            font-size: 100px;
+            font-weight: 900;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(100,100,100,0.25);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .memory-image {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            position: relative;
+        }
+        
+        .memory-image::after {
+            content: '🎴';
+            position: absolute;
+            font-size: 80px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+
+        .relaxation-image {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            position: relative;
+        }
+        
+        .relaxation-image::after {
+            content: '♪';
+            position: absolute;
+            font-size: 100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Icônes de postures de yoga en images SVG */
+        .yoga-pose-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .pose-icon-mountain {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .pose-icon-tree {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .pose-icon-cat {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .pose-icon-child {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .pose-icon-cobra {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .pose-icon-butterfly {
+            background: linear-gradient(135deg, #30cfd0 0%, #667eea 100%);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .modal-close {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 22px;
+            color: white;
+        }
+
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.4);
+            border-color: rgba(239, 68, 68, 0.6);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        /* STYLES D'ACCESSIBILITÉ */
+        body.high-contrast {
+            filter: contrast(1.5) brightness(1.1);
+        }
+
+        body.large-text {
+            font-size: 120%;
+        }
+
+        body.extra-large-text {
+            font-size: 150%;
+        }
+
+        .accessibility-menu {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            max-width: 500px;
+        }
+
+        .accessibility-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accessibility-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-switch {
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--success);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 32px;
+        }
+
+        /* DESIGN MOBILE INSPIRÉ - GRADIENT COLORÉ */
+        @media (max-width: 767px) {
+            body {
+                background: linear-gradient(180deg, 
+                    #FF8A65 0%, 
+                    #FFB74D 25%, 
+                    #FFD54F 50%, 
+                    #DCE775 75%, 
+                    #AED581 100%);
+            }
+
+            .background {
+                background: linear-gradient(180deg, 
+                    rgba(255, 138, 101, 0.8) 0%, 
+                    rgba(255, 183, 77, 0.8) 25%, 
+                    rgba(255, 213, 79, 0.8) 50%, 
+                    rgba(220, 231, 117, 0.8) 75%, 
+                    rgba(174, 213, 129, 0.8) 100%) !important;
+            }
+
+            .panel {
+                background: rgba(255, 255, 255, 0.25);
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            }
+
+            .panel-header {
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        /* SECTION HERO POUR MOBILE */
+        .mobile-hero {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-hero {
+                display: block;
+                text-align: center;
+                padding: 20px;
+                margin-bottom: 20px;
+                animation: fadeIn 0.8s ease;
+            }
+
+            .mobile-hero-text {
+                font-size: 14px;
+                line-height: 1.6;
+                color: white;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                margin-bottom: 20px;
+                opacity: 0.95;
+            }
+
+            .mobile-hero-image {
+                max-width: 100%;
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                margin-bottom: 20px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="background" id="background"></div>
+
+    <!-- BOUTONS FIXES EN BAS À DROITE - TOUJOURS VISIBLES -->
+    <div class="fixed-buttons">
+        <button class="fixed-btn accessibility-btn" onclick="showAccessibilityMenu()" title="Accessibilité">
+            <i class="fas fa-universal-access"></i>
+        </button>
+        <button class="fixed-btn voice-assistant-btn" onclick="startVoiceAssistant()" title="Assistant Vocal">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button class="fixed-btn emergency-btn" onclick="emergencyCall()" title="Appel d'Urgence">
+            <i class="fas fa-phone-volume"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Alert Banner -->
+        <div class="alert-banner" id="alertBanner" style="display: none;">
+            <div class="alert-item" id="alertContent">
+                <i class="fas fa-bell"></i>
+                <span id="alertText">Message d'alerte</span>
+            </div>
+        </div>
+
+        <!-- Section Hero pour Mobile -->
+        <div class="mobile-hero">
+
+
+
+            <img src="https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/vous-etes/professionnel/presse-media/photos/JIS26_40x60_sslogospatners.jpg" 
+                 alt="Seniors avec lunettes VR" 
+                 class="mobile-hero-image">
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Devices -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-home"></i>
+                        <span>Maison</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <div id="devicesList"></div>
+                </div>
+            </div>
+
+            <!-- Middle Panel: Info (Clock + Weather) -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Info</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <!-- Clock -->
+                    <div class="clock-widget">
+                        <!-- Image dynamique selon l'heure avec date et heure dessus -->
+                        <div class="clock-image-container">
+                            <img id="clockImage" class="clock-image" src="" alt="Période du jour">
+                            <div class="clock-overlay">
+                                <div class="time-on-image" id="timeDisplay">00:00</div>
+                                <div class="date-on-image" id="dateDisplay">Chargement...</div>
+                            </div>
+                            <div class="time-period-badge" id="timePeriodBadge">Matin</div>
+                        </div>
+                        
+                        <div style="padding: 20px;">
+                            <div class="time-slider">
+                                <label style="opacity: 0.8; font-size: 14px; margin-bottom: 8px; display: block;">
+                                    🕐 Simulateur : déplacez le curseur pour voir le programme de la journée.
+                                </label>
+                                <input type="range" id="timeSlider" min="0" max="24" step="0.5" value="12">
+                                <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; opacity: 0.7; font-weight: 600;">
+                                    <span>00h</span>
+                                    <span>06h</span>
+                                    <span>12h</span>
+                                    <span>18h</span>
+                                    <span>24h</span>
+                                </div>
+                              <!--   <div id="timeValueDisplay" style="text-align: center; margin-top: 12px; font-size: 20px; font-weight: 700; padding: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
+                                    12:00
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weather -->
+                    <!-- Météo - Carte visuelle harmonisée -->
+                    <div id="weatherWidget" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%); margin-bottom: 20px;">
+                        <div style="position: relative; overflow: hidden;">
+                            <img id="weatherImage" src="https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=400&h=300&fit=crop" alt="Météo" 
+                                 style="width: 100%; height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);"></div>
+                            
+                            <!-- Température en grand sur l'image -->
+                            <div id="weatherTemp" style="position: absolute; bottom: 15px; left: 15px; font-size: 48px; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">
+                                --°
+                            </div>
+                            
+                            <!-- Icône météo -->
+                            <div id="weatherIcon" style="position: absolute; top: 15px; right: 15px; font-size: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                                ☀️
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px;">
+                            <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px; text-align: center;">Météo - Paris</div>
+                            
+                            <!-- Détails météo -->
+                            <div style="display: flex; gap: 15px; justify-content: center; font-size: 13px;">
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-tint" style="opacity: 0.8;"></i>
+                                    <span id="weatherHumidity">--%</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fas fa-wind" style="opacity: 0.8;"></i>
+                                    <span id="weatherWind">-- km/h</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activités Panel -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-walking"></i>
+                        <span>Activités</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <!-- Quick Actions - Style visuel amélioré -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px;">
+                        <!-- Yoga -->
+                        <div onclick="yogaExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
+                            <div style="position: relative; overflow: hidden;">
+                                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" alt="Yoga" 
+                                     style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Yoga</div>
+                                <div style="font-size: 12px; opacity: 0.85;">Postures douces</div>
+                            </div>
+                        </div>
+
+                        <!-- Respiration -->
+                        <div onclick="breathingExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%);">
+                            <div style="position: relative; overflow: hidden;">
+                                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" alt="Méditation" 
+                                     style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Respiration</div>
+                                <div style="font-size: 12px; opacity: 0.85;">Exercice guidé</div>
+                            </div>
+                        </div>
+
+                        <!-- Photos -->
+                        <div onclick="showAlbum()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
+                            <div style="position: relative; overflow: hidden;">
+                                <img src="https://www.cewe.fr/cdn/images/uj/bm/UjBMdVBqWVpuaXMvRithYjVsQTlEM3V4SHhSZy91TjFpcGJjRm1rR1dxWFJOaHFJK1RTQ0kvbUtLbjFINmxFRm9tY2xaaUFjcml0VXptTkx1YnlVQXU5QjM5NXNFNjdxNDVhTHlOc1lUa0k9.jpg" alt="Photos" 
+                                     style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Photos</div>
+                                <div style="font-size: 12px; opacity: 0.85;">Vacances & famille</div>
+                            </div>
+                        </div>
+
+                        <!-- Contacts -->
+                        <div onclick="showContacts()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
+                            <div style="position: relative; overflow: hidden;">
+                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop" alt="Contacts" 
+                                     style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Contacts</div>
+                                <div style="font-size: 12px; opacity: 0.85;">Famille & Amis</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lecture Panel -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-book-open"></i>
+                        <span>Lecture</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <div class="reading-section">
+                        <div id="bookCovers" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jeux Panel -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-gamepad"></i>
+                        <span>Jeux</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px;">
+                            <!-- Quiz -->
+                            <div onclick="startQuiz()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);">
+                                <div style="position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&h=300&fit=crop" alt="Quiz" 
+                                         style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Quiz</div>
+                                    <div style="font-size: 12px; opacity: 0.85;">Culture générale</div>
+                                </div>
+                            </div>
+
+                            <!-- Mots Cachés -->
+                            <div onclick="startWordSearch()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
+                                <div style="position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=400&h=300&fit=crop" alt="Mots cachés" 
+                                         style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Mots Cachés</div>
+                                    <div style="font-size: 12px; opacity: 0.85;">Trouvez les mots</div>
+                                </div>
+                            </div>
+
+                            <!-- Calcul Mental -->
+                            <div onclick="startMentalMath()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
+                                <div style="position: relative; overflow: hidden;">
+                                    <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop" alt="Calcul mental" 
+                                         style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Calcul Mental</div>
+                                    <div style="font-size: 12px; opacity: 0.85;">Exercez votre esprit</div>
+                                </div>
+                            </div>
+
+                            <!-- Mémoire -->
+                            <div onclick="startMemoryGame()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
+                                <div style="position: relative; overflow: hidden;">
+                                    <img src="https://www.silveralliance.com/wp-content/uploads/2020/03/Jeux-m%C3%A9moire-seniors-silveralliance.jpg" alt="Jeu de mémoire" 
+                                         style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);"></div>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px; text-align: center;">
+                                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Mémoire</div>
+                                    <div style="font-size: 12px; opacity: 0.85;">Jeu de paires</div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Médicaments (déplacé avant Jeux) -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-pills"></i>
+                        <span>Pilulier</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <div id="pillsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Assistant IA Seniors © 2026 - Prototype conçu avec ❤️ pour votre bien-être par la Bibliothèque de la Cité des Sciences et de l'Industrie</p>
+        
+
+.</footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
+            <!-- Content will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // State management
+        const state = {
+            devices: [
+                { 
+                    id: 1, 
+                    name: 'Le salon', 
+                    icon: '💡', 
+                    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop',
+                    imageOn: 'https://images.unsplash.com/photo-1556912167-f556f1f39fdf?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop',
+                    type: 'light', 
+                    status: false 
+                },
+                { 
+                    id: 2, 
+                    name: 'La cuisine', 
+                    icon: '🔆', 
+                    image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=300&fit=crop',
+                    imageOn: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&h=300&fit=crop',
+                    type: 'light', 
+                    status: false 
+                },
+                { 
+                    id: 3, 
+                    name: 'La chambre', 
+                    icon: '🛏️', 
+                    image: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=300&fit=crop',
+                    imageOn: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?w=400&h=300&fit=crop',
+                    type: 'light', 
+                    status: true 
+                },
+                { 
+                    id: 4, 
+                    name: 'Chauffage', 
+                    icon: '🌡️', 
+                    image: 'https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?w=400&h=300&fit=crop',
+                    imageOn: 'https://www.thermor.fr/var/site/storage/images/1/6/9/5/3115961-2-fre-FR/Blog_782x480_emotion4.jpg',
+                    imageOff: 'https://images.unsplash.com/photo-1604709177225-055f99402ea3?w=400&h=300&fit=crop',
+                    type: 'heating', 
+                    status: true, 
+                    temp: 21 
+                },
+                { 
+                    id: 5, 
+                    name: 'Volets', 
+                    icon: '🪟', 
+                    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop',
+                    imageOn: 'https://us.123rf.com/450wm/byzonda/byzonda1511/byzonda151100010/48489515-fen%C3%AAtre-avec-volets-roulants-sur-un-mur-de-briques.jpg?ver=6',
+                    imageOff: 'https://www.brico-fenetre.com/media-cache/app_shop_square_768/98/f1/bee46af71217b395630284ea4dfc.jpeg',
+                    type: 'shutters', 
+                    status: false 
+                },
+                { 
+                    id: 6, 
+                    name: 'Fenêtres', 
+                    icon: '🪟', 
+                    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop',
+                    imageOn: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=300&fit=crop',
+                    type: 'windows', 
+                    status: true 
+                }
+            ],
+            pills: [
+                { 
+                    id: 1, 
+                    name: 'Aspirine', 
+                    icon: '💊', 
+                    image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400&h=300&fit=crop',
+                    dosage: '500mg', 
+                    count: 15,
+                    schedule: ['08:00', '20:00'],
+                    timeWindows: [
+                        { start: '07:30', end: '08:30' },
+                        { start: '19:30', end: '20:30' }
+                    ]
+                },
+                { 
+                    id: 2, 
+                    name: 'Vitamines', 
+                    icon: '🔆', 
+                    image: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=400&h=300&fit=crop',
+                    dosage: '1000mg', 
+                    count: 4,
+                    schedule: ['08:00'],
+                    timeWindows: [
+                        { start: '07:30', end: '08:30' }
+                    ]
+                },
+                { 
+                    id: 3, 
+                    name: 'Calcium', 
+                    icon: '🦴', 
+                    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=300&fit=crop',
+                    dosage: '600mg', 
+                    count: 0,
+                    schedule: ['12:00', '20:00'],
+                    timeWindows: [
+                        { start: '11:30', end: '12:30' },
+                        { start: '19:30', end: '20:30' }
+                    ]
+                },
+                { 
+                    id: 4, 
+                    name: 'Tension', 
+                    icon: '🩺', 
+                    image: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&h=300&fit=crop',
+                    dosage: '5mg', 
+                    count: 22,
+                    schedule: ['08:00'],
+                    timeWindows: [
+                        { start: '07:30', end: '08:30' }
+                    ]
+                }
+            ],
+            contacts: [
+                { id: 1, name: 'Dr. Martin', relation: 'Médecin traitant', avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=200&h=200&fit=crop' },
+                { id: 2, name: 'Sophie', relation: 'Fille', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
+                { id: 3, name: 'Pierre', relation: 'Fils', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' },
+                { id: 4, name: 'Marie', relation: 'Aide à domicile', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' }
+            ],
+            albumPhotos: [
+                { id: 1, url: 'https://media.istockphoto.com/id/672425798/fr/photo/couple-en-chaises-longues-sur-la-plage-aux-maldives.jpg?s=612x612&w=0&k=20&c=oo2jZFYW5D5J4w_zmKMThfDi6WTMjSIqDIGvGc7gf-o=', caption: 'Eté 2025' },
+                { id: 2, url: 'https://www.leparisien.fr/resizer/ntYZfln6w9kG0l8bcfhkz10u-iA=/932x582/cloudfront-eu-central-1.images.arcpublishing.com/lpguideshopping/6CTRLSNXIZGZVFT77OIZ5XXD3M.jpg', caption: 'Eté 2024' },
+                { id: 3, url: 'https://lamisoleil.com/images/domaines/chorges/loisirs/ski/vacances-ski-serre-poncon-hiver-lamisoleil-village-vacances_3.jpg', caption: 'Vacances ski' },
+                { id: 4, url: 'https://res.cloudinary.com/vacancesbleues/image/upload/c_fill,f_auto,fl_progressive,g_auto,h_270,q_auto,w_696/prod/var/site/storage/images/0/3/6/9/69630-1-eng-GB/bea88aab7b98-iStock-615098476-2-1-.jpg', caption: 'Séjour randonnée 2020' },
+                { id: 5, url: 'https://www.aquatique-vacances.com/media/10867/660x660/location-camping-vacances-sete-herault-occitanie.webp', caption: 'Sète 2029' },
+                { id: 6, url: 'https://img.lonelyplanet.fr/s3fs-public/styles/wide/public/2024-11/la_rochelle.jpg.webp?itok=ZiH6nMwx', caption: 'La Rochelle' }
+            ],
+            bookExcerpts: [
+{
+    id: 1,
+    title: 'La vie élastique : révolutions dans le vieillissement ?',
+    author: 'Eric Bapteste',
+    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Vie_elastique.jpg',
+    excerpt: 'Des informations sur le phénomène de vieillissement, ses causes et ses effets sur la santé ainsi que sur les dernières découvertes scientifiques à ce sujet.',
+},
+{
+    id: 2,
+    title: 'Générations ! : comment le lien intergénérationnel va changer le monde',
+    author: 'Collectif',
+    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Generaction.png',
+    excerpt: 'Transcription des échanges d\'une douzaine de binômes intergénérationnels sur cinq grands sujets de société : environnement, argent, fin de vie, accès à l\'information, numérique et sens de la vie.',
+},
+
+
+{
+    id: 4,
+    title: 'C\'est ma ménopause : le guide complet, rassurant et sans tabou',
+    author: 'Anna Roy, Caroline Michel',
+    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Cest_ma_menopause.png',
+    excerpt: 'La sage-femme Anna Roy déconstruit les idées reçues sur la ménopause et répond aux questions des femmes avec des conseils pratiques pour mieux vivre cette période.',
+},
+{
+    id: 5,
+    title: 'Performer après 50 ans : comment rester en forme et compétitif tout au long de sa vie',
+    author: 'Joe Friel',
+    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Performer_apres_50_ans.jpg',
+    excerpt: 'Des conseils pour continuer le sport intensif après 50 ans, avec des recommandations sur la musculation, la récupération, la nutrition et des programmes d\'entraînement progressifs.',
+},
+{
+    id: 6,
+    title: 'On mange quoi pour vivre 100 ans ?',
+    author: 'Delphine Lebrun, Emmanuelle Jumeaucourt',
+    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/On_mange_quoi.jpg',
+    excerpt: '45 recettes inspirées des cuisines des zones bleues, privilégiant fruits et légumes de saison, légumineuses, céréales complètes, poisson et bonnes graisses.',
+},
+
+    {
+        id: 7,
+        title: 'Bien vieillir : 50 solutions pour les territoires',
+        author: 'Yann Lasnier et Boris Venon ; préface par David Isnard',
+        cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Bien_vieillir_territoire.png',
+        excerpt: 'Face au vieillissement massif de la population prévu à partir de 2030, les auteurs tentent de pallier les lacunes de la politique publique nationale en proposant des solutions pour les élus territoriaux en matière de logement, de santé, de loisirs, de citoyenneté, d\'accès à l\'information, de lutte contre l\'isolement, entre autres..',
+    }
+    
+            ],
+            currentDate: new Date(),
+            time: 12,
+            simulatedMode: false,
+            dayIndex: 0,
+            weather: null,
+            currentSpeech: null,
+            recognition: null,
+            voices: [],
+            lastMinute: null,
+            lastAlertDay: null,
+            readingSuggestionShown: false
+        };
+
+        // Extraits de livres avec lecture
+        let currentReadingId = null;
+        let currentReadingUtterance = null;
+
+        function renderBookExcerpts() {
+            const container = document.getElementById('bookCovers');
+            if (!container) return;
+            
+            container.innerHTML = state.bookExcerpts.map(book => `
+                <div onclick="openBook(${book.id})" style="cursor: pointer; transition: all 0.3s; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <img src="${book.cover}" alt="${book.title}" 
+                         style="width: 100%; height: 180px; object-fit: cover; display: block;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 10px; text-align: center;">
+                        <div style="font-size: 13px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                        <div style="font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.author}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openBook(bookId) {
+            const book = state.bookExcerpts.find(b => b.id === bookId);
+            speak(`Ouverture de ${book.title}`);
+            
+            const html = `
+                <div style="max-width: 800px;">
+                    <div style="display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap;">
+                        <img src="${book.cover}" alt="${book.title}" 
+                             style="width: 200px; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+                        <div style="flex: 1; min-width: 250px;">
+                            <h2 style="font-size: 32px; margin-bottom: 10px;">${book.title}</h2>
+                            <p style="font-size: 20px; opacity: 0.9; margin-bottom: 20px;">par ${book.author}</p>
+                            <div style="background: rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                                <p style="font-size: 16px; line-height: 1.8;">${book.excerpt}</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button onclick="startBookReading(${book.id})" id="read-btn-${book.id}" class="modal-btn" style="flex: 1; min-width: 150px;">
+                                    <i class="fas fa-play"></i> <span id="read-btn-text-${book.id}">Lire à haute voix</span>
+                                </button>
+                                <button onclick="stopBookReading()" class="modal-btn secondary" style="flex: 1; min-width: 150px;">
+                                    <i class="fas fa-stop"></i> Arrêter
+                                </button>
+                            </div>
+                            <div style="margin-top: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; height: 8px;">
+                                <div id="book-progress-${book.id}" style="height: 100%; width: 0%; background: linear-gradient(90deg, #8B5CF6, #EC4899); transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        let currentBookReading = null;
+        let currentBookUtterance = null;
+
+        window.startBookReading = function(bookId) {
+            const book = state.bookExcerpts.find(b => b.id === bookId);
+            
+            if (currentBookReading === bookId && window.speechSynthesis.speaking) {
+                // Pause/Resume
+                if (window.speechSynthesis.paused) {
+                    window.speechSynthesis.resume();
+                    document.getElementById(`read-btn-text-${bookId}`).textContent = 'Pause';
+                    document.querySelector(`#read-btn-${bookId} i`).className = 'fas fa-pause';
+                } else {
+                    window.speechSynthesis.pause();
+                    document.getElementById(`read-btn-text-${bookId}`).textContent = 'Reprendre';
+                    document.querySelector(`#read-btn-${bookId} i`).className = 'fas fa-play';
+                }
+                return;
+            }
+            
+            // Stop any current reading
+            if (currentBookUtterance) {
+                window.speechSynthesis.cancel();
+            }
+            
+            currentBookReading = bookId;
+            
+            const utterance = new SpeechSynthesisUtterance();
+            utterance.text = `${book.title}, par ${book.author}. ${book.excerpt}`;
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            const voices = window.speechSynthesis.getVoices();
+            const frVoice = voices.find(v => v.lang.startsWith('fr'));
+            if (frVoice) utterance.voice = frVoice;
+            
+            const totalLength = utterance.text.length;
+            utterance.onboundary = (event) => {
+                const progress = (event.charIndex / totalLength) * 100;
+                const bar = document.getElementById(`book-progress-${bookId}`);
+                if (bar) bar.style.width = `${progress}%`;
+            };
+            
+            utterance.onend = () => {
+                currentBookReading = null;
+                currentBookUtterance = null;
+                const btn = document.getElementById(`read-btn-text-${bookId}`);
+                if (btn) {
+                    btn.textContent = 'Lire à haute voix';
+                    document.querySelector(`#read-btn-${bookId} i`).className = 'fas fa-play';
+                }
+                const bar = document.getElementById(`book-progress-${bookId}`);
+                if (bar) bar.style.width = '0%';
+                speak('Lecture terminée');
+            };
+            
+            utterance.onerror = () => {
+                currentBookReading = null;
+                currentBookUtterance = null;
+            };
+            
+            currentBookUtterance = utterance;
+            window.speechSynthesis.speak(utterance);
+            
+            document.getElementById(`read-btn-text-${bookId}`).textContent = 'Pause';
+            document.querySelector(`#read-btn-${bookId} i`).className = 'fas fa-pause';
+            speak('Début de la lecture');
+        };
+
+        window.stopBookReading = function() {
+            if (currentBookUtterance) {
+                window.speechSynthesis.cancel();
+                currentBookReading = null;
+                currentBookUtterance = null;
+                speak('Lecture arrêtée');
+            }
+        };
+
+        function toggleReading(bookId) {
+            const book = state.bookExcerpts.find(b => b.id === bookId);
+            
+            if (currentReadingId === bookId) {
+                // Pause
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                currentReadingId = null;
+                const btn = document.getElementById(`reading-btn-text-${bookId}`);
+                if (btn) btn.textContent = 'Lire';
+                const icon = document.querySelector(`#book-${bookId} .reading-btn i`);
+                if (icon) icon.className = 'fas fa-play';
+            } else {
+                // Stop any other reading
+                if (currentReadingId) {
+                    window.speechSynthesis.cancel();
+                    const oldBtn = document.getElementById(`reading-btn-text-${currentReadingId}`);
+                    if (oldBtn) {
+                        oldBtn.textContent = 'Lire';
+                        const oldIcon = document.querySelector(`#book-${currentReadingId} .reading-btn i`);
+                        if (oldIcon) oldIcon.className = 'fas fa-play';
+                    }
+                }
+                
+                // Start new reading
+                currentReadingId = bookId;
+                const btn = document.getElementById(`reading-btn-text-${bookId}`);
+                if (btn) btn.textContent = 'Pause';
+                const icon = document.querySelector(`#book-${bookId} .reading-btn i`);
+                if (icon) icon.className = 'fas fa-pause';
+                
+                const utterance = new SpeechSynthesisUtterance();
+                utterance.text = `${book.title}, par ${book.author}. ${book.excerpt}`;
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                // Voice selection
+                const voices = window.speechSynthesis.getVoices();
+                const frVoice = voices.find(v => v.lang.startsWith('fr'));
+                if (frVoice) utterance.voice = frVoice;
+                
+                // Progress tracking
+                const totalLength = utterance.text.length;
+                utterance.onboundary = (event) => {
+                    const progress = (event.charIndex / totalLength) * 100;
+                    const bar = document.getElementById(`reading-progress-${bookId}`);
+                    if (bar) bar.style.width = `${progress}%`;
+                };
+                
+                utterance.onend = () => {
+                    currentReadingId = null;
+                    const btn = document.getElementById(`reading-btn-text-${bookId}`);
+                    if (btn) {
+                        btn.textContent = 'Lire';
+                        const icon = document.querySelector(`#book-${bookId} .reading-btn i`);
+                        if (icon) icon.className = 'fas fa-play';
+                    }
+                    const bar = document.getElementById(`reading-progress-${bookId}`);
+                    if (bar) bar.style.width = '0%';
+                };
+                
+                utterance.onerror = () => {
+                    currentReadingId = null;
+                    const btn = document.getElementById(`reading-btn-text-${bookId}`);
+                    if (btn) {
+                        btn.textContent = 'Lire';
+                        document.querySelector(`#book-${bookId} .reading-btn i`).className = 'fas fa-play';
+                    }
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Toggle panel on mobile
+        function togglePanel(header) {
+            if (window.innerWidth > 1024) return;
+            
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.panel-toggle-icon');
+            
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        // Voice synthesis
+        async function initVoices() {
+            return new Promise((resolve) => {
+                let voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    state.voices = voices;
+                    resolve();
+                } else {
+                    window.speechSynthesis.onvoiceschanged = () => {
+                        state.voices = window.speechSynthesis.getVoices();
+                        resolve();
+                    };
+                    // Timeout pour iOS qui peut ne jamais déclencher onvoiceschanged
+                    setTimeout(() => {
+                        state.voices = window.speechSynthesis.getVoices();
+                        resolve();
+                    }, 1000);
+                }
+            });
+        }
+
+        function speak(text, priority = false) {
+            try {
+                // Annuler la parole en cours si prioritaire
+                if (priority && window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                // Sur iOS, cancel peut être nécessaire avant de parler
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                // Chercher une voix française
+                const voices = window.speechSynthesis.getVoices();
+                const frVoice = voices.find(v => v.lang.startsWith('fr')) || 
+                               voices.find(v => v.lang.includes('FR')) ||
+                               voices[0]; // Fallback sur la première voix disponible
+                
+                if (frVoice) {
+                    utterance.voice = frVoice;
+                }
+                
+                // Gérer les erreurs iOS
+                utterance.onerror = (event) => {
+                    console.error('Erreur synthèse vocale:', event);
+                };
+                
+                utterance.onstart = () => {
+                    console.log('🔊 Lecture vocale démarrée');
+                };
+                
+                utterance.onend = () => {
+                    console.log('✅ Lecture vocale terminée');
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            } catch (error) {
+                console.error('Erreur fonction speak:', error);
+            }
+        }
+
+        // Voice recognition
+        function initVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.log('Speech recognition not supported');
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            state.recognition = new SpeechRecognition();
+            state.recognition.lang = 'fr-FR';
+            state.recognition.continuous = false;
+            state.recognition.interimResults = false;
+            
+            state.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                console.log('Commande vocale:', transcript);
+                handleVoiceCommand(transcript);
+            };
+            
+            state.recognition.onerror = (event) => {
+                console.error('Erreur reconnaissance vocale:', event.error);
+                speak('Désolé, je n\'ai pas compris. Pouvez-vous répéter ?');
+            };
+        }
+
+        function startVoiceAssistant() {
+            if (!state.recognition) {
+                speak('La reconnaissance vocale n\'est pas disponible sur ce navigateur.');
+                return;
+            }
+            
+            speak('Je vous écoute. Que puis-je faire pour vous ?', true);
+            showAlert('🎤 Assistant vocal activé', '#8B5CF6');
+            
+            setTimeout(() => {
+                try {
+                    state.recognition.start();
+                } catch (e) {
+                    console.error('Erreur démarrage reconnaissance:', e);
+                }
+            }, 2000);
+        }
+
+function handleVoiceCommand(command) {
+    // Commandes pour allumer les lumières
+    if (command.includes('allume') || command.includes('allumer')) {
+        if (command.includes('salon')) {
+            toggleDevice(1);
+        } else if (command.includes('cuisine')) {
+            toggleDevice(2);
+        } else if (command.includes('chambre')) {
+            toggleDevice(3);
+        } else {
+            speak('Quelle lumière voulez-vous allumer ?');
+        }
+    }
+    // Commandes pour éteindre les lumières
+    else if (command.includes('éteins') || command.includes('éteindre')) {
+        if (command.includes('salon')) {
+            toggleDevice(1);
+        } else if (command.includes('cuisine')) {
+            toggleDevice(2);
+        } else if (command.includes('chambre')) {
+            toggleDevice(3);
+        } else {
+            speak('Quelle lumière voulez-vous éteindre ?');
+        }
+    }
+    // Commandes pour afficher les médicaments
+    else if (command.includes('médicament') || command.includes('pilule')) {
+        speak('Affichage de vos médicaments');
+        showAlert('💊 Médicaments affichés', '#3b82f6');
+    }
+    // Commandes pour appeler un contact
+    else if (command.includes('contact') || command.includes('appel')) {
+        showContacts();
+    }
+    // Commandes pour afficher un album photo
+    else if (command.includes('photo') || command.includes('album')) {
+        showAlbum();
+    }
+    // Commandes pour une aide d'urgence
+    else if (command.includes('urgence') || command.includes('aide')) {
+        emergencyCall();
+    }
+    // Commandes pour exercices de respiration
+    else if (command.includes('respiration') || command.includes('respirer')) {
+        breathingExercise();
+    }
+    // Commandes pour exercices de yoga
+    else if (command.includes('yoga')) {
+        yogaExercise();
+    }
+    // Commandes pour la météo
+    else if (command.includes('météo') || command.includes('temps')) {
+        const temp = document.getElementById('weatherTemp').textContent;
+        speak(`Il fait actuellement ${temp} à Paris`);
+    }
+    // Commandes pour connaître l'heure
+    else if (command.includes('heure')) {
+        const time = document.getElementById('timeDisplay').textContent;
+        speak(`Il est ${time}`);
+    }
+    // Commandes pour vérifier l'hydratation
+    else if (command.includes('eau') || command.includes('hydratation')) {
+        speak('Il est important de boire de l\'eau régulièrement. Avez-vous bu aujourd\'hui ?');
+    }
+    // Commandes pour vérifier la prise des médicaments (rappel)
+    else if (command.includes('rappel') && (command.includes('médicament') || command.includes('pilule'))) {
+        speak('Souhaitez-vous un rappel pour votre prochain médicament ?');
+        // Code pour afficher un rappel ou une notification pour la prise de médicaments
+    }
+    // Commandes pour les rendez-vous médicaux
+    else if (command.includes('rendez-vous') || command.includes('consultation') || command.includes('médecin')) {
+        speak('Voici vos prochains rendez-vous médicaux');
+        // Code pour afficher les rendez-vous ou les consultations programmées
+    }
+    // Commandes pour vérifier la santé (ex. douleur, bien-être)
+    else if (command.includes('douleur') || command.includes('mal') || command.includes('santé')) {
+        speak('Avez-vous ressenti une douleur ou un inconfort aujourd\'hui ?');
+        // Code pour vérifier les symptômes ou demander des détails supplémentaires
+    }
+    // Commandes pour discuter avec un membre de la famille
+    else if (command.includes('famille') || command.includes('enfant') || command.includes('parent')) {
+        speak('Voulez-vous appeler un membre de la famille ?');
+        // Code pour afficher les membres de la famille dans les contacts ou les rappeler
+    }
+    // Commandes pour envoyer un message ou appeler un membre de la famille
+    else if (command.includes('message') || command.includes('envoyer message')) {
+        speak('A qui souhaitez-vous envoyer un message ?');
+        // Code pour envoyer un message à un membre de la famille
+    }
+    // Commandes pour vérifier la température corporelle
+    else if (command.includes('température') || command.includes('fièvre')) {
+        speak('Souhaitez-vous vérifier votre température corporelle ?');
+        // Code pour vérifier ou rappeler l'outil pour vérifier la température
+    }
+    // Commandes pour savoir si des rappels sont activés
+    else if (command.includes('rappels') || command.includes('alarme')) {
+        speak('Voici vos rappels activés pour aujourd\'hui.');
+        // Code pour afficher ou rappeler les alarmes de prise de médicaments, rendez-vous, etc.
+    }
+    else {
+        speak('Désolé, je n\'ai pas compris. Pouvez-vous répéter ?');
+    }
+}
+
+        
+
+        // Show alert
+        function showAlert(message, color = '#3b82f6') {
+            const banner = document.getElementById('alertBanner');
+            const content = document.getElementById('alertContent');
+            const text = document.getElementById('alertText');
+            
+            text.textContent = message;
+            content.style.background = `${color}33`;
+            content.style.borderColor = `${color}99`;
+            
+            banner.style.display = 'block';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+        }
+
+        // Modal functions
+        function showModal(content) {
+            const modal = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = content;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.remove('active');
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'modalOverlay') {
+                closeModal();
+            }
+        }
+
+        // Devices
+        function renderDevices() {
+            const container = document.getElementById('devicesList');
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;">
+                    ${state.devices.map((device, index) => {
+                        const bgColors = [
+                            'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)'
+                        ];
+                        
+                        // Sélectionner l'image en fonction de l'état
+                        const currentImage = device.status ? device.imageOn : device.imageOff;
+                        
+                        return `
+                            <div onclick="deviceClick(${device.id})" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]};">
+                                <div style="position: relative; overflow: hidden;">
+                                    <img src="${currentImage}" alt="${device.name}" 
+                                         style="width: 100%; height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                                    
+                                    <!-- Badge de statut sur l'image -->
+                                    <div style="position: absolute; top: 10px; right: 10px; background: ${device.status ? 'rgba(16, 185, 129, 0.9)' : 'rgba(107, 114, 128, 0.9)'}; backdrop-filter: blur(10px); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                                        <i class="fas fa-circle" style="font-size: 6px;"></i>
+                                        ${device.status ? 'ON' : 'OFF'}
+                                    </div>
+                                </div>
+                                
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px;">
+                                    <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px; text-align: center;">${device.name}</div>
+                                    ${device.type === 'heating' && device.status ? 
+                                        `<div style="font-size: 13px; opacity: 0.9; text-align: center; margin-bottom: 8px;">🌡️ ${device.temp}°C</div>` : 
+                                        `<div style="font-size: 11px; opacity: 0.85; text-align: center; margin-bottom: 8px;">${device.type === 'light' ? 'Éclairage' : device.type === 'heating' ? 'Chauffage' : 'Volets'}</div>`
+                                    }
+                                    
+                                    <!-- Boutons de contrôle -->
+                                    <div style="display: flex; gap: 6px; margin-top: 8px;">
+                                        <button onclick="event.stopPropagation(); toggleDevice(${device.id})" 
+                                                style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: ${device.status ? 'rgba(239, 68, 68, 0.8)' : 'rgba(16, 185, 129, 0.8)'}; color: white; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                            <i class="fas ${device.status ? 'fa-power-off' : 'fa-lightbulb'}"></i>
+                                        </button>
+                                        ${device.type === 'heating' ? `
+                                            <button onclick="event.stopPropagation(); adjustTemp(${device.id}, -1)" 
+                                                    style="padding: 8px 10px; border: none; border-radius: 8px; background: rgba(59, 130, 246, 0.8); color: white; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <button onclick="event.stopPropagation(); adjustTemp(${device.id}, 1)" 
+                                                    style="padding: 8px 10px; border: none; border-radius: 8px; background: rgba(59, 130, 246, 0.8); color: white; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function toggleDevice(id) {
+            const device = state.devices.find(d => d.id === id);
+            device.status = !device.status;
+            renderDevices();
+           
+            let message = '';
+            if (device.type === 'heating') {
+                message = device.status ? 'Chauffage allumé' : 'Chauffage éteint';
+            } else if (device.type === 'shutters') {
+                message = device.status ? 'Volets ouverts' : 'Volets fermés';
+            } else if (device.type === 'light') {
+                // Pour les lumières, dire "Lumière du salon est allumée"
+                message = `La lumière dans ${device.name.toLowerCase()} ${device.status ? 'est allumée' : 'est éteinte'}`;
+            } else {
+                message = `${device.name} ${device.status ? 'allumée' : 'éteinte'}`;
+            }
+            speak(message);
+            showAlert(`${device.icon} ${message}`, device.status ? '#10b981' : '#6b7280');
+        }
+
+        function adjustTemp(id, delta) {
+            const device = state.devices.find(d => d.id === id);
+            device.temp += delta;
+            if (device.temp < 15) device.temp = 15;
+            if (device.temp > 30) device.temp = 30;
+            renderDevices();
+            
+            speak(`Température réglée à ${device.temp} degrés`);
+            showAlert(`🌡️ ${device.temp}°C`, '#f59e0b');
+        }
+
+        function deviceClick(id) {
+            const device = state.devices.find(d => d.id === id);
+            let statusText = '';
+            if (device.type === 'heating') {
+                statusText = device.status ? 'allumé' : 'éteint';
+            } else if (device.type === 'shutters') {
+                statusText = device.status ? 'ouverts' : 'fermés';
+            } else {
+                statusText = device.status ? 'allumée' : 'éteinte';
+            }
+            speak(`${device.name} est ${statusText}`);
+        }
+
+        // Pills with time control - CONTRÔLE DES HEURES DE PRISE
+        function isWithinTimeWindow(pill) {
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            if (state.simulatedMode) {
+                const hours = Math.floor(state.time);
+                const minutes = Math.round((state.time - hours) * 60);
+                const simulatedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                
+                return pill.timeWindows.some(window => {
+                    return simulatedTime >= window.start && simulatedTime <= window.end;
+                });
+            }
+            
+            return pill.timeWindows.some(window => {
+                return currentTime >= window.start && currentTime <= window.end;
+            });
+        }
+
+        function getNextScheduledTime(pill) {
+            const now = new Date();
+            const currentTime = state.simulatedMode ? 
+                `${String(Math.floor(state.time)).padStart(2, '0')}:${String(Math.round((state.time - Math.floor(state.time)) * 60)).padStart(2, '0')}` :
+                `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            const nextTime = pill.schedule.find(time => time > currentTime);
+            return nextTime || pill.schedule[0];
+        }
+
+        function renderPills() {
+            const container = document.getElementById('pillsList');
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    ${state.pills.map((pill, index) => {
+                        const countClass = pill.count === 0 ? 'count-empty' : (pill.count <= 5 ? 'count-low' : 'count-ok');
+                        const canTake = isWithinTimeWindow(pill) && pill.count > 0;
+                        
+                        const bgColors = [
+                            'linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)',
+                            'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)'
+                        ];
+                        
+                        const countColors = {
+                            'count-ok': 'rgba(16, 185, 129, 0.9)',
+                            'count-low': 'rgba(245, 158, 11, 0.9)',
+                            'count-empty': 'rgba(239, 68, 68, 0.9)'
+                        };
+                        
+                        return `
+                            <div style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]}; display: flex; align-items: stretch;">
+                                <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
+                                    <img src="${pill.image}" alt="${pill.name}" 
+                                         style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                                    
+                                    <!-- Badge de stock sur l'image -->
+                                    <div style="position: absolute; top: 10px; right: 10px; background: ${countColors[countClass]}; backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 50%; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.3); min-width: 45px; text-align: center;">
+                                        ${pill.count}
+                                    </div>
+                                    
+                                    <!-- Badge actif si dans la période -->
+                                    ${isWithinTimeWindow(pill) ? `
+                                        <div style="position: absolute; top: 10px; left: 10px; background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(10px); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.3); animation: cardPulse 2s ease-in-out infinite;">
+                                            <i class="fas fa-clock"></i> À prendre
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                    <div>
+                                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 5px;">${pill.name}</div>
+                                        <div style="font-size: 13px; opacity: 0.85; margin-bottom: 10px;">${pill.dosage}</div>
+                                        
+                                        <!-- Horaires de prise -->
+                                        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                                            ${pill.schedule.map(time => `
+                                                <span style="padding: 4px 8px; border-radius: 8px; background: ${isWithinTimeWindow(pill) ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.2)'}; border: 1px solid ${isWithinTimeWindow(pill) ? 'rgba(16, 185, 129, 0.6)' : 'rgba(59, 130, 246, 0.4)'}; font-size: 11px; font-weight: 600;">
+                                                    ${time}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Boutons d'action -->
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="takePill(${pill.id})" 
+                                                ${!canTake ? 'disabled' : ''}
+                                                style="flex: 1; padding: 12px; border: none; border-radius: 10px; background: ${canTake ? 'rgba(16, 185, 129, 0.9)' : 'rgba(107, 114, 128, 0.5)'}; color: white; font-size: 14px; font-weight: 700; cursor: ${canTake ? 'pointer' : 'not-allowed'}; transition: all 0.3s; opacity: ${canTake ? '1' : '0.5'};">
+                                            <i class="fas fa-check"></i> Prendre
+                                        </button>
+                                        <button onclick="refillPill(${pill.id})" 
+                                                style="padding: 12px 16px; border: none; border-radius: 10px; background: rgba(59, 130, 246, 0.9); color: white; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.3s; min-width: 50px;">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function takePill(id) {
+            const pill = state.pills.find(p => p.id === id);
+            
+            // Vérification stock
+            if (pill.count <= 0) {
+                speak(`Attention ! ${pill.name} est épuisé. Veuillez recharger.`);
+                showAlert(`❌ ${pill.name} épuisé !`, '#ef4444');
+                return;
+            }
+            
+
+
+            // CONTRÔLE STRICT DE L'HEURE - Ne décompte PAS si hors période
+            if (!isWithinTimeWindow(pill)) {
+                const nextTime = getNextScheduledTime(pill);
+                speak(`Ce n'est pas l'heure de prendre ${pill.name}. La prochaine prise est prévue à ${nextTime}. Médicament non décompté.`);
+                showAlert(`⏰ Pas l'heure pour ${pill.name}. Prochain: ${nextTime}`, '#f59e0b');
+                return; // On sort SANS décompter le médicament
+            }
+            
+            // Si on est dans la bonne période, on décompte
+            pill.count--;
+            renderPills();
+            
+            speak(`${pill.name} pris. Il vous en reste ${pill.count}.`);
+            showAlert(`✅ ${pill.name} pris`, '#10b981');
+            
+            if (pill.count === 0) {
+                setTimeout(() => {
+                    speak(`Attention ! ${pill.name} est maintenant épuisé.`);
+                    showAlert(`🚨 ${pill.name} épuisé !`, '#ef4444');
+                }, 2000);
+            } else if (pill.count <= 5) {
+                setTimeout(() => {
+                    speak(`Attention ! Il ne reste que ${pill.count} ${pill.name}.`);
+                    showAlert(`⚠️ Stock faible: ${pill.name}`, '#f59e0b');
+                }, 2000);
+            }
+        }
+
+        function refillPill(id) {
+            const pill = state.pills.find(p => p.id === id);
+            pill.count = 30;
+            renderPills();
+            
+            speak(`${pill.name} rechargé à 30 unités`);
+            showAlert(`✅ ${pill.name} rechargé`, '#10b981');
+        }
+
+        // Contacts
+        function showContacts() {
+            speak('Affichage de vos contacts');
+            
+            const html = `
+                <div class="game-modal-content" style="max-width: 600px; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 30px; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        <i class="fas fa-address-book"></i> Mes Contacts
+                    </h2>
+                    
+                    ${state.contacts.map(contact => `
+                        <div class="contact-card">
+                            <img src="${contact.avatar}" alt="${contact.name}" class="contact-avatar">
+                            <div class="contact-info">
+                                <div class="contact-name">${contact.name}</div>
+                                <div class="contact-relation">${contact.relation}</div>
+                            </div>
+                            <div class="contact-actions">
+                                <button class="contact-btn call-btn" onclick="callContact('${contact.name}')">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                                <button class="contact-btn video-btn" onclick="videoCall('${contact.name}')">
+                                    <i class="fas fa-video"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function callContact(name) {
+            speak(`Appel de ${name} en cours`);
+            showAlert(`📞 Appel de ${name}...`, '#10b981');
+            closeModal();
+        }
+
+        function videoCall(name) {
+            speak(`Appel vidéo avec ${name} en cours`);
+            showAlert(`📹 Appel vidéo avec ${name}...`, '#3b82f6');
+            closeModal();
+        }
+
+        // Photo Album
+        function showAlbum() {
+            speak('Affichage de votre album photo');
+            
+            const html = `
+                <div class="game-modal-content" style="max-width: 900px; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 30px; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        <i class="fas fa-images"></i> Album photo
+                    </h2>
+                    
+                    <div class="album-grid">
+                        ${state.albumPhotos.map(photo => `
+                            <div class="album-item" onclick="viewPhoto('${photo.url}', '${photo.caption}')">
+                                <img src="${photo.url}" alt="${photo.caption}">
+                                <div class="album-overlay">${photo.caption}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+        }
+
+        function viewPhoto(url, caption) {
+            speak(caption);
+            const html = `
+                <div class="game-modal-content" style="text-align: center; max-width: 800px; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 32px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">${caption}</h2>
+                    <img src="${url}" style="max-width: 100%; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                    <button onclick="showAlbum()" class="modal-btn" style="margin-top: 20px;">
+                        <i class="fas fa-arrow-left"></i> Retour à la bibliothèque
+                    </button>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        // Update clock
+        function updateClock() {
+            const now = state.simulatedMode ? new Date(2026, 1, 6, Math.floor(state.time), (state.time % 1) * 60) : new Date();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            document.getElementById('timeDisplay').textContent = `${hours}:${minutes}`;
+            
+            const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            
+            const dayName = days[now.getDay()];
+            const day = now.getDate();
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            
+            document.getElementById('dateDisplay').textContent = `${dayName} ${day} ${monthName} ${year}`;
+            
+            // Update background and clock image
+            const hour = now.getHours();
+            const bg = document.getElementById('background');
+            const clockImage = document.getElementById('clockImage');
+            const timePeriodBadge = document.getElementById('timePeriodBadge');
+            
+            // Définir l'image et le badge selon l'heure
+            let imageUrl = '';
+            let periodText = '';
+            
+            if (hour >= 5 && hour < 8) {
+                // Lever du soleil
+                bg.className = 'background morning';
+                imageUrl = 'https://images.unsplash.com/photo-1465447142348-e9952c393450?w=600&h=400&fit=crop';
+                periodText = '🌅 Lever du soleil';
+            } else if (hour >= 8 && hour < 12) {
+                // Matin
+                bg.className = 'background morning';
+                imageUrl = 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&h=400&fit=crop';
+                periodText = '☀️ Matin';
+            } else if (hour >= 12 && hour < 14) {
+                // Midi
+                bg.className = 'background afternoon';
+                imageUrl = 'https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=600&h=400&fit=crop';
+                periodText = '🌞 Midi';
+            } else if (hour >= 14 && hour < 18) {
+                // Après-midi
+                bg.className = 'background afternoon';
+                imageUrl = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop';
+                periodText = '☀️ Après-midi';
+            } else if (hour >= 18 && hour < 21) {
+                // Coucher de soleil
+                bg.className = 'background evening';
+                imageUrl = 'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?w=600&h=400&fit=crop';
+                periodText = '🌇 Coucher du soleil';
+            } else {
+                // Nuit
+                bg.className = 'background evening';
+                imageUrl = 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=600&h=400&fit=crop';
+                periodText = '🌙 Nuit';
+            }
+            
+            if (clockImage) clockImage.src = imageUrl;
+            if (timePeriodBadge) timePeriodBadge.textContent = periodText;
+            
+            // AUTOMATISATIONS NOCTURNES (00h00 - 06h00)
+            if (hour >= 0 && hour < 6) {
+                // Lumières éteintes (tous les devices de type 'light')
+                state.devices.filter(d => d.type === 'light').forEach(lightDevice => {
+                    if (lightDevice.status === true) {
+                        lightDevice.status = false;
+                    }
+                });
+                
+                // Fenêtres fermées
+                const fenetresDevice = state.devices.find(d => d.id === 6);
+                if (fenetresDevice && fenetresDevice.status === true) {
+                    fenetresDevice.status = false;
+                }
+                
+                // Chauffage à 19°C
+                const chauffageDevice = state.devices.find(d => d.id === 4);
+                if (chauffageDevice) {
+                    chauffageDevice.status = true;
+                    chauffageDevice.temp = 19;
+                }
+                
+                // Volets fermés
+                const voletsDevice = state.devices.find(d => d.id === 5);
+                if (voletsDevice && voletsDevice.status === true) {
+                    voletsDevice.status = false;
+                }
+                
+                // Re-render devices si changements
+                renderDevices();
+            }
+            
+            // PROPOSITION DE LECTURE À PARTIR DE 20h20
+            if (hour === 20 && minutes === '20' && !state.readingSuggestionShown) {
+                state.readingSuggestionShown = true;
+                speak('Il est 20h20, c\'est le moment idéal pour un moment de lecture. Voulez-vous que je vous propose un extrait ?');
+                showAlert('📚 Moment de lecture suggéré', '#8b5cf6');
+            }
+            
+            // Réinitialiser le flag de suggestion de lecture chaque jour
+            if (hour === 0 && minutes === '00') {
+                state.readingSuggestionShown = false;
+            }
+            
+            // Re-render pills UNIQUEMENT si la minute change (évite le re-render constant)
+            const currentMinute = `${hours}:${minutes}`;
+            if (!state.lastMinute || state.lastMinute !== currentMinute) {
+                state.lastMinute = currentMinute;
+                renderPills();
+                // Vérifier les alertes de santé chaque minute
+                checkHealthAlerts();
+            }
+        }
+
+        // Weather - Vraie météo avec géolocalisation
+        async function fetchWeather() {
+            try {
+                // Utilisation de l'API Open-Meteo (gratuite, sans clé API requise)
+                // Tentative de géolocalisation
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(async (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        await fetchWeatherData(lat, lon);
+                    }, async (error) => {
+                        console.log('Géolocalisation refusée, utilisation de Paris par défaut');
+                        // Paris par défaut si géolocalisation refusée
+                        await fetchWeatherData(48.8566, 2.3522);
+                    });
+                } else {
+                    // Paris par défaut si pas de géolocalisation
+                    await fetchWeatherData(48.8566, 2.3522);
+                }
+            } catch (error) {
+                console.error('Erreur météo:', error);
+                document.getElementById('weatherTemp').textContent = '--°';
+                document.getElementById('weatherIcon').textContent = '🌡️';
+            }
+        }
+        
+        async function fetchWeatherData(lat, lon) {
+            try {
+                // API Open-Meteo (gratuite, sans clé)
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+                const data = await response.json();
+                
+                const current = data.current_weather;
+                const temp = Math.round(current.temperature);
+                const windSpeed = Math.round(current.windspeed);
+                
+                // Déterminer la condition météo selon le code WMO
+                const weatherCode = current.weathercode;
+                let condition = 'Clear';
+                if (weatherCode >= 61 && weatherCode <= 67) condition = 'Rain';
+                else if (weatherCode >= 51 && weatherCode <= 57) condition = 'Drizzle';
+                else if (weatherCode >= 71 && weatherCode <= 77) condition = 'Snow';
+                else if (weatherCode >= 80 && weatherCode <= 82) condition = 'Rain';
+                else if (weatherCode >= 95 && weatherCode <= 99) condition = 'Thunderstorm';
+                else if (weatherCode >= 1 && weatherCode <= 3) condition = 'Clouds';
+                else if (weatherCode === 45 || weatherCode === 48) condition = 'Mist';
+                
+                const weatherData = {
+                    temp: temp,
+                    condition: condition,
+                    icon: getWeatherIcon(condition),
+                    humidity: 65, // Open-Meteo basic ne fournit pas l'humidité
+                    wind: windSpeed
+                };
+                
+                // Changer l'image selon la météo
+                const weatherImage = document.getElementById('weatherImage');
+                const weatherImages = {
+                    'Clear': 'https://images.unsplash.com/photo-1601297183305-6df142704ea2?w=400&h=300&fit=crop',
+                    'Clouds': 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=400&h=300&fit=crop',
+                    'Rain': 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=400&h=300&fit=crop',
+                    'Drizzle': 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?w=400&h=300&fit=crop',
+                    'Thunderstorm': 'https://images.unsplash.com/photo-1605727216801-e27ce1d0cc28?w=400&h=300&fit=crop',
+                    'Snow': 'https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=400&h=300&fit=crop',
+                    'Mist': 'https://images.unsplash.com/photo-1487621167305-5d248087c724?w=400&h=300&fit=crop'
+                };
+                
+                if (weatherImage) {
+                    weatherImage.src = weatherImages[weatherData.condition] || weatherImages['Clear'];
+                }
+                
+                const tempEl = document.getElementById('weatherTemp');
+                const iconEl = document.getElementById('weatherIcon');
+                const humidityEl = document.getElementById('weatherHumidity');
+                const windEl = document.getElementById('weatherWind');
+                
+                if (tempEl) tempEl.textContent = `${weatherData.temp}°`;
+                if (iconEl) iconEl.textContent = weatherData.icon;
+                if (humidityEl) humidityEl.textContent = `${weatherData.humidity}%`;
+                if (windEl) windEl.textContent = `${weatherData.wind} km/h`;
+                
+            } catch (error) {
+                console.error('Erreur récupération données météo:', error);
+                throw error;
+            }
+        }
+        
+        function getWeatherIcon(weatherMain) {
+            const icons = {
+                'Clear': '☀️',
+                'Clouds': '☁️',
+                'Rain': '🌧️',
+                'Drizzle': '🌦️',
+                'Thunderstorm': '⛈️',
+                'Snow': '❄️',
+                'Mist': '🌫️',
+                'Fog': '🌫️'
+            };
+            return icons[weatherMain] || '🌤️';
+        }
+
+        // Breathing exercise
+        function breathingExercise() {
+            speak('Exercice de respiration guidée. Préparez-vous.');
+            
+            const html = `
+                <div class="game-modal-content" style="text-align: center; max-width: 500px; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        <i class="fas fa-wind"></i> Respiration Guidée
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.95;">
+                        Suivez le cercle et respirez profondément
+                    </div>
+                    
+                    <div class="breathing-circle" id="breathingCircle">
+                        Prêt
+                    </div>
+                    
+                    <div style="font-size: 24px; font-weight: 700; margin: 20px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Cycle: <span id="breathingCycle">0</span>/5
+                    </div>
+                    
+                    <button onclick="stopBreathing()" class="modal-btn secondary">
+                        <i class="fas fa-stop"></i> Arrêter
+                    </button>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            let cycle = 0;
+            let breathingInterval;
+            
+            window.stopBreathing = function() {
+                clearInterval(breathingInterval);
+                speak('Exercice de respiration terminé. Bien joué !');
+            };
+            
+            setTimeout(() => {
+                breathingInterval = setInterval(() => {
+                    const circle = document.getElementById('breathingCircle');
+                    const cycleDisplay = document.getElementById('breathingCycle');
+                    
+                    if (!circle) {
+                        clearInterval(breathingInterval);
+                        return;
+                    }
+                    
+                    // Phase d'inspiration
+                    circle.classList.add('inhale');
+                    circle.classList.remove('exhale');
+                    circle.textContent = 'Inspirez';
+                    speak('Inspirez');
+                    
+                    setTimeout(() => {
+                        // Phase d'expiration
+                        circle.classList.remove('inhale');
+                        circle.classList.add('exhale');
+                        circle.textContent = 'Expirez';
+                        speak('Expirez');
+                        
+                        cycle++;
+                        cycleDisplay.textContent = cycle;
+                        
+                        if (cycle >= 5) {
+                            clearInterval(breathingInterval);
+                            setTimeout(() => {
+                                speak('Exercice terminé. Vous vous sentez détendu.');
+                                showAlert('✅ Exercice terminé !', '#10b981');
+                            }, 4000);
+                        }
+                    }, 4000);
+                }, 8000);
+            }, 1000);
+        }
+
+        // Yoga exercise
+        function yogaExercise() {
+            speak('Exercices de yoga doux');
+            
+            const poses = [
+                { name: 'Arbre', icon: '🌳', duration: '30', description: 'Équilibre sur une jambe' },
+                { name: 'Chat-Vache', icon: '🐱', duration: '60', description: 'Assouplissement du dos' },
+                { name: 'Enfant', icon: '🧘', duration: '60', description: 'Relaxation et étirement' },
+                { name: 'Guerrier', icon: '⚔️', duration: '30', description: 'Force et équilibre' },
+                { name: 'Cobra', icon: '🐍', duration: '30', description: 'Ouverture de la poitrine' },
+                { name: 'Papillon', icon: '🦋', duration: '60', description: 'Ouverture des hanches' }
+            ];
+            
+            const html = `
+                <div class="game-modal-content" style="text-align: center; max-width: 600px; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        <i class="fas fa-spa"></i> Yoga Doux
+                    </h2>
+                    
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.95;">
+                        Choisissez une posture
+                    </div>
+                    
+                    <div class="yoga-pose-grid">
+                        ${poses.map((pose, i) => `
+                            <div class="yoga-pose" onclick="startYogaPose(${i})">
+                                <div class="yoga-icon">${pose.icon}</div>
+                                <div class="yoga-name">${pose.name}</div>
+                                <div class="yoga-duration">${pose.duration} sec</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.startYogaPose = function(index) {
+                const pose = poses[index];
+                speak(`Posture ${pose.name}. ${pose.description}. Maintenez la position.`);
+                showAlert(`🧘 ${pose.name} - ${pose.duration} sec`, '#8B5CF6');
+                
+                const duration = parseInt(pose.duration) * 1000;
+                setTimeout(() => {
+                    speak('Posture terminée. Bien joué !');
+                    showAlert('✅ Posture terminée !', '#10b981');
+                }, duration);
+            };
+        }
+
+        // ========== JEUX ==========
+
+        // Quiz Game
+        function startQuiz() {
+            speak('Commençons le quiz de culture générale');
+            
+            const questions = [
+  {
+    question: "Quel est le plus long fleuve de France ?",
+    options: ["La Loire", "La Seine", "Le Rhône", "La Garonne"],
+    correct: 0
+  },
+  {
+    question: "Quel auteur a écrit 'Les Misérables' ?",
+    options: ["Victor Hugo", "Émile Zola", "Gustave Flaubert", "Albert Camus"],
+    correct: 0
+  },
+  {
+    question: "Quel est le symbole chimique de l'or ?",
+    options: ["Au", "Ag", "Fe", "O"],
+    correct: 0
+  },
+  {
+    question: "Quelle est la capitale de l’Italie ?",
+    options: ["Venise", "Rome", "Milan", "Florence"],
+    correct: 1
+  },
+  {
+    question: "Qui a composé la 'Symphonie n°9' (Ode à la joie) ?",
+    options: ["Mozart", "Bach", "Beethoven", "Chopin"],
+    correct: 2
+  }
+
+
+      ];
+            
+            let currentQuestion = 0;
+            let score = 0;
+            
+            function displayQuestion() {
+                if (currentQuestion >= questions.length) {
+                    const html = `
+                        <div style="text-align: center; max-width: 500px;">
+                            <h2 style="font-size: 48px; margin-bottom: 20px;">🎉</h2>
+                            <h3 style="font-size: 32px; margin-bottom: 20px;">Quiz Terminé !</h3>
+                            <div style="font-size: 24px; margin-bottom: 30px;">
+                                Votre score : <strong>${score}/${questions.length}</strong>
+                            </div>
+                            <div style="font-size: 18px; margin-bottom: 30px; opacity: 0.9;">
+                                ${score === questions.length ? 'Parfait ! Vous êtes un champion !' : 
+                                  score >= questions.length * 0.7 ? 'Très bien ! Excellent résultat !' :
+                                  score >= questions.length * 0.5 ? 'Bien joué ! Continuez comme ça !' :
+                                  'Pas mal ! Retentez votre chance !'}
+                            </div>
+                            <button onclick="startQuiz()" class="modal-btn" style="margin-right: 10px;">
+                                <i class="fas fa-redo"></i> Rejouer
+                            </button>
+                            <button onclick="closeModal()" class="modal-btn secondary">
+                                <i class="fas fa-times"></i> Fermer
+                            </button>
+                        </div>
+                    `;
+                    showModal(html);
+                    speak(`Quiz terminé ! Vous avez obtenu ${score} sur ${questions.length}.`);
+                    return;
+                }
+                
+                const q = questions[currentQuestion];
+                const html = `
+                    <div class="game-modal-content" style="max-width: 700px; text-align: center; padding: 40px; border-radius: 32px;">
+                        <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                            ❓ Quiz Culture Générale
+                        </h2>
+                        <div style="font-size: 18px; margin-bottom: 30px; opacity: 0.95;">
+                            Question ${currentQuestion + 1} / ${questions.length}
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 30px; margin-bottom: 25px; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);">
+                            <h3 style="font-size: 24px; line-height: 1.5; text-shadow: 0 1px 4px rgba(0,0,0,0.2);">${q.question}</h3>
+                        </div>
+                        <div style="display: grid; gap: 15px; margin-bottom: 25px;">
+                            ${q.options.map((option, i) => `
+                                <button onclick="checkQuizAnswer(${i}, ${q.correct})" 
+                                        class="modal-btn" 
+                                        style="font-size: 18px; padding: 20px; text-align: left;">
+                                    <strong>${String.fromCharCode(65 + i)}.</strong> ${option}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; font-size: 18px; padding: 16px; margin-bottom: 15px;">
+                            <i class="fas fa-times"></i> Fermer
+                        </button>
+                        <div style="font-size: 20px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                            Score : ${score} / ${questions.length}
+                        </div>
+                    </div>
+                `;
+                showModal(html);
+            }
+            
+            window.checkQuizAnswer = function(selected, correct) {
+                if (selected === correct) {
+                    speak('Bravo ! Bonne réponse');
+                    showAlert('✅ Bonne réponse !', '#10b981');
+                    score++;
+                } else {
+                    speak('Dommage, ce n\'est pas la bonne réponse');
+                    showAlert('❌ Mauvaise réponse', '#ef4444');
+                }
+                
+                currentQuestion++;
+                setTimeout(displayQuestion, 1500);
+            };
+            
+            displayQuestion();
+        }
+
+        // Word Search Game
+        function startWordSearch() {
+            speak('Jeu de mots cachés. Trouvez tous les mots');
+            
+            const wordsToFind = ['PARIS', 'FRANCE', 'SOLEIL', 'OCEAN', 'LIVRE'];
+            const gridSize = 10;
+            const grid = generateWordSearchGrid(wordsToFind, gridSize);
+            let selectedCells = [];
+            let foundWords = [];
+            
+            const html = `
+                <div class="game-modal-content" style="max-width: 800px; text-align: center; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        🔍 Mots Cachés
+                    </h2>
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.95;">
+                        Trouvez tous les mots (horizontalement)
+                    </div>
+                    <div id="wordSearchGrid" style="display: grid; grid-template-columns: repeat(${gridSize}, 1fr); gap: 4px; max-width: 500px; margin: 20px auto;">
+                        ${grid.map((row, i) => 
+                            row.map((letter, j) => `
+                                <div onclick="toggleWordCell(${i}, ${j})" 
+                                     id="cell-${i}-${j}"
+                                     style="aspect-ratio: 1; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(5px);">
+                                    ${letter}
+                                </div>
+                            `).join('')
+                        ).join('')}
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px;">
+                        ${wordsToFind.map(word => `
+                            <div id="word-badge-${word}" style="background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 8px 16px; font-size: 16px; font-weight: 600; backdrop-filter: blur(5px);">
+                                ${word}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button onclick="clearWordSelection()" class="modal-btn" style="margin-right: 10px;">
+                            <i class="fas fa-eraser"></i> Effacer sélection
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary">
+                            <i class="fas fa-times"></i> Fermer
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.toggleWordCell = function(row, col) {
+                const cellId = `cell-${row}-${col}`;
+                const cell = document.getElementById(cellId);
+                const cellIndex = selectedCells.findIndex(c => c.row === row && c.col === col);
+                
+                if (cellIndex > -1) {
+                    selectedCells.splice(cellIndex, 1);
+                    cell.style.background = 'rgba(255,255,255,0.2)';
+                } else {
+                    selectedCells.push({row, col, letter: grid[row][col]});
+                    cell.style.background = 'rgba(139, 92, 246, 0.6)';
+                    
+                    // Check if word is formed
+                    const selectedWord = selectedCells.map(c => c.letter).join('');
+                    if (wordsToFind.includes(selectedWord) && !foundWords.includes(selectedWord)) {
+                        foundWords.push(selectedWord);
+                        speak(`Mot trouvé : ${selectedWord}`);
+                        showAlert(`✅ ${selectedWord} trouvé !`, '#10b981');
+                        
+                        // Mark cells as found
+                        selectedCells.forEach(c => {
+                            const foundCell = document.getElementById(`cell-${c.row}-${c.col}`);
+                            foundCell.style.background = 'rgba(16, 185, 129, 0.6)';
+                            foundCell.style.borderColor = 'rgba(16, 185, 129, 0.9)';
+                        });
+                        
+                        // Mark word badge as found
+                        const badge = document.getElementById(`word-badge-${selectedWord}`);
+                        badge.style.background = 'rgba(16, 185, 129, 0.4)';
+                        badge.style.borderColor = 'rgba(16, 185, 129, 0.7)';
+                        badge.style.textDecoration = 'line-through';
+                        
+                        selectedCells = [];
+                        
+                        if (foundWords.length === wordsToFind.length) {
+                            setTimeout(() => {
+                                speak('Félicitations ! Vous avez trouvé tous les mots !');
+                                showAlert('🎉 Tous les mots trouvés !', '#10b981');
+                            }, 500);
+                        }
+                    }
+                }
+            };
+            
+            window.clearWordSelection = function() {
+                selectedCells.forEach(c => {
+                    const cell = document.getElementById(`cell-${c.row}-${c.col}`);
+                    if (!foundWords.some(word => word.includes(c.letter))) {
+                        cell.style.background = 'rgba(255,255,255,0.2)';
+                    }
+                });
+                selectedCells = [];
+            };
+        }
+
+        function generateWordSearchGrid(words, size) {
+            const grid = Array(size).fill().map(() => Array(size).fill(''));
+            
+            // Place words horizontally
+            words.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                while (!placed && attempts < 50) {
+                    const row = Math.floor(Math.random() * size);
+                    const col = Math.floor(Math.random() * (size - word.length + 1));
+                    
+                    let canPlace = true;
+                    for (let i = 0; i < word.length; i++) {
+                        if (grid[row][col + i] !== '' && grid[row][col + i] !== word[i]) {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+                    
+                    if (canPlace) {
+                        for (let i = 0; i < word.length; i++) {
+                            grid[row][col + i] = word[i];
+                        }
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            });
+            
+            // Fill empty cells with random letters
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (grid[i][j] === '') {
+                        grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    }
+                }
+            }
+            
+            return grid;
+        }
+
+        // Mental Math Game
+        function startMentalMath() {
+            speak('Exercice de calcul mental');
+            
+            let currentQuestion = 0;
+            let score = 0;
+            const totalQuestions = 5;
+            let startTime = Date.now();
+            
+            function generateQuestion() {
+                const operations = [
+                    { op: '+', min: 5, max: 50 },
+                    { op: '-', min: 5, max: 50 },
+                    { op: '×', min: 2, max: 12 }
+                ];
+                
+                const selected = operations[Math.floor(Math.random() * operations.length)];
+                const a = Math.floor(Math.random() * (selected.max - selected.min + 1)) + selected.min;
+                const b = Math.floor(Math.random() * (selected.max - selected.min + 1)) + selected.min;
+                
+                let answer;
+                switch(selected.op) {
+                    case '+': answer = a + b; break;
+                    case '-': answer = a - b; break;
+                    case '×': answer = a * b; break;
+                }
+                
+                return {
+                    question: `${a} ${selected.op} ${b}`,
+                    answer: answer
+                };
+            }
+            
+            function displayMathQuestion() {
+                if (currentQuestion >= totalQuestions) {
+                    const totalTime = Math.round((Date.now() - startTime) / 1000);
+                    const html = `
+                        <div style="text-align: center; max-width: 500px;">
+                            <h2 style="font-size: 48px; margin-bottom: 20px;">🎉</h2>
+                            <h3 style="font-size: 32px; margin-bottom: 20px;">Calcul terminé !</h3>
+                            <div style="font-size: 24px; margin-bottom: 20px;">
+                                Score : <strong>${score}/${totalQuestions}</strong>
+                            </div>
+                            <div style="font-size: 18px; margin-bottom: 30px; opacity: 0.9;">
+                                Temps total : ${totalTime} secondes
+                            </div>
+                            <button onclick="startMentalMath()" class="modal-btn" style="margin-right: 10px;">
+                                <i class="fas fa-redo"></i> Rejouer
+                            </button>
+                            <button onclick="closeModal()" class="modal-btn secondary">
+                                <i class="fas fa-times"></i> Fermer
+                            </button>
+                        </div>
+                    `;
+                    showModal(html);
+                    speak(`Exercice terminé ! Score : ${score} sur ${totalQuestions}.`);
+                    return;
+                }
+                
+                const q = generateQuestion();
+                const html = `
+                    <div class="game-modal-content" style="max-width: 600px; text-align: center; padding: 40px; border-radius: 32px;">
+                        <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                            🧮 Calcul Mental
+                        </h2>
+                        <div style="font-size: 18px; margin-bottom: 30px; opacity: 0.95;">
+                            Question ${currentQuestion + 1} / ${totalQuestions}
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 40px; margin-bottom: 30px; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);">
+                            <div style="font-size: 48px; font-weight: 800; margin-bottom: 20px; text-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                                ${q.question} = ?
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <input type="number" id="mathAnswer" 
+                                   style="width: 100%; font-size: 32px; padding: 20px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.15); color: white; text-align: center; font-weight: 700; backdrop-filter: blur(5px);"
+                                   placeholder="Votre réponse"
+                                   autofocus>
+                        </div>
+                        <button onclick="checkMathAnswer(${q.answer})" class="modal-btn" style="width: 100%; font-size: 20px; padding: 20px; margin-bottom: 10px;">
+                            <i class="fas fa-check"></i> Valider
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%; font-size: 18px; padding: 16px;">
+                            <i class="fas fa-times"></i> Fermer
+                        </button>
+                        <div style="margin-top: 15px; font-size: 20px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                            Score : ${score} / ${totalQuestions}
+                        </div>
+                    </div>
+                `;
+                
+                showModal(html);
+                
+                // Allow Enter key to submit
+                setTimeout(() => {
+                    const input = document.getElementById('mathAnswer');
+                    if (input) {
+                        input.focus();
+                        input.addEventListener('keypress', (e) => {
+                            if (e.key === 'Enter') {
+                                checkMathAnswer(q.answer);
+                            }
+                        });
+                    }
+                }, 100);
+            }
+            
+            window.checkMathAnswer = function(correctAnswer) {
+                const userAnswer = parseInt(document.getElementById('mathAnswer').value);
+                
+                if (userAnswer === correctAnswer) {
+                    speak('Bravo ! Bonne réponse');
+                    showAlert('✅ Correct !', '#10b981');
+                    score++;
+                } else {
+                    speak(`Dommage ! La bonne réponse était ${correctAnswer}`);
+                    showAlert(`❌ La réponse était ${correctAnswer}`, '#ef4444');
+                }
+                
+                currentQuestion++;
+                setTimeout(displayMathQuestion, 1500);
+            };
+            
+            displayMathQuestion();
+        }
+
+        // Memory Game
+        function startMemoryGame() {
+            speak('Jeu de mémoire. Trouvez les paires');
+            
+            const symbols = ['🌟', '🎨', '🎭', '🎪', '🎬', '🎸', '🎺', '🎻'];
+            const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+            let flipped = [];
+            let matched = [];
+            let moves = 0;
+            
+            const html = `
+                <div class="game-modal-content" style="max-width: 700px; text-align: center; padding: 40px; border-radius: 32px;">
+                    <h2 style="font-size: 36px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                        🎴 Jeu de Mémoire
+                    </h2>
+                    <div style="font-size: 18px; margin-bottom: 20px; opacity: 0.95;">
+                        Trouvez les 8 paires
+                    </div>
+                    <div id="memoryGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 500px; margin: 20px auto;">
+                        ${cards.map((symbol, i) => `
+                            <div onclick="flipMemoryCard(${i})" 
+                                 id="memory-${i}"
+                                 data-symbol="${symbol}"
+                                 style="aspect-ratio: 1; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 36px; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(10px);">
+                                <span style="display: none;">${symbol}</span>
+                                <span class="card-back">?</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="memoryStats" style="margin-top: 20px; font-size: 18px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Paires trouvées : 0 / 8 | Coups : 0
+                    </div>
+                    <button onclick="startMemoryGame()" class="modal-btn" style="margin-top: 20px; margin-right: 10px;">
+                        <i class="fas fa-redo"></i> Recommencer
+                    </button>
+                    <button onclick="closeModal()" class="modal-btn secondary" style="margin-top: 20px;">
+                        <i class="fas fa-times"></i> Fermer
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            
+            window.flipMemoryCard = function(index) {
+                if (flipped.length >= 2 || flipped.includes(index) || matched.includes(index)) return;
+                
+                const card = document.getElementById(`memory-${index}`);
+                const symbol = card.dataset.symbol;
+                
+                card.querySelector('span:first-child').style.display = 'block';
+                card.querySelector('.card-back').style.display = 'none';
+                card.style.background = 'rgba(139, 92, 246, 0.5)';
+                
+                flipped.push(index);
+                
+                if (flipped.length === 2) {
+                    moves++;
+                    const card1 = document.getElementById(`memory-${flipped[0]}`);
+                    const card2 = document.getElementById(`memory-${flipped[1]}`);
+                    
+                    if (card1.dataset.symbol === card2.dataset.symbol) {
+                        speak('Bravo ! Paire trouvée');
+                        card1.style.background = 'rgba(16, 185, 129, 0.5)';
+                        card2.style.background = 'rgba(16, 185, 129, 0.5)';
+                        card1.style.borderColor = 'rgba(16, 185, 129, 0.8)';
+                        card2.style.borderColor = 'rgba(16, 185, 129, 0.8)';
+                        matched.push(flipped[0], flipped[1]);
+                        flipped = [];
+                        
+                        document.getElementById('memoryStats').textContent = 
+                            `Paires trouvées : ${matched.length / 2} / 8 | Coups : ${moves}`;
+                        
+                        if (matched.length === 16) {
+                            setTimeout(() => {
+                                speak(`Félicitations ! Vous avez gagné en ${moves} coups !`);
+                                showAlert(`🎉 Gagné en ${moves} coups !`, '#10b981');
+                            }, 500);
+                        }
+                    } else {
+                        setTimeout(() => {
+                            card1.querySelector('span:first-child').style.display = 'none';
+                            card1.querySelector('.card-back').style.display = 'block';
+                            card1.style.background = 'rgba(255,255,255,0.2)';
+                            
+                            card2.querySelector('span:first-child').style.display = 'none';
+                            card2.querySelector('.card-back').style.display = 'block';
+                            card2.style.background = 'rgba(255,255,255,0.2)';
+                            
+                            flipped = [];
+                            
+                            document.getElementById('memoryStats').textContent = 
+                                `Paires trouvées : ${matched.length / 2} / 8 | Coups : ${moves}`;
+                        }, 1000);
+                    }
+                }
+            };
+        }
+
+        // Emergency call
+        function emergencyCall() {
+            speak('APPEL D\'URGENCE EN COURS. Connexion aux services d\'urgence.', true);
+            
+            const html = `
+                <div style="text-align: center; max-width: 500px;">
+                    <div style="font-size: 80px; margin-bottom: 20px; animation: pulse 1s infinite;">
+                        🚨
+                    </div>
+                    
+                    <h2 style="font-size: 36px; margin-bottom: 20px; color: #ef4444;">
+                        APPEL D'URGENCE
+                    </h2>
+                    
+                    <div style="font-size: 20px; margin-bottom: 30px; font-weight: 700;">
+                        Connexion en cours...
+                    </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.6); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <div style="font-size: 18px; margin-bottom: 10px;">
+                            <i class="fas fa-phone"></i> SAMU: 15
+                        </div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">
+                            <i class="fas fa-ambulance"></i> Pompiers: 18
+                        </div>
+                        <div style="font-size: 18px;">
+                            <i class="fas fa-phone-volume"></i> Sylvie (ma fille)
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 16px; margin-bottom: 20px; opacity: 0.9;">
+                        Votre localisation et vos informations médicales ont été transmises.
+                    </div>
+                    
+                    <button onclick="cancelEmergency()" class="modal-btn" style="background: rgba(239, 68, 68, 0.8); width: 100%; font-size: 18px;">
+                        <i class="fas fa-times"></i> ANNULER L'APPEL
+                    </button>
+                </div>
+            `;
+            
+            showModal(html);
+            showAlert('🚨 APPEL D\'URGENCE ACTIVÉ', '#ef4444');
+            
+            setTimeout(() => {
+                speak('Services d\'urgence contactés. Aide en route.');
+            }, 3000);
+            
+            window.cancelEmergency = function() {
+                speak('Appel d\'urgence annulé');
+                closeModal();
+                showAlert('❌ Appel annulé', '#f59e0b');
+            };
+        }
+
+        // Time slider
+        document.getElementById('timeSlider').addEventListener('input', function(e) {
+            state.time = parseFloat(e.target.value);
+            state.simulatedMode = true;
+            
+            // Affichage de l'heure
+            const hours = Math.floor(state.time);
+            const minutes = Math.round((state.time % 1) * 60);
+            const timeDisplay = document.getElementById('timeValueDisplay');
+            if (timeDisplay) {
+                timeDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            }
+            
+            // Automatisation de la maison selon l'heure
+            automateHomeByTime(hours);
+            
+            updateClock();
+        });
+
+        // Fonction d'automatisation de la maison
+        function automateHomeByTime(hours) {
+            // Volets : fermés le soir (18h-8h)
+            const shuttersDevice = state.devices.find(d => d.name === 'Volets' || d.name.includes('Volet'));
+            if (shuttersDevice) {
+                const shouldClose = hours >= 18 || hours < 8;
+                if (shuttersDevice.status !== shouldClose) {
+                    shuttersDevice.status = shouldClose;
+                }
+            }
+
+            // Lumières : éteintes après 22h
+            if (hours >= 22 || hours < 6) {
+                state.devices.forEach(device => {
+                    if (device.type === 'light' && device.status) {
+                        device.status = false;
+                    }
+                });
+            }
+
+            // Chauffage : réduit à 19° la nuit (22h-6h)
+            const heatingDevice = state.devices.find(d => d.name === 'Chauffage' || d.name.includes('Chauf'));
+            if (heatingDevice && heatingDevice.temp !== undefined) {
+                if ((hours >= 22 || hours < 6) && heatingDevice.temp !== 19) {
+                    heatingDevice.temp = 19;
+                } else if (hours >= 6 && hours < 22 && heatingDevice.temp === 19) {
+                    heatingDevice.temp = 21;
+                }
+            }
+
+            // Rafraîchir l'affichage
+            renderDevices();
+        }
+
+        // FONCTIONS D'ACCESSIBILITÉ
+        function showAccessibilityMenu() {
+            const highContrastActive = document.body.classList.contains('high-contrast');
+            const largeTextActive = document.body.classList.contains('large-text');
+            const extraLargeTextActive = document.body.classList.contains('extra-large-text');
+            
+            showModal(`
+                <div class="accessibility-menu">
+                    <h2 style="font-size: 32px; margin-bottom: 30px; text-align: center;">
+                        <i class="fas fa-universal-access"></i> Accessibilité
+                    </h2>
+                    
+                    <div class="accessibility-option" onclick="toggleHighContrast()">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Contraste élevé</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Améliore la lisibilité</div>
+                        </div>
+                        <div class="toggle-switch ${highContrastActive ? 'active' : ''}" id="toggleContrast"></div>
+                    </div>
+                    
+                    <div class="accessibility-option" onclick="toggleLargeText()">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Texte agrandi</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Augmente la taille du texte</div>
+                        </div>
+                        <div class="toggle-switch ${largeTextActive ? 'active' : ''}" id="toggleLarge"></div>
+                    </div>
+                    
+                    <div class="accessibility-option" onclick="toggleExtraLargeText()">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Texte très agrandi</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Texte encore plus grand</div>
+                        </div>
+                        <div class="toggle-switch ${extraLargeTextActive ? 'active' : ''}" id="toggleExtraLarge"></div>
+                    </div>
+                    
+                    <button class="modal-btn" onclick="testVoice()" style="width: 100%; margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: 700; cursor: pointer;">
+                        <i class="fas fa-volume-up"></i> Tester la voix
+                    </button>
+                    
+                    <button class="modal-btn" onclick="closeModal()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: 700; cursor: pointer;">
+                        <i class="fas fa-check"></i> Terminé
+                    </button>
+                </div>
+            `);
+        }
+
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+            const toggle = document.getElementById('toggleContrast');
+            if (toggle) toggle.classList.toggle('active');
+            speak(document.body.classList.contains('high-contrast') ? 'Contraste élevé activé' : 'Contraste élevé désactivé');
+        }
+
+        function toggleLargeText() {
+            document.body.classList.remove('extra-large-text');
+            document.body.classList.toggle('large-text');
+            const toggle = document.getElementById('toggleLarge');
+            const toggleExtra = document.getElementById('toggleExtraLarge');
+            if (toggle) toggle.classList.toggle('active');
+            if (toggleExtra) toggleExtra.classList.remove('active');
+            speak(document.body.classList.contains('large-text') ? 'Texte agrandi activé' : 'Texte agrandi désactivé');
+        }
+
+        function toggleExtraLargeText() {
+            document.body.classList.remove('large-text');
+            document.body.classList.toggle('extra-large-text');
+            const toggle = document.getElementById('toggleExtraLarge');
+            const toggleLarge = document.getElementById('toggleLarge');
+            if (toggle) toggle.classList.toggle('active');
+            if (toggleLarge) toggleLarge.classList.remove('active');
+            speak(document.body.classList.contains('extra-large-text') ? 'Texte très agrandi activé' : 'Texte très agrandi désactivé');
+        }
+
+        function testVoice() {
+            speak('Ceci est un test de la synthèse vocale. Bonjour, je suis votre assistant pour seniors.');
+        }
+
+        // ALERTES DE SANTÉ AUTOMATIQUES
+        let healthAlertsShown = {
+            morning: false,
+            water: false,
+            lunch: false,
+            nap: false,
+            evening: false,
+            night: false
+        };
+
+        function checkHealthAlerts() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const currentDay = now.toDateString();
+
+            // Réinitialiser les alertes chaque jour
+            if (state.lastAlertDay !== currentDay) {
+                healthAlertsShown = {
+                    morning: false,
+                    water: false,
+                    lunch: false,
+                    nap: false,
+                    evening: false,
+                    night: false
+                };
+                state.lastAlertDay = currentDay;
+            }
+
+            // 8h00 - Exercices du matin
+            if (hour === 8 && minute === 0 && !healthAlertsShown.morning) {
+                speak('Bonjour ! C\'est l\'heure de faire vos exercices du matin.');
+                showAlert('🏃 Avez-vous fait vos exercices du matin ?', '#3b82f6');
+                healthAlertsShown.morning = true;
+            }
+
+            // Toutes les 2 heures entre 10h et 20h - Boire de l'eau
+            if (minute === 0 && hour >= 10 && hour <= 20 && hour % 2 === 0 && !healthAlertsShown.water) {
+                speak('Pensez à boire un verre d\'eau pour rester hydraté.');
+                showAlert('💧 Pensez à boire un verre d\'eau', '#3b82f6');
+                healthAlertsShown.water = true;
+                setTimeout(() => { healthAlertsShown.water = false; }, 60000);
+            }
+
+            // 12h30 - Rappel déjeuner
+            if (hour === 12 && minute === 30 && !healthAlertsShown.lunch) {
+                speak('Il est l\'heure de déjeuner. Bon appétit !');
+                showAlert('🍽️ Il est l\'heure de déjeuner', '#f59e0b');
+                healthAlertsShown.lunch = true;
+            }
+
+            // 14h30 - Sieste
+            if (hour === 14 && minute === 30 && !healthAlertsShown.nap) {
+                speak('C\'est le moment idéal pour faire une petite sieste si vous le souhaitez.');
+                showAlert('😴 Il est temps de faire une petite sieste', '#a78bfa');
+                healthAlertsShown.nap = true;
+            }
+
+            // 18h00 - Marche du soir
+            if (hour === 18 && minute === 0 && !healthAlertsShown.evening) {
+                speak('C\'est le moment idéal pour une petite promenade du soir.');
+                showAlert('🚶 Que diriez-vous d\'une petite promenade ?', '#10b981');
+                healthAlertsShown.evening = true;
+            }
+
+            // 22h00 - Coucher
+            if (hour === 22 && minute === 0 && !healthAlertsShown.night) {
+                speak('Il est tard. Pensez à vous préparer pour la nuit. Dormez bien !');
+                showAlert('🌙 Il est temps de vous préparer pour la nuit', '#6366f1');
+                healthAlertsShown.night = true;
+            }
+        }
+
+        // Initialization
+        async function init() {
+            console.log('🚀 Initialisation du système...');
+            
+            await initVoices();
+            initVoiceRecognition();
+            
+            // Activation de la synthèse vocale pour iOS au premier clic
+            const iosVoiceActivation = () => {
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    console.log('📱 Activation synthèse vocale iOS...');
+                    const utterance = new SpeechSynthesisUtterance('');
+                    utterance.volume = 0;
+                    window.speechSynthesis.speak(utterance);
+                }
+                document.removeEventListener('touchstart', iosVoiceActivation);
+                document.removeEventListener('click', iosVoiceActivation);
+            };
+            
+            document.addEventListener('touchstart', iosVoiceActivation, { once: true });
+            document.addEventListener('click', iosVoiceActivation, { once: true });
+            
+            // Initialiser les panels fermés sur mobile/tablette
+            if (window.innerWidth <= 1024) {
+                document.querySelectorAll('.panel-content').forEach(content => {
+                    content.classList.remove('open');
+                });
+                document.querySelectorAll('.panel-toggle-icon').forEach(icon => {
+                    icon.classList.remove('open');
+                });
+            }
+            
+            state.currentDate = new Date();
+            state.dayIndex = state.currentDate.getDay();
+            
+            renderDevices();
+            renderPills();
+            renderBookExcerpts();
+            updateClock();
+            fetchWeather();
+            
+            setInterval(updateClock, 1000);
+            setInterval(fetchWeather, 600000); // Mise à jour météo toutes les 10 minutes
+            
+            setTimeout(() => {
+                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel. Je suis votre assistant IA, je suis là pour vous aider.`;
+                speak(msg);
+                showAlert(`👋 Bienvenue ! ${days[state.dayIndex]}`, '#10b981');
+                
+                const emptyPills = state.pills.filter(p => p.count <= 0);
+                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                
+                if (emptyPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont épuisés.');
+                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                    }, 3000);
+                } else if (lowPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                        showAlert('⚠️ Stock faible', '#f59e0b');
+                    }, 3000);
+                }
+            }, 1500);
+            
+            console.log('✅ Système initialisé !');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
