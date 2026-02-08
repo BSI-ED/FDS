@@ -2321,13 +2321,8 @@
                 { id: 6, url: 'https://img.lonelyplanet.fr/s3fs-public/styles/wide/public/2024-11/la_rochelle.jpg.webp?itok=ZiH6nMwx', caption: 'La Rochelle' }
             ],
             bookExcerpts: [
-{
-    id: 1,
-    title: 'La vie élastique : révolutions dans le vieillissement ?',
-    author: 'Eric Bapteste',
-    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Vie_elastique.jpg',
-    excerpt: 'Des informations sur le phénomène de vieillissement, ses causes et ses effets sur la santé ainsi que sur les dernières découvertes scientifiques à ce sujet.',
-},
+
+
 {
     id: 2,
     title: 'Générations ! : comment le lien intergénérationnel va changer le monde',
@@ -2429,7 +2424,7 @@
                 <div style="max-width: 800px; position: relative;">
                     ${prevBook ? `
                         <button onclick="openBook(${prevBook.id})" 
-                            style="position: absolute; left: -70px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                            style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
                             onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
                             onmouseout="this.style.transform='translateY(-50%) scale(1)'">
                             <i class="fas fa-chevron-left"></i>
@@ -2438,7 +2433,7 @@
                     
                     ${nextBook ? `
                         <button onclick="openBook(${nextBook.id})" 
-                            style="position: absolute; right: -70px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                            style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
                             onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
                             onmouseout="this.style.transform='translateY(-50%) scale(1)'">
                             <i class="fas fa-chevron-right"></i>
