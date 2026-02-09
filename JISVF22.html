@@ -2695,7 +2695,7 @@
             currentBookReading = bookId;
             
             const utterance = new SpeechSynthesisUtterance();
-            utterance.text = `${book.title}, par ${book.author}. ${book.excerpt}`;
+            utterance.text = book.excerpt; // Lire UNIQUEMENT l'excerpt
             utterance.lang = 'fr-FR';
             utterance.rate = 0.9;
             utterance.pitch = 1;
@@ -5625,6 +5625,28 @@ function handleVoiceCommand(command) {
             const activateVoice = () => {
                 if (!state.iosVoiceReady) {
                     initIOSVoice();
+                    
+                    // Sur iOS/mobile, lancer le message de bienvenue APRÈS l'interaction
+                    setTimeout(() => {
+                        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                        const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
+                        speak(msg);
+                        
+                        const emptyPills = state.pills.filter(p => p.count <= 0);
+                        const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                        
+                        if (emptyPills.length > 0) {
+                            setTimeout(() => {
+                                speak('Attention ! Certains médicaments sont épuisés.');
+                                showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                            }, 3000);
+                        } else if (lowPills.length > 0) {
+                            setTimeout(() => {
+                                speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                                showAlert('⚠️ Stock faible', '#f59e0b');
+                            }, 3000);
+                        }
+                    }, 500);
                 }
                 document.removeEventListener('touchstart', activateVoice);
                 document.removeEventListener('click', activateVoice);
@@ -5658,27 +5680,32 @@ function handleVoiceCommand(command) {
             setInterval(fetchWeather, 600000); // Mise à jour météo toutes les 10 minutes
             setInterval(fetchNewsRSS, 1800000); // Mise à jour actualités toutes les 30 minutes
             
-            // AMÉLIORATION: Augmenter le délai à 2 secondes pour laisser le temps aux voix de se charger
-            setTimeout(() => {
-                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
-                speak(msg);
-                
-                const emptyPills = state.pills.filter(p => p.count <= 0);
-                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
-                
-                if (emptyPills.length > 0) {
-                    setTimeout(() => {
-                        speak('Attention ! Certains médicaments sont épuisés.');
-                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
-                    }, 3000);
-                } else if (lowPills.length > 0) {
-                    setTimeout(() => {
-                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
-                        showAlert('⚠️ Stock faible', '#f59e0b');
-                    }, 3000);
-                }
-            }, 2000);
+            // AMÉLIORATION: Message de bienvenue uniquement sur desktop (pas mobile/iOS)
+            // Sur mobile/iOS, le message sera lancé au premier clic/touch
+            const isDesktop = window.innerWidth > 1024 && !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            if (isDesktop) {
+                setTimeout(() => {
+                    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                    const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
+                    speak(msg);
+                    
+                    const emptyPills = state.pills.filter(p => p.count <= 0);
+                    const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                    
+                    if (emptyPills.length > 0) {
+                        setTimeout(() => {
+                            speak('Attention ! Certains médicaments sont épuisés.');
+                            showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                        }, 3000);
+                    } else if (lowPills.length > 0) {
+                        setTimeout(() => {
+                            speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                            showAlert('⚠️ Stock faible', '#f59e0b');
+                        }, 3000);
+                    }
+                }, 2000);
+            }
             
             console.log('✅ Système initialisé !');
         }
