@@ -2406,8 +2406,8 @@
                     name: 'Fenêtres', 
                     icon: '🪟', 
                     image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop',
-                    imageOn: 'https://img.freepik.com/photos-gratuite/fenetre-rue-montreal-canada_649448-4311.jpg?semt=ais_hybrid&w=740&q=80',
-                    imageOff: 'https://thumbs.dreamstime.com/b/fleurs-d-hublot-14129290.jpg',
+                    imageOn: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=300&fit=crop',
                     type: 'windows', 
                     status: true 
                 }
@@ -2695,31 +2695,15 @@
             currentBookReading = bookId;
             
             const utterance = new SpeechSynthesisUtterance();
-            utterance.text = book.excerpt; // Lire UNIQUEMENT l'excerpt
+            utterance.text = `${book.title}, par ${book.author}. ${book.excerpt}`;
             utterance.lang = 'fr-FR';
-            utterance.rate = 0.92; // Vitesse confortable pour la lecture
-            utterance.pitch = 1.05; // Pitch légèrement plus élevé
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
             utterance.volume = 1;
             
-            // Sélection de voix premium pour la lecture
             const voices = window.speechSynthesis.getVoices();
-            const frVoice = 
-                // iOS/Safari Premium voices
-                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Amélie')) ||
-                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
-                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Enhanced')) ||
-                // Google Wavenet
-                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Wavenet')) ||
-                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google fr-FR-Standard')) ||
-                // Voix système françaises
-                voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
-                voices.find(v => v.lang === 'fr-FR') ||
-                voices.find(v => v.lang.startsWith('fr'));
-            
-            if (frVoice) {
-                utterance.voice = frVoice;
-                console.log('📖 Voix lecture:', frVoice.name);
-            }
+            const frVoice = voices.find(v => v.lang.startsWith('fr'));
+            if (frVoice) utterance.voice = frVoice;
             
             const totalLength = utterance.text.length;
             utterance.onboundary = (event) => {
@@ -2975,54 +2959,37 @@
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'fr-FR';
-                utterance.rate = 0.95; // Légèrement plus rapide pour plus de naturel
-                utterance.pitch = 1.05; // Pitch légèrement plus élevé pour plus de clarté
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
                 utterance.volume = 1;
                 
-                // Sélection AMÉLIORÉE de la voix française - privilégier les voix premium
+                // Sélection de la voix française - MODIFIÉ: support voix alternative
                 const voices = window.speechSynthesis.getVoices();
                 console.log(`📢 ${voices.length} voix disponibles`);
                 
                 let selectedVoice = null;
                 
                 if (state.useAlternativeVoice) {
-                    // Chercher une voix masculine premium
-                    selectedVoice = 
-                        // Voix premium iOS/Safari
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Thomas')) ||
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
-                        // Voix Google premium
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google') && v.name.includes('fr-FR-Wavenet')) ||
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google')) ||
-                        // Autres voix masculines
-                        voices.find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes('male'));
+                    // Chercher une voix masculine ou alternative
+                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && (
+                        v.name.includes('Thomas') || 
+                        v.name.includes('Daniel') ||
+                        v.name.toLowerCase().includes('male') ||
+                        v.name.toLowerCase().includes('homme')
+                    )) || voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google'));
                 }
                 
-                // Voix par défaut - PRIORISER LES VOIX PREMIUM
+                // Voix par défaut si pas de voix alternative trouvée
                 if (!selectedVoice) {
-                    selectedVoice = 
-                        // iOS/Safari Premium voices (les meilleures)
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Amélie')) ||
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Enhanced')) ||
-                        // Google Wavenet (très bonne qualité)
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Wavenet')) ||
-                        // Google standard
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google fr-FR-Standard')) ||
-                        // Voix système françaises (éviter Google basique si possible)
-                        voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
-                        // Fallback Google
-                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google')) ||
-                        // Derniers recours
-                        voices.find(v => v.lang === 'fr-FR') ||
-                        voices.find(v => v.lang.startsWith('fr-')) ||
-                        voices.find(v => v.lang.startsWith('fr')) ||
-                        voices[0];
+                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
+                                   voices.find(v => v.lang === 'fr-FR') ||
+                                   voices.find(v => v.lang.startsWith('fr')) ||
+                                   voices[0];
                 }
                 
                 if (selectedVoice) {
                     utterance.voice = selectedVoice;
-                    console.log('🎤 Voix sélectionnée:', selectedVoice.name, '- Qualité:', selectedVoice.localService ? 'Locale (Premium)' : 'En ligne');
+                    console.log('🎤 Voix sélectionnée:', selectedVoice.name);
                 }
                 
                 // Gestion des événements
@@ -4533,12 +4500,12 @@ function handleVoiceCommand(command) {
             if (hour >= 5 && hour < 8) {
                 // Lever du soleil
                 bg.className = 'background morning';
-                imageUrl = 'https://images.unsplash.com/photo-1465447142348-e9952c393450?w=600&h=400&fit=crop';
+                imageUrl = 'https://www.photo-paysage.com/?file=pic_download_link/picture&pid=5717';
                 periodText = '🌅 Lever du soleil';
             } else if (hour >= 8 && hour < 12) {
                 // Matin
                 bg.className = 'background morning';
-                imageUrl = 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=600&h=400&fit=crop';
+                imageUrl = 'https://media.istockphoto.com/id/840978500/fr/photo/foule-de-passants-anonymes-sur-coucher-de-soleil-dans-les-rues-de-la-ville.jpg?s=170667a&w=0&k=20&c=SDPayidtIoIgpXkzNgKPW9XjR40wQ9yIxry7PcR0SEA=';
                 periodText = '☀️ Matin';
             } else if (hour >= 12 && hour < 14) {
                 // Midi
@@ -4548,17 +4515,17 @@ function handleVoiceCommand(command) {
             } else if (hour >= 14 && hour < 18) {
                 // Après-midi
                 bg.className = 'background afternoon';
-                imageUrl = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop';
+                imageUrl = 'https://media.istockphoto.com/id/1280246120/fr/photo/tour-eiffel-%C3%A0-paris-skyline-%C3%A0-laube.jpg?s=612x612&w=0&k=20&c=TGei6uKPlOX7IUX2tGUkwE7ez5CVitoPFbUPgI3Q4ks=';
                 periodText = '☀️ Après-midi';
             } else if (hour >= 18 && hour < 21) {
                 // Coucher de soleil
                 bg.className = 'background evening';
-                imageUrl = 'https://images.unsplash.com/photo-1495567720989-cebdbdd97913?w=600&h=400&fit=crop';
+                imageUrl = 'https://www.pariszigzag.fr/wp-content/uploads/2014/04/coucher.jpg';
                 periodText = '🌇 Coucher du soleil';
             } else {
                 // Nuit
                 bg.className = 'background evening';
-                imageUrl = 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=600&h=400&fit=crop';
+                imageUrl = 'https://images.stockcake.com/public/d/e/0/de0b8084-dc03-4e13-9a06-10cdf8ab346e_large/paris-moonlight-scene-stockcake.jpg';
                 periodText = '🌙 Nuit';
             }
             
@@ -5658,28 +5625,6 @@ function handleVoiceCommand(command) {
             const activateVoice = () => {
                 if (!state.iosVoiceReady) {
                     initIOSVoice();
-                    
-                    // Sur iOS/mobile, lancer le message de bienvenue APRÈS l'interaction
-                    setTimeout(() => {
-                        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                        const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
-                        speak(msg);
-                        
-                        const emptyPills = state.pills.filter(p => p.count <= 0);
-                        const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
-                        
-                        if (emptyPills.length > 0) {
-                            setTimeout(() => {
-                                speak('Attention ! Certains médicaments sont épuisés.');
-                                showAlert('🚨 Médicaments épuisés !', '#ef4444');
-                            }, 3000);
-                        } else if (lowPills.length > 0) {
-                            setTimeout(() => {
-                                speak('Attention ! Certains médicaments sont bientôt épuisés.');
-                                showAlert('⚠️ Stock faible', '#f59e0b');
-                            }, 3000);
-                        }
-                    }, 500);
                 }
                 document.removeEventListener('touchstart', activateVoice);
                 document.removeEventListener('click', activateVoice);
@@ -5713,32 +5658,27 @@ function handleVoiceCommand(command) {
             setInterval(fetchWeather, 600000); // Mise à jour météo toutes les 10 minutes
             setInterval(fetchNewsRSS, 1800000); // Mise à jour actualités toutes les 30 minutes
             
-            // AMÉLIORATION: Message de bienvenue uniquement sur desktop (pas mobile/iOS)
-            // Sur mobile/iOS, le message sera lancé au premier clic/touch
-            const isDesktop = window.innerWidth > 1024 && !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            if (isDesktop) {
-                setTimeout(() => {
-                    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                    const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
-                    speak(msg);
-                    
-                    const emptyPills = state.pills.filter(p => p.count <= 0);
-                    const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
-                    
-                    if (emptyPills.length > 0) {
-                        setTimeout(() => {
-                            speak('Attention ! Certains médicaments sont épuisés.');
-                            showAlert('🚨 Médicaments épuisés !', '#ef4444');
-                        }, 3000);
-                    } else if (lowPills.length > 0) {
-                        setTimeout(() => {
-                            speak('Attention ! Certains médicaments sont bientôt épuisés.');
-                            showAlert('⚠️ Stock faible', '#f59e0b');
-                        }, 3000);
-                    }
-                }, 2000);
-            }
+            // AMÉLIORATION: Augmenter le délai à 2 secondes pour laisser le temps aux voix de se charger
+            setTimeout(() => {
+                const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+                const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
+                speak(msg);
+                
+                const emptyPills = state.pills.filter(p => p.count <= 0);
+                const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
+                
+                if (emptyPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont épuisés.');
+                        showAlert('🚨 Médicaments épuisés !', '#ef4444');
+                    }, 3000);
+                } else if (lowPills.length > 0) {
+                    setTimeout(() => {
+                        speak('Attention ! Certains médicaments sont bientôt épuisés.');
+                        showAlert('⚠️ Stock faible', '#f59e0b');
+                    }, 3000);
+                }
+            }, 2000);
             
             console.log('✅ Système initialisé !');
         }
