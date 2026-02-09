@@ -633,12 +633,17 @@
             border-radius: 18px;
             padding: 16px;
             margin-bottom: 12px;
+            cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .pill-item:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .pill-item:active {
+            transform: scale(0.98);
         }
 
         .pill-header {
@@ -860,23 +865,88 @@
             transform: translateX(100%) translateY(100%) rotate(45deg);
         }
 
-        /* Styles pour toutes les cartes avec images (devices, pills, activités) */
-        div[onclick]:has(img[style*="height: 140px"]) {
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        div[onclick]:has(img[style*="height: 140px"]):hover {
+        /* Styles pour les cartes de dispositifs domotiques */
+        .device-card:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
         }
 
-        div[onclick]:has(img[style*="height: 140px"]):hover img {
+        .device-card:hover img {
             transform: scale(1.1);
         }
 
-        div[onclick]:has(img[style*="height: 140px"]):active {
+        .device-card:active {
             transform: translateY(-4px) scale(1.01);
+        }
+        
+        /* Styles pour les cartes de médicaments */
+        .pill-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        .pill-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .pill-card:active {
+            transform: scale(0.98);
+        }
+        
+        /* Styles pour les cartes de santé (tension, glycémie, poids) */
+        .health-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        .health-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .health-card:active {
+            transform: scale(0.98);
+        }
+        
+        /* Styles pour les cartes de jeux */
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        .game-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .game-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        /* Styles pour les cartes d'activités */
+        .activity-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        .activity-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .activity-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        /* Styles pour les cartes de livres */
+        .book-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4) !important;
+        }
+
+        .book-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .book-card:active {
+            transform: translateY(-2px) scale(1.01);
         }
 
         @keyframes cardFadeIn {
@@ -2166,7 +2236,7 @@
                     <!-- Quick Actions - Style visuel amélioré -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px;">
                         <!-- Yoga -->
-                        <div onclick="yogaExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
+                        <div class="activity-card" onclick="yogaExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
                             <div style="position: relative; overflow: hidden;">
                                 <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop" alt="Yoga" 
                                      style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2179,7 +2249,7 @@
                         </div>
 
                         <!-- Respiration -->
-                        <div onclick="breathingExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%);">
+                        <div class="activity-card" onclick="breathingExercise()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.3) 100%);">
                             <div style="position: relative; overflow: hidden;">
                                 <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=300&fit=crop" alt="Méditation" 
                                      style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2192,7 +2262,7 @@
                         </div>
 
                         <!-- Photos -->
-                        <div onclick="showAlbum()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
+                        <div class="activity-card" onclick="showAlbum()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
                             <div style="position: relative; overflow: hidden;">
                                 <img src="https://www.cewe.fr/cdn/images/uj/bm/UjBMdVBqWVpuaXMvRithYjVsQTlEM3V4SHhSZy91TjFpcGJjRm1rR1dxWFJOaHFJK1RTQ0kvbUtLbjFINmxFRm9tY2xaaUFjcml0VXptTkx1YnlVQXU5QjM5NXNFNjdxNDVhTHlOc1lUa0k9.jpg" alt="Photos" 
                                      style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2205,7 +2275,7 @@
                         </div>
 
                         <!-- Contacts -->
-                        <div onclick="showContacts()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
+                        <div class="activity-card" onclick="showContacts()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
                             <div style="position: relative; overflow: hidden;">
                                 <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop" alt="Contacts" 
                                      style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2248,7 +2318,7 @@
                 <div class="panel-content">
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px;">
                             <!-- Quiz -->
-                            <div onclick="startQuiz()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);">
+                            <div class="game-card" onclick="startQuiz()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);">
                                 <div style="position: relative; overflow: hidden;">
                                     <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=400&h=300&fit=crop" alt="Quiz" 
                                          style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2261,7 +2331,7 @@
                             </div>
 
                             <!-- Mots Cachés -->
-                            <div onclick="startWordSearch()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
+                            <div class="game-card" onclick="startWordSearch()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);">
                                 <div style="position: relative; overflow: hidden;">
                                     <img src="https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=400&h=300&fit=crop" alt="Mots cachés" 
                                          style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2274,7 +2344,7 @@
                             </div>
 
                             <!-- Calcul Mental -->
-                            <div onclick="startMentalMath()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
+                            <div class="game-card" onclick="startMentalMath()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%);">
                                 <div style="position: relative; overflow: hidden;">
                                     <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop" alt="Calcul mental" 
                                          style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2287,7 +2357,7 @@
                             </div>
 
                             <!-- Mémoire -->
-                            <div onclick="startMemoryGame()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
+                            <div class="game-card" onclick="startMemoryGame()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2) 0%, rgba(219, 39, 119, 0.3) 100%);">
                                 <div style="position: relative; overflow: hidden;">
                                     <img src="https://www.silveralliance.com/wp-content/uploads/2020/03/Jeux-m%C3%A9moire-seniors-silveralliance.jpg" alt="Jeu de mémoire" 
                                          style="width: 100%; height: 160px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -2406,8 +2476,8 @@
                     name: 'Fenêtres', 
                     icon: '🪟', 
                     image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop',
-                    imageOn: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=400&h=300&fit=crop',
-                    imageOff: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=300&fit=crop',
+                    imageOn: 'https://img.freepik.com/photos-gratuite/fenetre-rue-montreal-canada_649448-4311.jpg?semt=ais_hybrid&w=740&q=80',
+                    imageOff: 'https://img.freepik.com/photos-premium/vue-exterieure-architecture-portugaise-typique-batiments-plus-anciens-algarve_69593-10373.jpg?semt=ais_hybrid&w=740&q=80',
                     type: 'windows', 
                     status: true 
                 }
@@ -2590,9 +2660,9 @@
             if (!container) return;
             
             container.innerHTML = state.bookExcerpts.map(book => `
-                <div onclick="openBook(${book.id})" style="cursor: pointer; transition: all 0.3s; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                <div class="book-card" onclick="openBook(${book.id})" style="cursor: pointer; transition: all 0.3s; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                     <img src="${book.cover}" alt="${book.title}" 
-                         style="width: 100%; height: 180px; object-fit: cover; display: block;">
+                         style="width: 100%; height: 180px; object-fit: cover; display: block; transition: transform 0.4s;">
                     <div style="background: rgba(255,255,255,0.1); padding: 10px; text-align: center;">
                         <div style="font-size: 13px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
                         <div style="font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.author}</div>
@@ -3723,7 +3793,7 @@ function handleVoiceCommand(command) {
                         const currentImage = device.status ? device.imageOn : device.imageOff;
                         
                         return `
-                            <div onclick="deviceClick(${device.id})" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]};">
+                            <div class="device-card" onclick="deviceClick(${device.id})" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]};">
                                 <div style="position: relative; overflow: hidden;">
                                     <img src="${currentImage}" alt="${device.name}" 
                                          style="width: 100%; height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -3868,7 +3938,7 @@ function handleVoiceCommand(command) {
                         };
                         
                         return `
-                            <div style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]}; display: flex; align-items: stretch;">
+                            <div class="pill-card" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[index % bgColors.length]}; display: flex; align-items: stretch;">
                                 <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
                                     <img src="${pill.image}" alt="${pill.name}" 
                                          style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -3974,14 +4044,43 @@ function handleVoiceCommand(command) {
         // === FONCTIONS POUR LE FIL D'ACTUALITÉS RSS ===
         async function fetchNewsRSS() {
             try {
-                // Essayer d'abord avec un proxy CORS
-                const corsProxy = 'https://api.codetabs.com/v1/proxy?quest=';
+                // URL du flux RSS du Monde Santé
                 const rssUrl = 'https://www.lemonde.fr/sante/rss_full.xml';
                 
-                const response = await fetch(corsProxy + encodeURIComponent(rssUrl));
+                // Liste de proxies CORS à essayer dans l'ordre
+                const corsProxies = [
+                    'https://api.allorigins.win/raw?url=',
+                    'https://corsproxy.io/?',
+                    'https://api.codetabs.com/v1/proxy?quest='
+                ];
                 
-                if (!response.ok) {
-                    throw new Error('Erreur réseau');
+                let response = null;
+                let proxyUsed = null;
+                
+                // Essayer chaque proxy jusqu'à ce qu'un fonctionne
+                for (const proxy of corsProxies) {
+                    try {
+                        console.log(`🔄 Tentative avec proxy: ${proxy}`);
+                        response = await fetch(proxy + encodeURIComponent(rssUrl), {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/xml, text/xml, */*'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            proxyUsed = proxy;
+                            console.log(`✅ Proxy fonctionnel: ${proxy}`);
+                            break;
+                        }
+                    } catch (err) {
+                        console.log(`❌ Échec avec ${proxy}:`, err.message);
+                        continue;
+                    }
+                }
+                
+                if (!response || !response.ok) {
+                    throw new Error('Tous les proxies ont échoué');
                 }
                 
                 const text = await response.text();
@@ -3993,6 +4092,7 @@ function handleVoiceCommand(command) {
                 // Vérifier s'il y a des erreurs de parsing
                 const parserError = xml.querySelector('parsererror');
                 if (parserError) {
+                    console.error('Erreur de parsing XML:', parserError.textContent);
                     throw new Error('Erreur de parsing XML');
                 }
                 
@@ -4003,39 +4103,52 @@ function handleVoiceCommand(command) {
                 items.forEach((item, index) => {
                     if (index < 20) { // Limiter à 20 articles
                         const title = item.querySelector('title')?.textContent || '';
+                        const link = item.querySelector('link')?.textContent || '';
                         if (title && title.trim() !== '') {
                             // Nettoyer le titre (supprimer les balises CDATA si présentes)
                             const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-                            newsItems.push(cleanTitle);
+                            newsItems.push({
+                                title: cleanTitle,
+                                link: link
+                            });
                         }
                     }
                 });
                 
                 if (newsItems.length > 0) {
-                    state.newsItems = newsItems;
+                    // Stocker uniquement les titres dans state.newsItems pour la compatibilité
+                    state.newsItems = newsItems.map(item => item.title);
+                    state.newsItemsWithLinks = newsItems; // Stocker avec liens pour usage futur
                     renderNewsTicker();
-                    console.log(`✅ ${newsItems.length} actualités santé chargées`);
+                    console.log(`✅ ${newsItems.length} actualités santé du Monde chargées via ${proxyUsed}`);
+                    console.log(`📰 Source: ${rssUrl}`);
                 } else {
-                    throw new Error('Aucune actualité trouvée dans le flux');
+                    throw new Error('Aucune actualité trouvée dans le flux RSS');
                 }
             } catch (error) {
-                console.error('Erreur lors de la récupération des actualités:', error);
+                console.error('❌ Erreur lors de la récupération des actualités:', error);
+                console.log('🔄 Utilisation des actualités de démonstration');
                 
                 // Afficher des actualités de démonstration en cas d'erreur
                 state.newsItems = [
-                    'Santé : Nouvelle campagne de prévention contre les maladies cardiovasculaires',
-                    'Recherche : Avancée majeure dans le traitement d\'Alzheimer',
-                    'Nutrition : Les bienfaits du régime méditerranéen confirmés par une étude',
-                    'Sommeil : Comment améliorer la qualité de votre repos nocturne',
-                    'Activité physique : 30 minutes de marche par jour réduisent les risques',
-                    'Bien-être : La méditation, un allié pour la santé mentale des seniors',
-                    'Prévention : Dépistage du cancer, l\'importance des examens réguliers',
-                    'Médicaments : Nouveaux traitements contre le diabète disponibles',
-                    'Vaccination : Rappels recommandés pour les personnes âgées',
-                    'Santé mentale : Lutter contre l\'isolement chez les seniors'
+                    '🩺 Santé : Nouvelle campagne de prévention contre les maladies cardiovasculaires',
+                    '🧠 Recherche : Avancée majeure dans le traitement d\'Alzheimer',
+                    '🥗 Nutrition : Les bienfaits du régime méditerranéen confirmés par une étude',
+                    '😴 Sommeil : Comment améliorer la qualité de votre repos nocturne',
+                    '🚶 Activité physique : 30 minutes de marche par jour réduisent les risques',
+                    '🧘 Bien-être : La méditation, un allié pour la santé mentale des seniors',
+                    '🔬 Prévention : Dépistage du cancer, l\'importance des examens réguliers',
+                    '💊 Médicaments : Nouveaux traitements contre le diabète disponibles',
+                    '💉 Vaccination : Rappels recommandés pour les personnes âgées',
+                    '❤️ Santé mentale : Lutter contre l\'isolement chez les seniors',
+                    '🏥 Téléconsultation : Une solution pratique pour les seniors',
+                    '🦴 Ostéoporose : Conseils pour renforcer vos os',
+                    '👁️ Vision : Importance des examens ophtalmologiques réguliers',
+                    '🦷 Santé dentaire : Prévention des maladies parodontales',
+                    '🫀 Hypertension : Contrôler sa tension artérielle au quotidien'
                 ];
                 renderNewsTicker();
-                console.log('📰 Actualités santé de démonstration affichées');
+                console.log('📰 Actualités santé de démonstration affichées (Mode hors ligne)');
             }
         }
 
@@ -4096,7 +4209,7 @@ function handleVoiceCommand(command) {
             container.innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 15px;">
                     <!-- Tension artérielle -->
-                    <div onclick="editBloodPressure()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[0]}; display: flex; align-items: stretch;">
+                    <div class="health-card" onclick="editBloodPressure()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[0]}; display: flex; align-items: stretch;">
                         <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
                             <img src="https://cdn.shortpixel.ai/spai/q_lossy+ret_img+to_webp/www.le-tensiometre.com/wp-content/uploads/2021/04/quel-bras-mesurer-tension-arterielle.jpg" alt="Tension" 
                                  style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -4135,7 +4248,7 @@ function handleVoiceCommand(command) {
                     </div>
 
                     <!-- Glycémie -->
-                    <div onclick="editGlucose()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[1]}; display: flex; align-items: stretch;">
+                    <div class="health-card" onclick="editGlucose()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[1]}; display: flex; align-items: stretch;">
                         <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
                             <img src="https://www.administration.ylea.eu/upload/site/pasqua.jpg" alt="Glycémie" 
                                  style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
@@ -4174,7 +4287,7 @@ function handleVoiceCommand(command) {
                     </div>
 
                     <!-- Poids -->
-                    <div onclick="editWeight()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[2]}; display: flex; align-items: stretch;">
+                    <div class="health-card" onclick="editWeight()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[2]}; display: flex; align-items: stretch;">
                         <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
                             <img src="https://i-sam.unimedias.fr/2023/07/28/gettyimages-1436906124.jpg?auto=format%2Ccompress&crop=faces&cs=tinysrgb&fit=crop&h=501&ixlib=php-4.1.0&w=890" alt="Poids" 
                                  style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
