@@ -16,9 +16,9 @@
             --afternoon-start: #4A90E2;
             --afternoon-mid: #7CB9E8;
             --afternoon-end: #B0E0E6;
-            --evening-start: #2C3E50;
-            --evening-mid: #34495E;
-            --evening-end: #1A252F;
+            --evening-start: #1e293b;
+            --evening-mid: #334155;
+            --evening-end: #1e293b;
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.25);
             --success: #10b981;
@@ -54,6 +54,10 @@
         }
 
         * {
+            scroll-behavior: smooth;
+        }
+        
+        html {
             scroll-behavior: smooth;
         }
 
@@ -3199,7 +3203,7 @@ function handleVoiceCommand(command) {
     // AMÉLIORATION: Compteur de questions pour éviter les boucles infinies
     state.questionCount++;
     if (state.questionCount > 10) {
-        speak('Je crois que nous avons assez parlé pour le moment. À bientôt !');
+        speak('J\’espère avoir pu vous aider, n’hésitez pas si besoin. À bientôt !');
         state.conversationActive = false;
         try {
             state.recognition.stop();
@@ -3738,6 +3742,34 @@ function handleVoiceCommand(command) {
                             transform: translateX(450px);
                             opacity: 0;
                         }
+                    }
+                    @keyframes dotPulse {
+                        0%, 60%, 100% {
+                            transform: scale(1);
+                            opacity: 0.4;
+                        }
+                        30% {
+                            transform: scale(1.3);
+                            opacity: 1;
+                        }
+                    }
+                    .loading-dot {
+                        display: inline-block;
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 50%;
+                        background: white;
+                        margin: 0 2px;
+                        animation: dotPulse 1.4s infinite ease-in-out;
+                    }
+                    .loading-dot:nth-child(1) {
+                        animation-delay: 0s;
+                    }
+                    .loading-dot:nth-child(2) {
+                        animation-delay: 0.2s;
+                    }
+                    .loading-dot:nth-child(3) {
+                        animation-delay: 0.4s;
                     }
                 `;
                 document.head.appendChild(style);
@@ -5774,7 +5806,7 @@ function handleVoiceCommand(command) {
             // AMÉLIORATION: Augmenter le délai à 2 secondes pour laisser le temps aux voix de se charger
             setTimeout(() => {
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
+                const msg = `Bienvenue, je suis votre assistant IA ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
                 speak(msg);
                 
                 const emptyPills = state.pills.filter(p => p.count <= 0);
