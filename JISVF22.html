@@ -2081,7 +2081,7 @@
                         <div style="padding: 20px;">
                             <div class="time-slider">
                                 <label style="opacity: 0.8; font-size: 14px; margin-bottom: 8px; display: block;">
-                                    🕐 Simulateur : déplacez le curseur pour voir le programme de la journée.
+                                    🕐 Simulateur : faites glisser le curseur pour découvrir le programme de la journée.
                                 </label>
                                 <input type="range" id="timeSlider" min="0" max="24" step="0.5" value="12">
                                 <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; opacity: 0.7; font-weight: 600;">
@@ -5661,7 +5661,7 @@ function handleVoiceCommand(command) {
             // AMÉLIORATION: Augmenter le délai à 2 secondes pour laisser le temps aux voix de se charger
             setTimeout(() => {
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
+                const msg = `Bienvenue, je suis votre assistant BSI ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
                 speak(msg);
                 
                 const emptyPills = state.pills.filter(p => p.count <= 0);
