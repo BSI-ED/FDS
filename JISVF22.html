@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistant IA Seniors - Version Améliorée 2026</title>
+    <title>Assistant IA Seniors - BSI 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,6 +162,15 @@
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         }
 
+        .alerts-toggle-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .alerts-toggle-btn.disabled {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            opacity: 0.6;
+        }
+
         @keyframes pulse-glow {
             0%, 100% {
                 box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
@@ -191,6 +200,17 @@
                 bottom: 15px;
                 right: 15px;
                 gap: 12px;
+            }
+        }
+
+        /* MASQUER AFFICHE JIS EN MODE PAYSAGE SUR IPHONE/IPAD */
+        @media (max-width: 926px) and (orientation: landscape) {
+            .header {
+                display: none !important;
+            }
+            
+            .container {
+                padding-top: 15px !important;
             }
         }
 
@@ -275,7 +295,7 @@
                 display: grid;
                 grid-template-columns: 380px 1fr 380px;
                 grid-template-rows: auto auto auto auto;
-                gap: 15px;
+                gap: 5px;
             }
             
             /* Maison à gauche - occupe toutes les lignes */
@@ -308,10 +328,26 @@
                 grid-row: 4; 
             }
             
-            /* Pilulier à droite - occupe toutes les lignes */
+            /* Pilulier à droite - lignes 1-2 (réduit de moitié) */
             .panel:nth-child(6) { 
                 grid-column: 3; 
-                grid-row: 1 / 5;
+                grid-row: 1 / 3;
+            }
+            
+            /* Suivi Santé à droite - lignes 3-4 */
+            .panel:nth-child(7) { 
+                grid-column: 3; 
+                grid-row: 3 / 5;
+            }
+            
+            /* Limiter la hauteur du Pilulier pour qu'il prenne environ la moitié */
+            .panel:nth-child(6) {
+                max-height: 120vh;
+            }
+            
+            /* Hauteur pour le Suivi Santé */
+            .panel:nth-child(7) {
+                max-height: 120vh;
             }
         }
 
@@ -355,8 +391,26 @@
             box-shadow: 0 12px 48px rgba(139, 92, 246, 0.2);
         }
 
-        /* RESPONSIVE - PANELS COLLAPSIBLES SUR MOBILE */
-        @media (max-width: 767px) {
+        /* RESPONSIVE - PANELS COLLAPSIBLES SUR MOBILE ET TABLETTE */
+        @media (max-width: 1024px) {
+            /* Affiche JIS en plein écran */
+            .header {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                right: 0;
+                width: 100vw !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 15px !important;
+                z-index: 1000;
+                border-radius: 0 !important;
+            }
+            
+            .container {
+                padding-top: 180px;
+            }
+            
             .panel {
                 max-height: none;
             }
@@ -381,6 +435,14 @@
             .panel-toggle-icon {
                 font-size: 20px;
                 transition: transform 0.3s ease;
+                background: rgba(0, 0, 0, 0.4);
+                padding: 8px;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             
             .panel-toggle-icon.open {
@@ -397,6 +459,24 @@
             .panel-content.open {
                 max-height: 3000px;
                 padding: 20px;
+            }
+        }
+        
+        /* AMÉLIORATION LISIBILITÉ EN MODE PAYSAGE */
+        @media (max-width: 926px) and (orientation: landscape) {
+            .device-item span,
+            .device-item .icon-state,
+            .pill-item strong,
+            .pill-item .times,
+            .pill-item .pill-count,
+            .activity-item h3,
+            .activity-item p,
+            .reading-item h3,
+            .reading-item p {
+                background: rgba(0, 0, 0, 0.6);
+                padding: 4px 8px;
+                border-radius: 6px;
+                display: inline-block;
             }
         }
 
@@ -732,6 +812,18 @@
         .action-subtitle {
             font-size: 13px;
             opacity: 0.8;
+        }
+
+        /* CORRECTIF BOUTON ADD-PILL SUR IPHONE */
+        @media (max-width: 480px) {
+            .action-card {
+                position: relative;
+                z-index: 1;
+            }
+            
+            .action-card:first-of-type {
+                margin-top: 10px;
+            }
         }
 
         /* Nouveaux styles pour les cartes visuelles */
@@ -1265,6 +1357,68 @@
             margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.4s ease;
+        }
+
+        /* Fil d'actualités RSS - Le Monde */
+        .news-ticker-container {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .news-ticker-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .news-ticker {
+            position: relative;
+            height: 30px;
+            overflow: hidden;
+        }
+
+        .news-ticker-content {
+            display: flex;
+            white-space: nowrap;
+            animation: scroll-news 80s linear infinite;
+            gap: 50px;
+        }
+
+        .news-ticker-item {
+            display: inline-flex;
+            align-items: center;
+            font-size: 15px;
+            color: white;
+            padding-right: 50px;
+        }
+
+        .news-ticker-item::before {
+            content: "•";
+            margin-right: 15px;
+            color: #FFD93D;
+            font-size: 20px;
+        }
+
+        @keyframes scroll-news {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .news-ticker-container:hover .news-ticker-content {
+            animation-play-state: paused;
         }
 
         .book-excerpt:hover {
@@ -1850,8 +2004,14 @@
 
     <!-- BOUTONS FIXES EN BAS À DROITE - TOUJOURS VISIBLES -->
     <div class="fixed-buttons">
+        <button class="fixed-btn alerts-toggle-btn" id="alertsToggleBtn" onclick="toggleAlertsDisplay()" title="Afficher/Masquer les alertes">
+            <i class="fas fa-bell"></i>
+        </button>
         <button class="fixed-btn accessibility-btn" onclick="showAccessibilityMenu()" title="Accessibilité">
             <i class="fas fa-universal-access"></i>
+        </button>
+        <button class="fixed-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="Activer/Désactiver la voix" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <i class="fas fa-volume-up" id="voiceIcon"></i>
         </button>
         <button class="fixed-btn voice-assistant-btn" onclick="startVoiceAssistant()" title="Assistant Vocal">
             <i class="fas fa-microphone"></i>
@@ -1887,7 +2047,7 @@
                 <div class="panel-header" onclick="togglePanel(this)">
                     <div class="panel-title">
                         <i class="fas fa-home"></i>
-                        <span>Maison</span>
+                        <span>Domotique</span>
                     </div>
                     <i class="fas fa-chevron-down panel-toggle-icon"></i>
                 </div>
@@ -1896,12 +2056,12 @@
                 </div>
             </div>
 
-            <!-- Middle Panel: Info (Clock + Weather) -->
+            <!-- Middle Panel: Informations du jour (Clock + Weather) -->
             <div class="panel">
                 <div class="panel-header" onclick="togglePanel(this)">
                     <div class="panel-title">
                         <i class="fas fa-info-circle"></i>
-                        <span>Info</span>
+                        <span>Informations du jour</span>
                     </div>
                     <i class="fas fa-chevron-down panel-toggle-icon"></i>
                 </div>
@@ -1969,6 +2129,23 @@
                                 <div style="display: flex; align-items: center; gap: 5px;">
                                     <i class="fas fa-wind" style="opacity: 0.8;"></i>
                                     <span id="weatherWind">-- km/h</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fil d'actualités Le Monde Santé - Même style que météo -->
+                    <div id="newsWidget" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%); margin-bottom: 20px;">
+                        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px;">
+                            <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px; text-align: center;">
+                                <i class="fas fa-newspaper" style="margin-right: 5px;"></i>
+                                Le Monde Santé
+                            </div>
+                            
+                            <!-- Ticker d'actualités -->
+                            <div style="position: relative; height: 25px; overflow: hidden; background: rgba(0, 0, 0, 0.15); border-radius: 8px; padding: 0 10px;">
+                                <div class="news-ticker-content" id="newsTicker" style="display: flex; white-space: nowrap; animation: scroll-news 80s linear infinite; gap: 50px;">
+                                    <span class="news-ticker-item" style="display: inline-flex; align-items: center; font-size: 13px; padding-right: 50px;">Chargement des actualités santé...</span>
                                 </div>
                             </div>
                         </div>
@@ -2138,11 +2315,25 @@
                     <div id="pillsList"></div>
                 </div>
             </div>
+
+            <!-- Nouveau Panel: Suivi Santé -->
+            <div class="panel">
+                <div class="panel-header" onclick="togglePanel(this)">
+                    <div class="panel-title">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Suivi Santé</span>
+                    </div>
+                    <i class="fas fa-chevron-down panel-toggle-icon"></i>
+                </div>
+                <div class="panel-content">
+                    <div class="health-metrics" id="healthMetrics"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Footer -->
         <footer>
-            <p>Assistant IA Seniors © 2026 - Conçu avec ❤️ pour votre bien-être par la Bibliothèque de la Cité des Sciences et de l'Industrie dans le cadre des Journées de l'Innovation Santé</p>
+            <p>Assistant IA Seniors © 2026 - Prototype conçu avec ❤️ pour votre bien-être par la Bibliothèque de la Cité des Sciences et de l'Industrie</p>
         
 
 .</footer>
@@ -2209,6 +2400,16 @@
                     imageOff: 'https://www.brico-fenetre.com/media-cache/app_shop_square_768/98/f1/bee46af71217b395630284ea4dfc.jpeg',
                     type: 'shutters', 
                     status: false 
+                },
+                { 
+                    id: 6, 
+                    name: 'Fenêtres', 
+                    icon: '🪟', 
+                    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop',
+                    imageOn: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=400&h=300&fit=crop',
+                    imageOff: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=300&fit=crop',
+                    type: 'windows', 
+                    status: true 
                 }
             ],
             pills: [
@@ -2229,7 +2430,7 @@
                     id: 2, 
                     name: 'Vitamines', 
                     icon: '🔆', 
-                    image: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?w=400&h=300&fit=crop',
+                    image: 'https://www.shutterstock.com/image-photo/healthy-vitamins-fresh-vegetables-supplements-600nw-2719349027.jpg',
                     dosage: '1000mg', 
                     count: 4,
                     schedule: ['08:00'],
@@ -2261,6 +2462,30 @@
                     timeWindows: [
                         { start: '07:30', end: '08:30' }
                     ]
+                },
+                { 
+                    id: 5, 
+                    name: 'Cholestérol', 
+                    icon: '💊', 
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRX-BZm_Rz3QrBKy93LkFV0KBUJg4tD8TLqIg&s',
+                    dosage: '20mg', 
+                    count: 18,
+                    schedule: ['20:00'],
+                    timeWindows: [
+                        { start: '19:30', end: '20:30' }
+                    ]
+                },
+                { 
+                    id: 6, 
+                    name: 'Vitamine D', 
+                    icon: '☀️', 
+                    image: 'https://static.lematin.ma/files/lematin/images/articles/2023/02/8cc2f1d9656adbdd1a84ca68bbd15fa9.jpg',
+                    dosage: '2000 UI', 
+                    count: 28,
+                    schedule: ['08:00'],
+                    timeWindows: [
+                        { start: '07:30', end: '08:30' }
+                    ]
                 }
             ],
             contacts: [
@@ -2278,13 +2503,8 @@
                 { id: 6, url: 'https://img.lonelyplanet.fr/s3fs-public/styles/wide/public/2024-11/la_rochelle.jpg.webp?itok=ZiH6nMwx', caption: 'La Rochelle' }
             ],
             bookExcerpts: [
-{
-    id: 1,
-    title: 'La vie élastique : révolutions dans le vieillissement ?',
-    author: 'Eric Bapteste',
-    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Vie_elastique.jpg',
-    excerpt: 'Des informations sur le phénomène de vieillissement, ses causes et ses effets sur la santé ainsi que sur les dernières découvertes scientifiques à ce sujet.',
-},
+
+
 {
     id: 2,
     title: 'Générations ! : comment le lien intergénérationnel va changer le monde',
@@ -2292,29 +2512,24 @@
     cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Generaction.png',
     excerpt: 'Transcription des échanges d\'une douzaine de binômes intergénérationnels sur cinq grands sujets de société : environnement, argent, fin de vie, accès à l\'information, numérique et sens de la vie.',
 },
+
+
 {
     id: 3,
-    title: 'Bien vieillir : 50 solutions pour les territoires',
-    author: 'Yann Lasnier, Boris Venon',
-    cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Bien_vieillir_territoire.png',
-    excerpt: 'Face au vieillissement massif de la population prévu à partir de 2030, les auteurs proposent des solutions concrètes pour les élus territoriaux : logement, santé, loisirs, citoyenneté et lutte contre l\'isolement.',
-},
-{
-    id: 4,
     title: 'C\'est ma ménopause : le guide complet, rassurant et sans tabou',
     author: 'Anna Roy, Caroline Michel',
     cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Cest_ma_menopause.png',
     excerpt: 'La sage-femme Anna Roy déconstruit les idées reçues sur la ménopause et répond aux questions des femmes avec des conseils pratiques pour mieux vivre cette période.',
 },
 {
-    id: 5,
+    id: 4,
     title: 'Performer après 50 ans : comment rester en forme et compétitif tout au long de sa vie',
     author: 'Joe Friel',
     cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Performer_apres_50_ans.jpg',
     excerpt: 'Des conseils pour continuer le sport intensif après 50 ans, avec des recommandations sur la musculation, la récupération, la nutrition et des programmes d\'entraînement progressifs.',
 },
 {
-    id: 6,
+    id: 5,
     title: 'On mange quoi pour vivre 100 ans ?',
     author: 'Delphine Lebrun, Emmanuelle Jumeaucourt',
     cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/On_mange_quoi.jpg',
@@ -2322,12 +2537,20 @@
 },
 
     {
-        id: 7,
+        id: 6,
         title: 'Bien vieillir : 50 solutions pour les territoires',
         author: 'Yann Lasnier et Boris Venon ; préface par David Isnard',
         cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Bien_vieillir_territoire.png',
         excerpt: 'Face au vieillissement massif de la population prévu à partir de 2030, les auteurs tentent de pallier les lacunes de la politique publique nationale en proposant des solutions pour les élus territoriaux en matière de logement, de santé, de loisirs, de citoyenneté, d\'accès à l\'information, de lutte contre l\'isolement, entre autres..',
+    },
+    {
+        id: 7,
+        title: 'Beau, beau et vieux à la fois : esthétique de la vieillesse ',
+        author: 'Aude Lamorelle ; préface Richard Leydier',
+        cover: 'https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/au-programme/lieux-ressources/cite-de-la-sante/_images/Ressources/Bibliographies/JIS_2026/Beau_beau.jpg',
+        excerpt: 'L\’auteure montre comment, en Occident, le vieillissement est souvent pensé à travers une opposition entre idéal de jeunesse et corps âgé. Elle met en regard le ressenti des personnes âgées et l\’essor de la chirurgie esthétique comme réponse sociale au temps qui passe.',
     }
+    
     
             ],
             currentDate: new Date(),
@@ -2339,7 +2562,23 @@
             recognition: null,
             voices: [],
             lastMinute: null,
-            lastAlertDay: null
+            lastAlertDay: null,
+            readingSuggestionShown: false,
+            isSliding: false,
+            voiceEnabled: true, // Contrôle activation/désactivation de la voix
+            useAlternativeVoice: false, // NOUVEAU: Option pour voix alternative
+            iosVoiceReady: false, // État de la voix iOS
+            conversationActive: false, // Conversation en cours
+            questionCount: 0, // Nombre de questions posées
+            alertsEnabled: true, // Affichage des alertes activé par défaut
+            // Données de santé
+            healthMetrics: {
+                bloodPressure: { systolic: 120, diastolic: 75 },
+                glucose: 95,
+                weight: 72
+            },
+            // Fil d'actualités RSS
+            newsItems: []
         };
 
         // Extraits de livres avec lecture
@@ -2366,8 +2605,32 @@
             const book = state.bookExcerpts.find(b => b.id === bookId);
             speak(`Ouverture de ${book.title}`);
             
+            // Trouver l'index du livre actuel
+            const currentIndex = state.bookExcerpts.findIndex(b => b.id === bookId);
+            const totalBooks = state.bookExcerpts.length;
+            const prevBook = currentIndex > 0 ? state.bookExcerpts[currentIndex - 1] : null;
+            const nextBook = currentIndex < totalBooks - 1 ? state.bookExcerpts[currentIndex + 1] : null;
+            
             const html = `
-                <div style="max-width: 800px;">
+                <div style="max-width: 800px; position: relative;">
+                    ${prevBook ? `
+                        <button onclick="openBook(${prevBook.id})" 
+                            style="position: absolute; left: -20px; top: 60%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                            onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
+                            onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    ` : ''}
+                    
+                    ${nextBook ? `
+                        <button onclick="openBook(${nextBook.id})" 
+                            style="position: absolute; right: -20px; top: 60%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                            onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
+                            onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    ` : ''}
+                    
                     <div style="display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap;">
                         <img src="${book.cover}" alt="${book.title}" 
                              style="width: 200px; height: 300px; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
@@ -2390,6 +2653,11 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div style="text-align: center; margin-bottom: 15px; font-size: 16px; opacity: 0.8;">
+                        Livre ${currentIndex + 1} / ${totalBooks}
+                    </div>
+                    
                     <button onclick="closeModal()" class="modal-btn secondary" style="width: 100%;">
                         <i class="fas fa-times"></i> Fermer
                     </button>
@@ -2558,7 +2826,7 @@
 
         // Toggle panel on mobile
         function togglePanel(header) {
-            if (window.innerWidth >= 768) return;
+            if (window.innerWidth > 1024) return;
             
             const content = header.nextElementSibling;
             const icon = header.querySelector('.panel-toggle-icon');
@@ -2588,15 +2856,104 @@
             });
         }
 
+        // ========== FONCTIONS DE SYNTHÈSE VOCALE AMÉLIORÉES ==========
+        
+        /**
+         * Initialise la synthèse vocale sur iOS
+         * Cette fonction doit être appelée au premier clic/touch utilisateur
+         */
+        function initIOSVoice() {
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            
+            if (isIOS && !state.iosVoiceReady) {
+                console.log('📱 Initialisation synthèse vocale iOS...');
+                
+                // Créer un utterance vide pour activer l'API
+                const utterance = new SpeechSynthesisUtterance('');
+                utterance.volume = 0.01; // Volume très faible
+                utterance.rate = 10; // Très rapide
+                utterance.pitch = 1;
+                
+                utterance.onend = () => {
+                    state.iosVoiceReady = true;
+                    console.log('✅ Synthèse vocale iOS prête');
+                };
+                
+                utterance.onerror = (e) => {
+                    console.warn('⚠️ Erreur init iOS voice:', e);
+                    state.iosVoiceReady = true; // On continue quand même
+                };
+                
+                // Annuler toute parole en cours
+                window.speechSynthesis.cancel();
+                
+                // Lancer l'activation
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
+            } else if (!isIOS) {
+                // AMÉLIORATION: Sur desktop, considérer comme prêt immédiatement
+                state.iosVoiceReady = true;
+                console.log('✅ Synthèse vocale prête (non-iOS)');
+            }
+        }
+
+        /**
+         * Fonction speak() améliorée avec support iOS optimisé
+         */
         function speak(text, priority = false) {
+            // Vérifier si la voix est activée
+            if (!state.voiceEnabled) {
+                console.log('🔇 Voix désactivée');
+                return;
+            }
+            
+            if (!text) return;
+            
+            // Ne JAMAIS lire les alertes qui s'affichent visuellement
+            const alertKeywords = [
+                'Avez-vous fait vos exercices',
+                'Bonjour ! C\'est l\'heure de faire',
+                'Pensez à boire un verre d\'eau',
+                'Il est l\'heure de déjeuner',
+                'C\'est le moment idéal pour faire une petite sieste',
+                'C\'est le moment idéal pour une petite promenade',
+                'Il est tard. Pensez à vous préparer pour la nuit'
+            ];
+            
+            for (const keyword of alertKeywords) {
+                if (text.includes(keyword)) {
+                    console.log('🔇 Alerte visuelle uniquement (non lue)');
+                    return;
+                }
+            }
+            
             try {
-                // Annuler la parole en cours si prioritaire
-                if (priority && window.speechSynthesis.speaking) {
+                console.log('🔊 Tentative de parole:', text.substring(0, 50));
+                
+                // Sur iOS, toujours annuler avant de parler
+                const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isIOS) {
                     window.speechSynthesis.cancel();
+                    
+                    // Petit délai pour iOS
+                    setTimeout(() => speakNow(text, priority, isIOS), 100);
+                } else {
+                    speakNow(text, priority, false);
                 }
                 
-                // Sur iOS, cancel peut être nécessaire avant de parler
-                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+            } catch (error) {
+                console.error('❌ Erreur fonction speak:', error);
+            }
+        }
+
+        /**
+         * Fonction interne pour lancer la synthèse vocale
+         */
+        function speakNow(text, priority, isIOS) {
+            try {
+                // Annuler si prioritaire
+                if (priority && window.speechSynthesis.speaking) {
                     window.speechSynthesis.cancel();
                 }
                 
@@ -2606,21 +2963,36 @@
                 utterance.pitch = 1;
                 utterance.volume = 1;
                 
-                // Chercher une voix française
+                // Sélection de la voix française - MODIFIÉ: support voix alternative
                 const voices = window.speechSynthesis.getVoices();
-                const frVoice = voices.find(v => v.lang.startsWith('fr')) || 
-                               voices.find(v => v.lang.includes('FR')) ||
-                               voices[0]; // Fallback sur la première voix disponible
+                console.log(`📢 ${voices.length} voix disponibles`);
                 
-                if (frVoice) {
-                    utterance.voice = frVoice;
+                let selectedVoice = null;
+                
+                if (state.useAlternativeVoice) {
+                    // Chercher une voix masculine ou alternative
+                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && (
+                        v.name.includes('Thomas') || 
+                        v.name.includes('Daniel') ||
+                        v.name.toLowerCase().includes('male') ||
+                        v.name.toLowerCase().includes('homme')
+                    )) || voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google'));
                 }
                 
-                // Gérer les erreurs iOS
-                utterance.onerror = (event) => {
-                    console.error('Erreur synthèse vocale:', event);
-                };
+                // Voix par défaut si pas de voix alternative trouvée
+                if (!selectedVoice) {
+                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
+                                   voices.find(v => v.lang === 'fr-FR') ||
+                                   voices.find(v => v.lang.startsWith('fr')) ||
+                                   voices[0];
+                }
                 
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    console.log('🎤 Voix sélectionnée:', selectedVoice.name);
+                }
+                
+                // Gestion des événements
                 utterance.onstart = () => {
                     console.log('🔊 Lecture vocale démarrée');
                 };
@@ -2629,9 +3001,45 @@
                     console.log('✅ Lecture vocale terminée');
                 };
                 
+                utterance.onerror = (event) => {
+                    console.error('❌ Erreur synthèse vocale:', event.error);
+                    
+                    // Sur iOS, retry si erreur "interrupted"
+                    if (isIOS && event.error === 'interrupted') {
+                        console.log('🔄 Retry sur iOS...');
+                        setTimeout(() => {
+                            window.speechSynthesis.cancel();
+                            window.speechSynthesis.speak(utterance);
+                        }, 200);
+                    }
+                };
+                
+                // Lancer la synthèse
                 window.speechSynthesis.speak(utterance);
+                
             } catch (error) {
-                console.error('Erreur fonction speak:', error);
+                console.error('❌ Erreur speakNow:', error);
+            }
+        }
+
+        /**
+         * Active ou désactive la voix
+         */
+        function toggleVoice() {
+            state.voiceEnabled = !state.voiceEnabled;
+            
+            const btn = document.getElementById('voiceToggleBtn');
+            const icon = document.getElementById('voiceIcon');
+            
+            if (state.voiceEnabled) {
+                btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                icon.className = 'fas fa-volume-up';
+                speak('Voix activée', true);
+            } else {
+                btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                icon.className = 'fas fa-volume-mute';
+                // Ne pas parler si on désactive
+                showAlert('🔇 Voix désactivée', '#ef4444');
             }
         }
 
@@ -2645,18 +3053,37 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             state.recognition = new SpeechRecognition();
             state.recognition.lang = 'fr-FR';
-            state.recognition.continuous = false;
+            state.recognition.continuous = true; // Écoute continue activée
             state.recognition.interimResults = false;
             
             state.recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript.toLowerCase();
+                const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
                 console.log('Commande vocale:', transcript);
                 handleVoiceCommand(transcript);
             };
             
+            state.recognition.onend = () => {
+                // Redémarrer automatiquement si la conversation est active
+                if (state.conversationActive) {
+                    console.log('🔄 Redémarrage automatique de l\'écoute');
+                    setTimeout(() => {
+                        try {
+                            state.recognition.start();
+                        } catch (e) {
+                            console.log('Reconnaissance déjà active');
+                        }
+                    }, 100);
+                }
+            };
+            
             state.recognition.onerror = (event) => {
                 console.error('Erreur reconnaissance vocale:', event.error);
-                speak('Désolé, je n\'ai pas compris. Pouvez-vous répéter ?');
+                if (event.error === 'no-speech') {
+                    // Ne rien dire pour éviter les répétitions
+                    console.log('Aucune parole détectée');
+                } else if (event.error !== 'aborted') {
+                    speak('Désolé, je n\'ai pas compris. Pouvez-vous répéter ?');
+                }
             };
         }
 
@@ -2666,7 +3093,25 @@
                 return;
             }
             
-            speak('Je vous écoute. Que puis-je faire pour vous ?', true);
+            if (state.conversationActive) {
+                // Arrêter la conversation
+                state.conversationActive = false;
+                state.questionCount = 0;
+                try {
+                    state.recognition.stop();
+                } catch (e) {
+                    console.log('Arrêt reconnaissance');
+                }
+                speak('Au revoir !');
+                showAlert('🎤 Assistant vocal désactivé', '#ef4444');
+                return;
+            }
+            
+            // Démarrer la conversation
+            state.conversationActive = true;
+            state.questionCount = 0;
+            
+            speak('Que puis-je faire pour vous ?', true);
             showAlert('🎤 Assistant vocal activé', '#8B5CF6');
             
             setTimeout(() => {
@@ -2679,126 +3124,566 @@
         }
 
 function handleVoiceCommand(command) {
-    // Commandes pour allumer les lumières
-    if (command.includes('allume') || command.includes('allumer')) {
-        if (command.includes('salon')) {
-            toggleDevice(1);
-        } else if (command.includes('cuisine')) {
-            toggleDevice(2);
-        } else if (command.includes('chambre')) {
-            toggleDevice(3);
+    console.log('🎤 Commande reçue:', command);
+    
+    // AMÉLIORATION: Compteur de questions pour éviter les boucles infinies
+    state.questionCount++;
+    if (state.questionCount > 10) {
+        speak('Je crois que nous avons assez parlé pour le moment. À bientôt !');
+        state.conversationActive = false;
+        try {
+            state.recognition.stop();
+        } catch (e) {}
+        state.questionCount = 0;
+        return;
+    }
+    
+    // JEUX
+    if (command.includes('quiz') || command.includes('culture générale')) {
+        speak('Lancement du quiz de culture générale');
+        startQuiz();
+    }
+    else if (command.includes('mots cachés') || command.includes('mot caché')) {
+        speak('Lancement du jeu de mots cachés');
+        startWordSearch();
+    }
+    else if (command.includes('calcul') || command.includes('mathématique') || command.includes('math')) {
+        speak('Lancement du calcul mental');
+        startMentalMath();
+    }
+    else if (command.includes('mémoire') || command.includes('paire')) {
+        speak('Lancement du jeu de mémoire');
+        startMemoryGame();
+    }
+    else if (command.includes('jeu') || command.includes('jouer')) {
+        speak('Quel jeu souhaitez-vous ? Nous avons un quiz, des mots cachés, du calcul mental et un jeu de mémoire.');
+    }
+    
+    // LECTURE
+    else if (command.includes('livre') || command.includes('lecture') || command.includes('lire')) {
+        // Extraire les titres de livres disponibles
+        const bookTitles = ['petit prince', 'étranger', 'voyage'];
+        let bookFound = null;
+        
+        // Chercher si un titre est mentionné dans la commande
+        for (let i = 0; i < bookTitles.length; i++) {
+            if (command.includes(bookTitles[i])) {
+                bookFound = i + 1; // ID du livre (1, 2, ou 3)
+                break;
+            }
+        }
+        
+        if (bookFound) {
+            const bookNames = ['Le Petit Prince', 'L\'Étranger', 'Le Voyage'];
+            speak(`Je vous ouvre ${bookNames[bookFound - 1]}`);
+            setTimeout(() => openBook(bookFound), 500);
         } else {
-            speak('Quelle lumière voulez-vous allumer ?');
+            speak('Quel livre souhaitez-vous lire ? Le Petit Prince, L\'Étranger ou Le Voyage ?');
         }
     }
-    // Commandes pour éteindre les lumières
-    else if (command.includes('éteins') || command.includes('éteindre')) {
-        if (command.includes('salon')) {
-            toggleDevice(1);
-        } else if (command.includes('cuisine')) {
-            toggleDevice(2);
-        } else if (command.includes('chambre')) {
-            toggleDevice(3);
-        } else {
-            speak('Quelle lumière voulez-vous éteindre ?');
-        }
-    }
-    // Commandes pour afficher les médicaments
-    else if (command.includes('médicament') || command.includes('pilule')) {
-        speak('Affichage de vos médicaments');
-        showAlert('💊 Médicaments affichés', '#3b82f6');
-    }
-    // Commandes pour appeler un contact
-    else if (command.includes('contact') || command.includes('appel')) {
-        showContacts();
-    }
-    // Commandes pour afficher un album photo
-    else if (command.includes('photo') || command.includes('album')) {
-        showAlbum();
-    }
-    // Commandes pour une aide d'urgence
-    else if (command.includes('urgence') || command.includes('aide')) {
-        emergencyCall();
-    }
-    // Commandes pour exercices de respiration
+    
+    // EXERCICES
     else if (command.includes('respiration') || command.includes('respirer')) {
+        speak('Lancement des exercices de respiration');
         breathingExercise();
     }
-    // Commandes pour exercices de yoga
     else if (command.includes('yoga')) {
+        speak('Lancement des exercices de yoga');
         yogaExercise();
     }
-    // Commandes pour la météo
-    else if (command.includes('météo') || command.includes('temps')) {
+    
+    // CONTACTS ET COMMUNICATION
+    else if (command.includes('contact') || command.includes('téléphone')) {
+        speak('Affichage de vos contacts');
+        showContacts();
+    }
+    else if (command.includes('photo') || command.includes('album')) {
+        speak('Affichage de l\'album photo');
+        showAlbum();
+    }
+    
+    // URGENCE
+    else if (command.includes('urgence') || command.includes('aide') || command.includes('secours')) {
+        speak('Appel d\'urgence');
+        emergencyCall();
+    }
+    
+    // LUMIÈRES - Commandes pour allumer - AMÉLIORÉ
+    else if (command.includes('allume') || command.includes('allumer')) {
+        if (command.includes('salon')) {
+            const device = state.devices.find(d => d.id === 1);
+            if (device && !device.status) {
+                toggleDevice(1);
+            } else if (device && device.status) {
+                speak('La lumière du salon est déjà allumée');
+            }
+        } else if (command.includes('cuisine')) {
+            const device = state.devices.find(d => d.id === 2);
+            if (device && !device.status) {
+                toggleDevice(2);
+            } else if (device && device.status) {
+                speak('La lumière de la cuisine est déjà allumée');
+            }
+        } else if (command.includes('chambre')) {
+            const device = state.devices.find(d => d.id === 3);
+            if (device && !device.status) {
+                toggleDevice(3);
+            } else if (device && device.status) {
+                speak('La lumière de la chambre est déjà allumée');
+            }
+        } else if (command.includes('tout') || command.includes('toute')) {
+            speak('J\'allume toutes les lumières');
+            state.devices.filter(d => d.type === 'light').forEach(d => {
+                if (!d.status) toggleDevice(d.id);
+            });
+        } else {
+            speak('Quelle lumière souhaitez-vous allumer ? Le salon, la cuisine ou la chambre ?');
+        }
+    }
+    
+    // LUMIÈRES - Commandes pour éteindre - AMÉLIORÉ
+    else if (command.includes('éteins') || command.includes('éteindre')) {
+        if (command.includes('salon')) {
+            const device = state.devices.find(d => d.id === 1);
+            if (device && device.status) {
+                toggleDevice(1);
+            } else if (device && !device.status) {
+                speak('La lumière du salon est déjà éteinte');
+            }
+        } else if (command.includes('cuisine')) {
+            const device = state.devices.find(d => d.id === 2);
+            if (device && device.status) {
+                toggleDevice(2);
+            } else if (device && !device.status) {
+                speak('La lumière de la cuisine est déjà éteinte');
+            }
+        } else if (command.includes('chambre')) {
+            const device = state.devices.find(d => d.id === 3);
+            if (device && device.status) {
+                toggleDevice(3);
+            } else if (device && !device.status) {
+                speak('La lumière de la chambre est déjà éteinte');
+            }
+        } else if (command.includes('tout') || command.includes('toute')) {
+            speak('J\'éteins toutes les lumières');
+            state.devices.filter(d => d.type === 'light').forEach(d => {
+                if (d.status) toggleDevice(d.id);
+            });
+        } else {
+            speak('Quelle lumière souhaitez-vous éteindre ? Le salon, la cuisine ou la chambre ?');
+        }
+    }
+    
+    // VOLETS - AMÉLIORÉ
+    else if (command.includes('volet')) {
+        const volets = state.devices.find(d => d.name === 'Volets');
+        if (command.includes('ouvre') || command.includes('ouvrir') || command.includes('ouvrez')) {
+            if (volets && !volets.status) {
+                speak('J\'ouvre les volets');
+                toggleDevice(volets.id);
+            } else if (volets && volets.status) {
+                speak('Les volets sont déjà ouverts');
+            }
+        } else if (command.includes('ferme') || command.includes('fermer') || command.includes('fermez')) {
+            if (volets && volets.status) {
+                speak('Je ferme les volets');
+                toggleDevice(volets.id);
+            } else if (volets && !volets.status) {
+                speak('Les volets sont déjà fermés');
+            }
+        } else if (command.includes('vérifier') || command.includes('vérifie') || command.includes('est-ce que') || command.includes('sont')) {
+            if (volets) {
+                const status = volets.status ? 'ouverts' : 'fermés';
+                speak(`Les volets sont ${status}`);
+                showAlert(`🪟 Volets ${status}`, volets.status ? '#10b981' : '#6b7280');
+            }
+        }
+    }
+    
+    // FENÊTRES - AMÉLIORÉ
+    else if (command.includes('fenêtre')) {
+        const fenetres = state.devices.find(d => d.name === 'Fenêtres');
+        if (command.includes('ouvre') || command.includes('ouvrir') || command.includes('ouvrez')) {
+            if (fenetres && !fenetres.status) {
+                speak('J\'ouvre la fenêtre');
+                toggleDevice(fenetres.id);
+            } else if (fenetres && fenetres.status) {
+                speak('La fenêtre est déjà ouverte');
+            }
+        } else if (command.includes('ferme') || command.includes('fermer') || command.includes('fermez')) {
+            if (fenetres && fenetres.status) {
+                speak('Je ferme la fenêtre');
+                toggleDevice(fenetres.id);
+            } else if (fenetres && !fenetres.status) {
+                speak('La fenêtre est déjà fermée');
+            }
+        } else if (command.includes('vérifier') || command.includes('vérifie') || command.includes('est-ce que') || command.includes('est')) {
+            if (fenetres) {
+                const status = fenetres.status ? 'ouverte' : 'fermée';
+                speak(`La fenêtre est ${status}`);
+                showAlert(`🪟 Fenêtre ${status}`, fenetres.status ? '#10b981' : '#6b7280');
+            }
+        }
+    }
+    
+    // APPELS TÉLÉPHONIQUES
+    else if (command.includes('appeler') || command.includes('appelle')) {
+        const contacts = state.contacts || [
+            { name: 'Sophie', relation: 'Fille' },
+            { name: 'Lucas', relation: 'Fils' },
+            { name: 'Dr. Martin', relation: 'Médecin' }
+        ];
+        
+        if (command.includes('fille') || command.includes('sophie')) {
+            const contact = contacts.find(c => c.name.toLowerCase().includes('sophie'));
+            const name = contact ? contact.name : 'ma fille';
+            speak(`Appel de ${name} en cours`);
+            showAlert(`📞 Appel de ${name}...`, '#10b981');
+        }
+        else if (command.includes('fils') || command.includes('lucas')) {
+            const contact = contacts.find(c => c.name.toLowerCase().includes('lucas'));
+            const name = contact ? contact.name : 'mon fils';
+            speak(`Appel de ${name} en cours`);
+            showAlert(`📞 Appel de ${name}...`, '#10b981');
+        }
+        else if (command.includes('médecin') || command.includes('docteur')) {
+            speak(`Appel du médecin en cours`);
+            showAlert(`📞 Appel du médecin...`, '#10b981');
+        }
+        else {
+            speak('Qui souhaitez-vous appeler ? Votre fille, votre fils ou le médecin ?');
+            showContacts();
+        }
+    }
+    
+    // LECTURE
+    else if (command.includes('lancer la lecture') || command.includes('lance la lecture') || command.includes('lire un livre')) {
+        speak('Je vous montre les livres disponibles. Lequel souhaitez-vous ?');
+        setTimeout(() => scrollToPanel('📚'), 500);
+    }
+    
+    // JEUX
+    else if (command.includes('ouvrir un jeu') || command.includes('ouvre un jeu') || command.includes('lance un jeu')) {
+        speak('Voici les jeux disponibles. Quiz, mots cachés, calcul mental ou mémoire ?');
+        setTimeout(() => scrollToPanel('🎮'), 500);
+    }
+    
+    // CHAUFFAGE
+    else if (command.includes('chauffage') || command.includes('température')) {
+        if (command.includes('augmente') || command.includes('monte') || command.includes('plus chaud')) {
+            const chauffage = state.devices.find(d => d.type === 'heating');
+            if (chauffage && chauffage.temp < 25) {
+                chauffage.temp++;
+                speak(`Température augmentée à ${chauffage.temp} degrés`);
+                renderDevices();
+            }
+        } else if (command.includes('baisse') || command.includes('descend') || command.includes('moins chaud')) {
+            const chauffage = state.devices.find(d => d.type === 'heating');
+            if (chauffage && chauffage.temp > 15) {
+                chauffage.temp--;
+                speak(`Température baissée à ${chauffage.temp} degrés`);
+                renderDevices();
+            }
+        }
+    }
+    
+    // MÉDICAMENTS - SCÉNARIO AMÉLIORÉ
+    else if (command.includes('médicament') || command.includes('pilule') || command.includes('comprimé') || command.includes('pilulier')) {
+        speak('Je vous affiche le pilulier afin de vérifier si vous êtes à jour', true);
+        
+        // Ouvrir et scroller vers le panneau du pilulier
+        setTimeout(() => {
+            const pillPanel = document.querySelector('.panel-header').parentElement;
+            const pillHeaders = document.querySelectorAll('.panel-title');
+            
+            // Trouver le panneau Pilulier
+            for (const header of pillHeaders) {
+                if (header.textContent.includes('💊') || header.textContent.includes('Pilulier')) {
+                    const panel = header.closest('.panel');
+                    const content = panel.querySelector('.panel-content');
+                    const icon = panel.querySelector('.panel-toggle-icon');
+                    
+                    // Ouvrir le panneau s'il est fermé
+                    if (!content.classList.contains('open')) {
+                        content.classList.add('open');
+                        icon.classList.add('open');
+                    }
+                    
+                    // Scroll vers le pilulier
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    showAlert('💊 Pilulier affiché', '#3b82f6');
+                    
+                    // Vérifier les médicaments à prendre
+                    setTimeout(() => checkMedicationStatus(), 1000);
+                    break;
+                }
+            }
+        }, 500);
+    }
+    
+    // EST-CE L'HEURE POUR MES MÉDICAMENTS ?
+    else if (command.includes('heure') && (command.includes('médicament') || command.includes('pilule'))) {
+        checkMedicationStatus();
+    }
+    
+    // MÉTÉO
+    else if (command.includes('météo') || command.includes('temps qu\'il fait')) {
         const temp = document.getElementById('weatherTemp').textContent;
         speak(`Il fait actuellement ${temp} à Paris`);
     }
-    // Commandes pour connaître l'heure
-    else if (command.includes('heure')) {
+    
+    // HEURE
+    else if (command.includes('heure') || command.includes('quelle heure')) {
         const time = document.getElementById('timeDisplay').textContent;
         speak(`Il est ${time}`);
     }
-    // Commandes pour vérifier l'hydratation
-    else if (command.includes('eau') || command.includes('hydratation')) {
-        speak('Il est important de boire de l\'eau régulièrement. Avez-vous bu aujourd\'hui ?');
+    
+    // DATE
+    else if (command.includes('date') || command.includes('quel jour') || command.includes('jour sommes-nous')) {
+        const date = document.getElementById('dateDisplay').textContent;
+        speak(`Nous sommes le ${date}`);
     }
-    // Commandes pour vérifier la prise des médicaments (rappel)
-    else if (command.includes('rappel') && (command.includes('médicament') || command.includes('pilule'))) {
-        speak('Souhaitez-vous un rappel pour votre prochain médicament ?');
-        // Code pour afficher un rappel ou une notification pour la prise de médicaments
+    
+    // HYDRATATION
+    else if (command.includes('eau') || command.includes('boire') || command.includes('hydrat')) {
+        speak('Il est important de boire de l\'eau régulièrement. Pensez à vous hydrater.');
+        showAlert('💧 Pensez à boire de l\'eau', '#3b82f6');
     }
-    // Commandes pour les rendez-vous médicaux
-    else if (command.includes('rendez-vous') || command.includes('consultation') || command.includes('médecin')) {
-        speak('Voici vos prochains rendez-vous médicaux');
-        // Code pour afficher les rendez-vous ou les consultations programmées
+    
+    // AIDE GÉNÉRALE
+    else if (command.includes('aide') || command.includes('help') || command.includes('que peux-tu faire')) {
+        speak('Je peux vous aider avec les lumières, les jeux, la lecture, les contacts, la météo, l\'heure, et bien plus encore. Que souhaitez-vous faire ?');
     }
-    // Commandes pour vérifier la santé (ex. douleur, bien-être)
-    else if (command.includes('douleur') || command.includes('mal') || command.includes('santé')) {
-        speak('Avez-vous ressenti une douleur ou un inconfort aujourd\'hui ?');
-        // Code pour vérifier les symptômes ou demander des détails supplémentaires
+    
+    // SALUTATIONS - AMÉLIORATION
+    else if (command.includes('bonjour') || command.includes('salut') || command.includes('coucou')) {
+        const greetings = [
+            'Bonjour ! Comment allez-vous aujourd\'hui ?',
+            'Salut ! Que puis-je faire pour vous ?',
+            'Bonjour ! Ravi de vous parler. Comment puis-je vous aider ?'
+        ];
+        speak(greetings[Math.floor(Math.random() * greetings.length)]);
     }
-    // Commandes pour discuter avec un membre de la famille
-    else if (command.includes('famille') || command.includes('enfant') || command.includes('parent')) {
-        speak('Voulez-vous appeler un membre de la famille ?');
-        // Code pour afficher les membres de la famille dans les contacts ou les rappeler
+    
+    // AU REVOIR - AMÉLIORATION
+    else if (command.includes('au revoir') || command.includes('arrête') || command.includes('stop') || command.includes('merci c\'est bon')) {
+        speak('Au revoir ! N\'hésitez pas à me rappeler si besoin.');
+        state.conversationActive = false;
+        try {
+            state.recognition.stop();
+        } catch (e) {}
+        state.questionCount = 0;
     }
-    // Commandes pour envoyer un message ou appeler un membre de la famille
-    else if (command.includes('message') || command.includes('envoyer message')) {
-        speak('A qui souhaitez-vous envoyer un message ?');
-        // Code pour envoyer un message à un membre de la famille
-    }
-    // Commandes pour vérifier la température corporelle
-    else if (command.includes('température') || command.includes('fièvre')) {
-        speak('Souhaitez-vous vérifier votre température corporelle ?');
-        // Code pour vérifier ou rappeler l'outil pour vérifier la température
-    }
-    // Commandes pour savoir si des rappels sont activés
-    else if (command.includes('rappels') || command.includes('alarme')) {
-        speak('Voici vos rappels activés pour aujourd\'hui.');
-        // Code pour afficher ou rappeler les alarmes de prise de médicaments, rendez-vous, etc.
-    }
+    
+    // COMMANDE NON RECONNUE - AMÉLIORATION
     else {
-        speak('Désolé, je n\'ai pas compris. Pouvez-vous répéter ?');
+        const unknownResponses = [
+            'Je n\'ai pas bien compris. Pouvez-vous reformuler s\'il vous plaît ?',
+            'Désolé, je n\'ai pas saisi. Que souhaitez-vous faire ?',
+            'Pardon, pourriez-vous répéter plus clairement ?'
+        ];
+        speak(unknownResponses[Math.floor(Math.random() * unknownResponses.length)]);
+    }
+    
+    // Continuer la conversation si active
+    if (state.conversationActive) {
+        setTimeout(() => {
+            state.questionCount++;
+            
+            // Variété de messages selon le nombre de questions
+            let message;
+            if (state.questionCount === 1) {
+                message = 'Que puis-je faire pour vous ?';
+            } else {
+                // Alterner entre différentes formules pour une meilleure UX
+                const messages = [
+                    'Je vous écoute.',
+                    'Autre chose ?',
+                    'Dites-moi.',
+                    'Oui ?',
+                    'Je suis là.',
+                    'À votre service.',
+                    'Continuez.',
+                    'Et ensuite ?'
+                ];
+                // Sélectionner un message différent à chaque fois
+                const index = (state.questionCount - 2) % messages.length;
+                message = messages[index];
+            }
+            
+            speak(message);
+        }, 2000);
     }
 }
+
+        /**
+         * Vérifier le statut des médicaments à prendre maintenant
+         */
+        function checkMedicationStatus() {
+            const pillsToTake = state.pills.filter(p => isWithinTimeWindow(p) && p.count > 0);
+            const pillsOutOfStock = state.pills.filter(p => p.count === 0);
+            const pillsLowStock = state.pills.filter(p => p.count > 0 && p.count <= 5);
+            
+            if (pillsToTake.length > 0) {
+                const names = pillsToTake.map(p => p.name).join(', ');
+                speak(`Oui, c'est l'heure de prendre : ${names}`, true);
+                showAlert(`⏰ À prendre: ${names}`, '#10b981');
+            } else {
+                const nextPill = state.pills[0];
+                const nextTime = getNextScheduledTime(nextPill);
+                speak(`Non, ce n'est pas encore l'heure. Le prochain médicament est à ${nextTime}`, true);
+                showAlert(`⏰ Prochain: ${nextTime}`, '#3b82f6');
+            }
+            
+            // Alertes de stock
+            if (pillsOutOfStock.length > 0) {
+                setTimeout(() => {
+                    speak('Attention, certains médicaments sont épuisés', true);
+                    showAlert('🚨 Stock épuisé !', '#ef4444');
+                }, 2000);
+            } else if (pillsLowStock.length > 0) {
+                setTimeout(() => {
+                    speak('Certains médicaments sont bientôt épuisés', true);
+                    showAlert('⚠️ Stock faible', '#f59e0b');
+                }, 2000);
+            }
+        }
+
+        /**
+         * Scroller vers un panneau spécifique par son emoji
+         */
+        function scrollToPanel(emoji) {
+            const panels = document.querySelectorAll('.panel-title');
+            for (const panel of panels) {
+                if (panel.textContent.includes(emoji)) {
+                    const panelElement = panel.closest('.panel');
+                    const panelContent = panelElement.querySelector('.panel-content');
+                    const panelIcon = panelElement.querySelector('.panel-toggle-icon');
+                    
+                    // Ouvrir le panneau s'il est fermé
+                    if (!panelContent.classList.contains('open')) {
+                        panelContent.classList.add('open');
+                        panelIcon.classList.add('open');
+                    }
+                    
+                    panelElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    break;
+                }
+            }
+        }
 
         
 
         // Show alert
         function showAlert(message, color = '#3b82f6') {
-            const banner = document.getElementById('alertBanner');
-            const content = document.getElementById('alertContent');
-            const text = document.getElementById('alertText');
+            // MODIFICATION: Vérifier si les alertes sont activées
+            if (!state.alertsEnabled) {
+                console.log('🔕 Alertes désactivées, message non affiché:', message);
+                return;
+            }
             
-            text.textContent = message;
-            content.style.background = `${color}33`;
-            content.style.borderColor = `${color}99`;
+            // Ne pas annoncer vocalement - les alertes sont purement visuelles
+            // La voix est gérée séparément dans les fonctions qui appellent showAlert
             
-            banner.style.display = 'block';
+            // Créer un conteneur pour les alertes s'il n'existe pas
+            let alertsContainer = document.getElementById('healthAlertsContainer');
+            if (!alertsContainer) {
+                alertsContainer = document.createElement('div');
+                alertsContainer.id = 'healthAlertsContainer';
+                alertsContainer.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 15px;
+                    max-width: 400px;
+                    pointer-events: none;
+                `;
+                document.body.appendChild(alertsContainer);
+            }
             
+            // Créer l'alerte
+            const alertId = 'alert-' + Date.now();
+            const alertDiv = document.createElement('div');
+            alertDiv.id = alertId;
+            alertDiv.style.cssText = `
+                background: ${color}22;
+                backdrop-filter: blur(20px);
+                border: 2px solid ${color}99;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: slideInRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                pointer-events: auto;
+                position: relative;
+            `;
+            
+            alertDiv.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 28px;">💡</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 16px; font-weight: 600; color: white;">${message}</div>
+                    </div>
+                    <button onclick="document.getElementById('${alertId}').remove()" style="
+                        background: rgba(255, 255, 255, 0.2);
+                        border: none;
+                        border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                        cursor: pointer;
+                        color: white;
+                        font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">×</button>
+                </div>
+            `;
+            
+            // Ajouter l'animation CSS si elle n'existe pas
+            if (!document.getElementById('alertAnimations')) {
+                const style = document.createElement('style');
+                style.id = 'alertAnimations';
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from {
+                            transform: translateX(450px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                    }
+                    @keyframes slideOutRight {
+                        from {
+                            transform: translateX(0);
+                            opacity: 1;
+                        }
+                        to {
+                            transform: translateX(450px);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            alertsContainer.appendChild(alertDiv);
+            
+            // Auto-suppression après 30 secondes
             setTimeout(() => {
-                banner.style.display = 'none';
-            }, 5000);
+                alertDiv.style.animation = 'slideOutRight 0.5s ease';
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 500);
+            }, 30000);
         }
 
         // Modal functions
@@ -2893,6 +3778,8 @@ function handleVoiceCommand(command) {
                 message = device.status ? 'Chauffage allumé' : 'Chauffage éteint';
             } else if (device.type === 'shutters') {
                 message = device.status ? 'Volets ouverts' : 'Volets fermés';
+            } else if (device.type === 'windows') {
+                message = device.status ? 'Fenêtre ouverte' : 'Fenêtre fermée';
             } else if (device.type === 'light') {
                 // Pour les lumières, dire "Lumière du salon est allumée"
                 message = `La lumière dans ${device.name.toLowerCase()} ${device.status ? 'est allumée' : 'est éteinte'}`;
@@ -2921,10 +3808,12 @@ function handleVoiceCommand(command) {
                 statusText = device.status ? 'allumé' : 'éteint';
             } else if (device.type === 'shutters') {
                 statusText = device.status ? 'ouverts' : 'fermés';
+            } else if (device.type === 'windows') {
+                statusText = device.status ? 'ouverte' : 'fermée';
             } else {
                 statusText = device.status ? 'allumée' : 'éteinte';
             }
-            speak(`${device.name} est ${statusText}`);
+            speak(`${device.name} ${device.status ? 'est' : 'est'} ${statusText}`);
         }
 
         // Pills with time control - CONTRÔLE DES HEURES DE PRISE
@@ -3082,6 +3971,382 @@ function handleVoiceCommand(command) {
             showAlert(`✅ ${pill.name} rechargé`, '#10b981');
         }
 
+        // === FONCTIONS POUR LE FIL D'ACTUALITÉS RSS ===
+        async function fetchNewsRSS() {
+            try {
+                // Essayer d'abord avec un proxy CORS
+                const corsProxy = 'https://api.codetabs.com/v1/proxy?quest=';
+                const rssUrl = 'https://www.lemonde.fr/sante/rss_full.xml';
+                
+                const response = await fetch(corsProxy + encodeURIComponent(rssUrl));
+                
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                
+                const text = await response.text();
+                
+                // Parser le XML
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(text, 'text/xml');
+                
+                // Vérifier s'il y a des erreurs de parsing
+                const parserError = xml.querySelector('parsererror');
+                if (parserError) {
+                    throw new Error('Erreur de parsing XML');
+                }
+                
+                // Extraire les titres des articles
+                const items = xml.querySelectorAll('item');
+                const newsItems = [];
+                
+                items.forEach((item, index) => {
+                    if (index < 20) { // Limiter à 20 articles
+                        const title = item.querySelector('title')?.textContent || '';
+                        if (title && title.trim() !== '') {
+                            // Nettoyer le titre (supprimer les balises CDATA si présentes)
+                            const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+                            newsItems.push(cleanTitle);
+                        }
+                    }
+                });
+                
+                if (newsItems.length > 0) {
+                    state.newsItems = newsItems;
+                    renderNewsTicker();
+                    console.log(`✅ ${newsItems.length} actualités santé chargées`);
+                } else {
+                    throw new Error('Aucune actualité trouvée dans le flux');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des actualités:', error);
+                
+                // Afficher des actualités de démonstration en cas d'erreur
+                state.newsItems = [
+                    'Santé : Nouvelle campagne de prévention contre les maladies cardiovasculaires',
+                    'Recherche : Avancée majeure dans le traitement d\'Alzheimer',
+                    'Nutrition : Les bienfaits du régime méditerranéen confirmés par une étude',
+                    'Sommeil : Comment améliorer la qualité de votre repos nocturne',
+                    'Activité physique : 30 minutes de marche par jour réduisent les risques',
+                    'Bien-être : La méditation, un allié pour la santé mentale des seniors',
+                    'Prévention : Dépistage du cancer, l\'importance des examens réguliers',
+                    'Médicaments : Nouveaux traitements contre le diabète disponibles',
+                    'Vaccination : Rappels recommandés pour les personnes âgées',
+                    'Santé mentale : Lutter contre l\'isolement chez les seniors'
+                ];
+                renderNewsTicker();
+                console.log('📰 Actualités santé de démonstration affichées');
+            }
+        }
+
+        function renderNewsTicker() {
+            const ticker = document.getElementById('newsTicker');
+            if (!ticker || state.newsItems.length === 0) return;
+            
+            // Doubler les items pour créer un défilement continu sans blanc
+            const newsHTML = [...state.newsItems, ...state.newsItems]
+                .map(item => `<span class="news-ticker-item" style="display: inline-flex; align-items: center; font-size: 13px; padding-right: 50px;">${item}</span>`)
+                .join('');
+            
+            ticker.innerHTML = newsHTML;
+        }
+
+        // === FONCTIONS POUR LE BLOC SANTÉ ===
+        function renderHealthMetrics() {
+            const container = document.getElementById('healthMetrics');
+            if (!container) return;
+            
+            const metrics = state.healthMetrics;
+            const bp = metrics.bloodPressure;
+            
+            // Déterminer les classes de couleur selon les valeurs
+            const getBPClass = (sys, dia) => {
+                if (sys > 140 || dia > 90) return 'danger';
+                if (sys > 130 || dia > 85) return 'warning';
+                return 'normal';
+            };
+            
+            const getGlucoseClass = (glucose) => {
+                if (glucose > 125) return 'danger';
+                if (glucose > 110) return 'warning';
+                return 'normal';
+            };
+            
+            const getBPColor = (bpClass) => {
+                if (bpClass === 'danger') return 'rgba(239, 68, 68, 0.9)';
+                if (bpClass === 'warning') return 'rgba(245, 158, 11, 0.9)';
+                return 'rgba(16, 185, 129, 0.9)';
+            };
+            
+            const getGlucoseColor = (glucoseClass) => {
+                if (glucoseClass === 'danger') return 'rgba(239, 68, 68, 0.9)';
+                if (glucoseClass === 'warning') return 'rgba(245, 158, 11, 0.9)';
+                return 'rgba(16, 185, 129, 0.9)';
+            };
+            
+            const bpClass = getBPClass(bp.systolic, bp.diastolic);
+            const glucoseClass = getGlucoseClass(metrics.glucose);
+            
+            const bgColors = [
+                'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%)'
+            ];
+            
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Tension artérielle -->
+                    <div onclick="editBloodPressure()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[0]}; display: flex; align-items: stretch;">
+                        <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
+                            <img src="https://cdn.shortpixel.ai/spai/q_lossy+ret_img+to_webp/www.le-tensiometre.com/wp-content/uploads/2021/04/quel-bras-mesurer-tension-arterielle.jpg" alt="Tension" 
+                                 style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                            
+                            <!-- Badge de valeur sur l'image -->
+                            <div style="position: absolute; top: 10px; right: 10px; background: ${getBPColor(bpClass)}; backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 12px; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.3); text-align: center;">
+                                ${bp.systolic}/${bp.diastolic}
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700; margin-bottom: 5px;">
+                                    <i class="fas fa-heartbeat" style="margin-right: 8px; color: #3b82f6;"></i>
+                                    Tension artérielle
+                                </div>
+                                <div style="font-size: 13px; opacity: 0.85; margin-bottom: 10px;">Systolique / Diastolique (mmHg)</div>
+                                
+                                <!-- Indicateur de niveau -->
+                                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                                    <span style="padding: 4px 8px; border-radius: 8px; background: ${bpClass === 'normal' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.2)'}; border: 1px solid ${bpClass === 'normal' ? 'rgba(16, 185, 129, 0.6)' : 'rgba(59, 130, 246, 0.4)'}; font-size: 11px; font-weight: 600;">
+                                        ${bpClass === 'normal' ? '✓ Normale' : bpClass === 'warning' ? '⚠ Attention' : '⚠ Élevée'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bouton d'action -->
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="event.stopPropagation(); editBloodPressure()" 
+                                        style="flex: 1; padding: 12px; border: none; border-radius: 10px; background: rgba(59, 130, 246, 0.9); color: white; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Glycémie -->
+                    <div onclick="editGlucose()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[1]}; display: flex; align-items: stretch;">
+                        <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
+                            <img src="https://www.administration.ylea.eu/upload/site/pasqua.jpg" alt="Glycémie" 
+                                 style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                            
+                            <!-- Badge de valeur sur l'image -->
+                            <div style="position: absolute; top: 10px; right: 10px; background: ${getGlucoseColor(glucoseClass)}; backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 12px; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.3); text-align: center;">
+                                ${metrics.glucose}
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700; margin-bottom: 5px;">
+                                    <i class="fas fa-tint" style="margin-right: 8px; color: #3b82f6;"></i>
+                                    Glycémie
+                                </div>
+                                <div style="font-size: 13px; opacity: 0.85; margin-bottom: 10px;">mg/dL à jeun</div>
+                                
+                                <!-- Indicateur de niveau -->
+                                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                                    <span style="padding: 4px 8px; border-radius: 8px; background: ${glucoseClass === 'normal' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.2)'}; border: 1px solid ${glucoseClass === 'normal' ? 'rgba(16, 185, 129, 0.6)' : 'rgba(59, 130, 246, 0.4)'}; font-size: 11px; font-weight: 600;">
+                                        ${glucoseClass === 'normal' ? '✓ Normale' : glucoseClass === 'warning' ? '⚠ Attention' : '⚠ Élevée'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bouton d'action -->
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="event.stopPropagation(); editGlucose()" 
+                                        style="flex: 1; padding: 12px; border: none; border-radius: 10px; background: rgba(59, 130, 246, 0.9); color: white; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Poids -->
+                    <div onclick="editWeight()" style="cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.2); position: relative; background: ${bgColors[2]}; display: flex; align-items: stretch;">
+                        <div style="position: relative; overflow: hidden; width: 180px; flex-shrink: 0;">
+                            <img src="https://i-sam.unimedias.fr/2023/07/28/gettyimages-1436906124.jpg?auto=format%2Ccompress&crop=faces&cs=tinysrgb&fit=crop&h=501&ixlib=php-4.1.0&w=890" alt="Poids" 
+                                 style="width: 100%; height: 100%; min-height: 140px; object-fit: cover; display: block; transition: transform 0.4s;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);"></div>
+                            
+                            <!-- Badge de valeur sur l'image -->
+                            <div style="position: absolute; top: 10px; right: 10px; background: rgba(16, 185, 129, 0.9); backdrop-filter: blur(10px); padding: 8px 12px; border-radius: 12px; font-size: 16px; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.3); text-align: center;">
+                                ${metrics.weight} kg
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div style="font-size: 18px; font-weight: 700; margin-bottom: 5px;">
+                                    <i class="fas fa-weight" style="margin-right: 8px; color: #3b82f6;"></i>
+                                    Poids
+                                </div>
+                                <div style="font-size: 13px; opacity: 0.85; margin-bottom: 10px;">Kilogrammes</div>
+                                
+                                <!-- Indicateur -->
+                                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                                    <span style="padding: 4px 8px; border-radius: 8px; background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.6); font-size: 11px; font-weight: 600;">
+                                        ✓ Suivi actif
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- Bouton d'action -->
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="event.stopPropagation(); editWeight()" 
+                                        style="flex: 1; padding: 12px; border: none; border-radius: 10px; background: rgba(59, 130, 246, 0.9); color: white; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s;">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editBloodPressure() {
+            const current = state.healthMetrics.bloodPressure;
+            const html = `
+                <div style="max-width: 500px; padding: 30px;">
+                    <h2 style="font-size: 28px; margin-bottom: 25px; text-align: center;">
+                        <i class="fas fa-heartbeat"></i> Modifier la tension
+                    </h2>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                            Systolique (mmHg)
+                        </label>
+                        <input type="number" id="systolicInput" value="${current.systolic}" min="80" max="200"
+                               style="width: 100%; padding: 12px; font-size: 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; text-align: center;">
+                    </div>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                            Diastolique (mmHg)
+                        </label>
+                        <input type="number" id="diastolicInput" value="${current.diastolic}" min="50" max="120"
+                               style="width: 100%; padding: 12px; font-size: 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; text-align: center;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="saveBloodPressure()" class="modal-btn" style="flex: 1;">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary" style="flex: 1;">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveBloodPressure() {
+            const systolic = parseInt(document.getElementById('systolicInput').value);
+            const diastolic = parseInt(document.getElementById('diastolicInput').value);
+            
+            if (systolic && diastolic) {
+                state.healthMetrics.bloodPressure = { systolic, diastolic };
+                renderHealthMetrics();
+                closeModal();
+                speak(`Tension enregistrée: ${systolic} sur ${diastolic}`);
+                showAlert(`✅ Tension mise à jour`, '#10b981');
+            }
+        }
+
+        function editGlucose() {
+            const current = state.healthMetrics.glucose;
+            const html = `
+                <div style="max-width: 500px; padding: 30px;">
+                    <h2 style="font-size: 28px; margin-bottom: 25px; text-align: center;">
+                        <i class="fas fa-tint"></i> Modifier la glycémie
+                    </h2>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                            Glycémie (mg/dL)
+                        </label>
+                        <input type="number" id="glucoseInput" value="${current}" min="60" max="300"
+                               style="width: 100%; padding: 12px; font-size: 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; text-align: center;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="saveGlucose()" class="modal-btn" style="flex: 1;">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary" style="flex: 1;">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveGlucose() {
+            const glucose = parseInt(document.getElementById('glucoseInput').value);
+            
+            if (glucose) {
+                state.healthMetrics.glucose = glucose;
+                renderHealthMetrics();
+                closeModal();
+                speak(`Glycémie enregistrée: ${glucose} milligrammes par décilitre`);
+                showAlert(`✅ Glycémie mise à jour`, '#10b981');
+            }
+        }
+
+        function editWeight() {
+            const current = state.healthMetrics.weight;
+            const html = `
+                <div style="max-width: 500px; padding: 30px;">
+                    <h2 style="font-size: 28px; margin-bottom: 25px; text-align: center;">
+                        <i class="fas fa-weight"></i> Modifier le poids
+                    </h2>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 16px; font-weight: 600; margin-bottom: 8px;">
+                            Poids (kg)
+                        </label>
+                        <input type="number" id="weightInput" value="${current}" min="30" max="200" step="0.1"
+                               style="width: 100%; padding: 12px; font-size: 18px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; text-align: center;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="saveWeight()" class="modal-btn" style="flex: 1;">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
+                        <button onclick="closeModal()" class="modal-btn secondary" style="flex: 1;">
+                            <i class="fas fa-times"></i> Annuler
+                        </button>
+                    </div>
+                </div>
+            `;
+            showModal(html);
+        }
+
+        function saveWeight() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            
+            if (weight) {
+                state.healthMetrics.weight = weight;
+                renderHealthMetrics();
+                closeModal();
+                speak(`Poids enregistré: ${weight} kilogrammes`);
+                showAlert(`✅ Poids mis à jour`, '#10b981');
+            }
+        }
+
         // Contacts
         function showContacts() {
             speak('Affichage de vos contacts');
@@ -3161,12 +4426,42 @@ function handleVoiceCommand(command) {
 
         function viewPhoto(url, caption) {
             speak(caption);
+            
+            // Trouver l'index de la photo actuelle
+            const currentIndex = state.albumPhotos.findIndex(p => p.url === url);
+            const totalPhotos = state.albumPhotos.length;
+            
             const html = `
-                <div class="game-modal-content" style="text-align: center; max-width: 800px; padding: 40px; border-radius: 32px;">
+                <div class="game-modal-content" style="text-align: center; max-width: 800px; padding: 40px; border-radius: 32px; position: relative;">
                     <h2 style="font-size: 32px; margin-bottom: 20px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">${caption}</h2>
-                    <img src="${url}" style="max-width: 100%; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                    <div style="position: relative; display: inline-block; width: 100%;">
+                        <img src="${url}" style="max-width: 100%; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+                        
+                        ${currentIndex > 0 ? `
+                            <button onclick="viewPhoto('${state.albumPhotos[currentIndex - 1].url}', '${state.albumPhotos[currentIndex - 1].caption}')" 
+                                style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                                onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
+                                onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        ` : ''}
+                        
+                        ${currentIndex < totalPhotos - 1 ? `
+                            <button onclick="viewPhoto('${state.albumPhotos[currentIndex + 1].url}', '${state.albumPhotos[currentIndex + 1].caption}')" 
+                                style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10; transition: all 0.3s ease;"
+                                onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" 
+                                onmouseout="this.style.transform='translateY(-50%) scale(1)'">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                    
+                    <div style="margin-top: 15px; font-size: 16px; opacity: 0.8;">
+                        Photo ${currentIndex + 1} / ${totalPhotos}
+                    </div>
+                    
                     <button onclick="showAlbum()" class="modal-btn" style="margin-top: 20px;">
-                        <i class="fas fa-arrow-left"></i> Retour à la bibliothèque
+                        <i class="fas fa-arrow-left"></i> Retour à l'album
                     </button>
                 </div>
             `;
@@ -3236,6 +4531,50 @@ function handleVoiceCommand(command) {
             
             if (clockImage) clockImage.src = imageUrl;
             if (timePeriodBadge) timePeriodBadge.textContent = periodText;
+            
+            // AUTOMATISATIONS NOCTURNES (00h00 - 06h00)
+            if (hour >= 0 && hour < 6) {
+                // Lumières éteintes (tous les devices de type 'light')
+                state.devices.filter(d => d.type === 'light').forEach(lightDevice => {
+                    if (lightDevice.status === true) {
+                        lightDevice.status = false;
+                    }
+                });
+                
+                // Fenêtres fermées
+                const fenetresDevice = state.devices.find(d => d.id === 6);
+                if (fenetresDevice && fenetresDevice.status === true) {
+                    fenetresDevice.status = false;
+                }
+                
+                // Chauffage à 19°C
+                const chauffageDevice = state.devices.find(d => d.id === 4);
+                if (chauffageDevice) {
+                    chauffageDevice.status = true;
+                    chauffageDevice.temp = 19;
+                }
+                
+                // Volets fermés
+                const voletsDevice = state.devices.find(d => d.id === 5);
+                if (voletsDevice && voletsDevice.status === true) {
+                    voletsDevice.status = false;
+                }
+                
+                // Re-render devices si changements
+                renderDevices();
+            }
+            
+            // PROPOSITION DE LECTURE À PARTIR DE 20h20
+            if (hour === 20 && minutes === '20' && !state.readingSuggestionShown) {
+                state.readingSuggestionShown = true;
+                speak('Il est 20h20, c\'est le moment idéal pour un moment de lecture. Voulez-vous que je vous propose un extrait ?');
+                showAlert('📚 Moment de lecture suggéré', '#8b5cf6');
+            }
+            
+            // Réinitialiser le flag de suggestion de lecture chaque jour
+            if (hour === 0 && minutes === '00') {
+                state.readingSuggestionShown = false;
+            }
             
             // Re-render pills UNIQUEMENT si la minute change (évite le re-render constant)
             const currentMinute = `${hours}:${minutes}`;
@@ -4021,10 +5360,25 @@ function handleVoiceCommand(command) {
             };
         }
 
+        // Toggle affichage des alertes
+        function toggleAlertsDisplay() {
+            state.alertsEnabled = !state.alertsEnabled;
+            const btn = document.getElementById('alertsToggleBtn');
+            
+            if (state.alertsEnabled) {
+                btn.classList.remove('disabled');
+                speak('Alertes activées');
+            } else {
+                btn.classList.add('disabled');
+                speak('Alertes désactivées');
+            }
+        }
+
         // Time slider
         document.getElementById('timeSlider').addEventListener('input', function(e) {
             state.time = parseFloat(e.target.value);
             state.simulatedMode = true;
+            state.isSliding = true; // Indiquer que le slider est en cours de déplacement
             
             // Affichage de l'heure
             const hours = Math.floor(state.time);
@@ -4038,6 +5392,21 @@ function handleVoiceCommand(command) {
             automateHomeByTime(hours);
             
             updateClock();
+        });
+
+        // Quand le slider s'arrête (utilisateur relâche)
+        document.getElementById('timeSlider').addEventListener('change', function(e) {
+            state.isSliding = false; // Le slider n'est plus en mouvement
+            // Maintenant on peut vérifier les alertes
+            const now = state.simulatedMode ? new Date(2026, 1, 6, Math.floor(state.time), (state.time % 1) * 60) : new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const currentMinute = `${hours}:${minutes}`;
+            
+            // Forcer la mise à jour pour déclencher les alertes si nécessaire
+            state.lastMinute = null;
+            renderPills();
+            checkHealthAlerts();
         });
 
         // Fonction d'automatisation de la maison
@@ -4110,6 +5479,14 @@ function handleVoiceCommand(command) {
                         <div class="toggle-switch ${extraLargeTextActive ? 'active' : ''}" id="toggleExtraLarge"></div>
                     </div>
                     
+                    <div class="accessibility-option" onclick="toggleAlternativeVoice()">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Voix alternative</div>
+                            <div style="font-size: 14px; opacity: 0.8;">Changer la voix de synthèse</div>
+                        </div>
+                        <div class="toggle-switch ${state.useAlternativeVoice ? 'active' : ''}" id="toggleAltVoice"></div>
+                    </div>
+                    
                     <button class="modal-btn" onclick="testVoice()" style="width: 100%; margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: 700; cursor: pointer;">
                         <i class="fas fa-volume-up"></i> Tester la voix
                     </button>
@@ -4152,6 +5529,14 @@ function handleVoiceCommand(command) {
             speak('Ceci est un test de la synthèse vocale. Bonjour, je suis votre assistant pour seniors.');
         }
 
+        // NOUVEAU: Toggle voix alternative
+        function toggleAlternativeVoice() {
+            state.useAlternativeVoice = !state.useAlternativeVoice;
+            const toggle = document.getElementById('toggleAltVoice');
+            if (toggle) toggle.classList.toggle('active');
+            speak(state.useAlternativeVoice ? 'Voix alternative activée' : 'Voix par défaut activée');
+        }
+
         // ALERTES DE SANTÉ AUTOMATIQUES
         let healthAlertsShown = {
             morning: false,
@@ -4163,7 +5548,13 @@ function handleVoiceCommand(command) {
         };
 
         function checkHealthAlerts() {
-            const now = new Date();
+            // Ne pas afficher les alertes si le slider est en cours de déplacement
+            if (state.isSliding) return;
+            
+            // Ne pas afficher les alertes si désactivées
+            if (!state.alertsEnabled) return;
+            
+            const now = state.simulatedMode ? new Date(2026, 1, 6, Math.floor(state.time), (state.time % 1) * 60) : new Date();
             const hour = now.getHours();
             const minute = now.getMinutes();
             const currentDay = now.toDateString();
@@ -4183,14 +5574,12 @@ function handleVoiceCommand(command) {
 
             // 8h00 - Exercices du matin
             if (hour === 8 && minute === 0 && !healthAlertsShown.morning) {
-                speak('Bonjour ! C\'est l\'heure de faire vos exercices du matin.');
                 showAlert('🏃 Avez-vous fait vos exercices du matin ?', '#3b82f6');
                 healthAlertsShown.morning = true;
             }
 
             // Toutes les 2 heures entre 10h et 20h - Boire de l'eau
             if (minute === 0 && hour >= 10 && hour <= 20 && hour % 2 === 0 && !healthAlertsShown.water) {
-                speak('Pensez à boire un verre d\'eau pour rester hydraté.');
                 showAlert('💧 Pensez à boire un verre d\'eau', '#3b82f6');
                 healthAlertsShown.water = true;
                 setTimeout(() => { healthAlertsShown.water = false; }, 60000);
@@ -4198,28 +5587,24 @@ function handleVoiceCommand(command) {
 
             // 12h30 - Rappel déjeuner
             if (hour === 12 && minute === 30 && !healthAlertsShown.lunch) {
-                speak('Il est l\'heure de déjeuner. Bon appétit !');
                 showAlert('🍽️ Il est l\'heure de déjeuner', '#f59e0b');
                 healthAlertsShown.lunch = true;
             }
 
             // 14h30 - Sieste
             if (hour === 14 && minute === 30 && !healthAlertsShown.nap) {
-                speak('C\'est le moment idéal pour faire une petite sieste si vous le souhaitez.');
                 showAlert('😴 Il est temps de faire une petite sieste', '#a78bfa');
                 healthAlertsShown.nap = true;
             }
 
             // 18h00 - Marche du soir
             if (hour === 18 && minute === 0 && !healthAlertsShown.evening) {
-                speak('C\'est le moment idéal pour une petite promenade du soir.');
                 showAlert('🚶 Que diriez-vous d\'une petite promenade ?', '#10b981');
                 healthAlertsShown.evening = true;
             }
 
             // 22h00 - Coucher
             if (hour === 22 && minute === 0 && !healthAlertsShown.night) {
-                speak('Il est tard. Pensez à vous préparer pour la nuit. Dormez bien !');
                 showAlert('🌙 Il est temps de vous préparer pour la nuit', '#6366f1');
                 healthAlertsShown.night = true;
             }
@@ -4229,23 +5614,34 @@ function handleVoiceCommand(command) {
         async function init() {
             console.log('🚀 Initialisation du système...');
             
+            // AMÉLIORATION: Charger les voix en premier
             await initVoices();
             initVoiceRecognition();
             
-            // Activation de la synthèse vocale pour iOS au premier clic
-            const iosVoiceActivation = () => {
-                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                    console.log('📱 Activation synthèse vocale iOS...');
-                    const utterance = new SpeechSynthesisUtterance('');
-                    utterance.volume = 0;
-                    window.speechSynthesis.speak(utterance);
+            // AMÉLIORATION: Activer immédiatement la synthèse vocale pour iOS
+            initIOSVoice();
+            
+            // Activation supplémentaire au premier clic pour iOS
+            const activateVoice = () => {
+                if (!state.iosVoiceReady) {
+                    initIOSVoice();
                 }
-                document.removeEventListener('touchstart', iosVoiceActivation);
-                document.removeEventListener('click', iosVoiceActivation);
+                document.removeEventListener('touchstart', activateVoice);
+                document.removeEventListener('click', activateVoice);
             };
             
-            document.addEventListener('touchstart', iosVoiceActivation, { once: true });
-            document.addEventListener('click', iosVoiceActivation, { once: true });
+            document.addEventListener('touchstart', activateVoice, { once: true });
+            document.addEventListener('click', activateVoice, { once: true });
+            
+            // Initialiser les panels fermés sur mobile/tablette
+            if (window.innerWidth <= 1024) {
+                document.querySelectorAll('.panel-content').forEach(content => {
+                    content.classList.remove('open');
+                });
+                document.querySelectorAll('.panel-toggle-icon').forEach(icon => {
+                    icon.classList.remove('open');
+                });
+            }
             
             state.currentDate = new Date();
             state.dayIndex = state.currentDate.getDay();
@@ -4253,17 +5649,20 @@ function handleVoiceCommand(command) {
             renderDevices();
             renderPills();
             renderBookExcerpts();
+            renderHealthMetrics(); // Nouveau: Afficher le bloc santé
             updateClock();
             fetchWeather();
+            fetchNewsRSS(); // Nouveau: Charger le fil d'actualités
             
             setInterval(updateClock, 1000);
             setInterval(fetchWeather, 600000); // Mise à jour météo toutes les 10 minutes
+            setInterval(fetchNewsRSS, 1800000); // Mise à jour actualités toutes les 30 minutes
             
+            // AMÉLIORATION: Augmenter le délai à 2 secondes pour laisser le temps aux voix de se charger
             setTimeout(() => {
                 const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel. Je suis votre assistant IA, je suis là pour vous aider.`;
+                const msg = `Bienvenue ! Nous sommes ${days[state.dayIndex]}. Le système est opérationnel.`;
                 speak(msg);
-                showAlert(`👋 Bienvenue ! ${days[state.dayIndex]}`, '#10b981');
                 
                 const emptyPills = state.pills.filter(p => p.count <= 0);
                 const lowPills = state.pills.filter(p => p.count <= 5 && p.count > 0);
@@ -4279,7 +5678,7 @@ function handleVoiceCommand(command) {
                         showAlert('⚠️ Stock faible', '#f59e0b');
                     }, 3000);
                 }
-            }, 1500);
+            }, 2000);
             
             console.log('✅ Système initialisé !');
         }
