@@ -2697,13 +2697,29 @@
             const utterance = new SpeechSynthesisUtterance();
             utterance.text = book.excerpt; // Lire UNIQUEMENT l'excerpt
             utterance.lang = 'fr-FR';
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
+            utterance.rate = 0.92; // Vitesse confortable pour la lecture
+            utterance.pitch = 1.05; // Pitch légèrement plus élevé
             utterance.volume = 1;
             
+            // Sélection de voix premium pour la lecture
             const voices = window.speechSynthesis.getVoices();
-            const frVoice = voices.find(v => v.lang.startsWith('fr'));
-            if (frVoice) utterance.voice = frVoice;
+            const frVoice = 
+                // iOS/Safari Premium voices
+                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Amélie')) ||
+                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
+                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Enhanced')) ||
+                // Google Wavenet
+                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Wavenet')) ||
+                voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google fr-FR-Standard')) ||
+                // Voix système françaises
+                voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
+                voices.find(v => v.lang === 'fr-FR') ||
+                voices.find(v => v.lang.startsWith('fr'));
+            
+            if (frVoice) {
+                utterance.voice = frVoice;
+                console.log('📖 Voix lecture:', frVoice.name);
+            }
             
             const totalLength = utterance.text.length;
             utterance.onboundary = (event) => {
@@ -2959,37 +2975,54 @@
                 
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'fr-FR';
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
+                utterance.rate = 0.95; // Légèrement plus rapide pour plus de naturel
+                utterance.pitch = 1.05; // Pitch légèrement plus élevé pour plus de clarté
                 utterance.volume = 1;
                 
-                // Sélection de la voix française - MODIFIÉ: support voix alternative
+                // Sélection AMÉLIORÉE de la voix française - privilégier les voix premium
                 const voices = window.speechSynthesis.getVoices();
                 console.log(`📢 ${voices.length} voix disponibles`);
                 
                 let selectedVoice = null;
                 
                 if (state.useAlternativeVoice) {
-                    // Chercher une voix masculine ou alternative
-                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && (
-                        v.name.includes('Thomas') || 
-                        v.name.includes('Daniel') ||
-                        v.name.toLowerCase().includes('male') ||
-                        v.name.toLowerCase().includes('homme')
-                    )) || voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google'));
+                    // Chercher une voix masculine premium
+                    selectedVoice = 
+                        // Voix premium iOS/Safari
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Thomas')) ||
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
+                        // Voix Google premium
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google') && v.name.includes('fr-FR-Wavenet')) ||
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google')) ||
+                        // Autres voix masculines
+                        voices.find(v => v.lang === 'fr-FR' && v.name.toLowerCase().includes('male'));
                 }
                 
-                // Voix par défaut si pas de voix alternative trouvée
+                // Voix par défaut - PRIORISER LES VOIX PREMIUM
                 if (!selectedVoice) {
-                    selectedVoice = voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
-                                   voices.find(v => v.lang === 'fr-FR') ||
-                                   voices.find(v => v.lang.startsWith('fr')) ||
-                                   voices[0];
+                    selectedVoice = 
+                        // iOS/Safari Premium voices (les meilleures)
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Amélie')) ||
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Premium')) ||
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Enhanced')) ||
+                        // Google Wavenet (très bonne qualité)
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Wavenet')) ||
+                        // Google standard
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google fr-FR-Standard')) ||
+                        // Voix système françaises (éviter Google basique si possible)
+                        voices.find(v => v.lang === 'fr-FR' && !v.name.includes('Google')) ||
+                        // Fallback Google
+                        voices.find(v => v.lang === 'fr-FR' && v.name.includes('Google')) ||
+                        // Derniers recours
+                        voices.find(v => v.lang === 'fr-FR') ||
+                        voices.find(v => v.lang.startsWith('fr-')) ||
+                        voices.find(v => v.lang.startsWith('fr')) ||
+                        voices[0];
                 }
                 
                 if (selectedVoice) {
                     utterance.voice = selectedVoice;
-                    console.log('🎤 Voix sélectionnée:', selectedVoice.name);
+                    console.log('🎤 Voix sélectionnée:', selectedVoice.name, '- Qualité:', selectedVoice.localService ? 'Locale (Premium)' : 'En ligne');
                 }
                 
                 // Gestion des événements
