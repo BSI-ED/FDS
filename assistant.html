@@ -89,9 +89,72 @@
         .hidden {
             display: none !important;
         }
+
+        #visitCounter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px 30px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        #visitCounter:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .counter-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .counter-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a0d8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            #visitCounter {
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+            }
+
+            .counter-label {
+                font-size: 12px;
+            }
+
+            .counter-value {
+                font-size: 36px;
+            }
+        }
     </style>
 </head>
 <body onclick="handleTap()">
+    <!-- Compteur de visites -->
+    <div id="visitCounter">
+        <div class="counter-label">Visites</div>
+        <div class="counter-value" id="counterValue">0</div>
+    </div>
+
     <div id="tapIndicator">
         <div class="tap-circle">
             <div class="tap-icon">👆</div>
@@ -111,6 +174,57 @@
         let deja_lu = false;
         const indicator = document.getElementById('tapIndicator');
 
+        // ========== GESTION DU COMPTEUR DE VISITES ==========
+        function initVisitCounter() {
+            // Récupérer le nombre de visites stocké
+            let visitCount = localStorage.getItem('visitCount');
+            
+            if (visitCount === null) {
+                // Première visite
+                visitCount = 1;
+            } else {
+                // Incrémenter le compteur
+                visitCount = parseInt(visitCount) + 1;
+            }
+            
+            // Sauvegarder le nouveau compte
+            localStorage.setItem('visitCount', visitCount);
+            
+            // Afficher le compteur avec animation
+            const counterElement = document.getElementById('counterValue');
+            animateCounter(counterElement, visitCount);
+            
+            console.log(`✅ Visite n°${visitCount} enregistrée`);
+            
+            return visitCount;
+        }
+
+        // Animation du compteur
+        function animateCounter(element, targetValue) {
+            let currentValue = 0;
+            const increment = Math.ceil(targetValue / 30);
+            const duration = 1000; // 1 seconde
+            const stepTime = duration / (targetValue / increment);
+            
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = currentValue;
+            }, stepTime);
+        }
+
+        // Fonction pour réinitialiser le compteur (optionnel, pour debug)
+        function resetCounter() {
+            localStorage.setItem('visitCount', '0');
+            document.getElementById('counterValue').textContent = '0';
+            console.log('🔄 Compteur réinitialisé');
+        }
+        // Pour utiliser: ouvrir la console et taper resetCounter()
+
+        // ========== SYNTHÈSE VOCALE ==========
         function lireMessage() {
             if (deja_lu) return;
             
@@ -136,8 +250,12 @@
             lireMessage();
         }
 
-        // Afficher l'indicateur après un court délai
+        // ========== INITIALISATION ==========
         window.addEventListener('load', function() {
+            // Initialiser le compteur de visites
+            initVisitCounter();
+            
+            // Afficher l'indicateur après un court délai
             setTimeout(function() {
                 indicator.classList.add('visible');
             }, 800);
