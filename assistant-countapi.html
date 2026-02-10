@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA - Message Vocal (CountAPI)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a url('https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/vous-etes/professionnel/presse-media/photos/JIS26_40x60_sslogospatners.jpg') center center no-repeat fixed;
+            background-size: auto 100%;
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #tapIndicator {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #tapIndicator.visible {
+            opacity: 1;
+        }
+
+        .tap-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .tap-icon {
+            font-size: 50px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .tap-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                           0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6),
+                           0 0 0 30px rgba(255, 255, 255, 0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #visitCounter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px 30px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        #visitCounter:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .counter-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .counter-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a0d8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+
+        .counter-status {
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        .status-online {
+            color: #10b981;
+        }
+
+        .cloud-badge {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 12px 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 768px) {
+            #visitCounter {
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+            }
+
+            .counter-label {
+                font-size: 12px;
+            }
+
+            .counter-value {
+                font-size: 36px;
+            }
+
+            .cloud-badge {
+                top: 20px;
+                left: 20px;
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body onclick="handleTap()">
+    <!-- Badge Cloud -->
+    <div class="cloud-badge">
+        🌐 Compteur Global
+    </div>
+
+    <!-- Compteur de visites -->
+    <div id="visitCounter">
+        <div class="counter-label">Visites Totales</div>
+        <div class="counter-value" id="counterValue">...</div>
+        <div class="counter-status" id="counterStatus">
+            <span class="status-online">⏳ Chargement...</span>
+        </div>
+    </div>
+
+    <div id="tapIndicator">
+        <div class="tap-circle">
+            <div class="tap-icon">👆</div>
+        </div>
+        <div class="tap-text">Tapez sur l'écran</div>
+    </div>
+
+    <script>
+        const texte = [
+            "Bonjour…",
+            "Je suis votre assistant IA.",
+            "Le prototype a été conçu pour simuler une maison connectée avec un dispositif intelligent.",
+            "Approchez-vous du support interactif pour commencer l'expérience.",
+            "Bonne découverte !"
+        ];
+
+        let deja_lu = false;
+        const indicator = document.getElementById('tapIndicator');
+
+        // ========== CONFIGURATION COUNTAPI ==========
+        // CountAPI.xyz est un service gratuit de compteur en ligne
+        // Pas besoin de compte, pas de configuration !
+        
+        // 🔧 PERSONNALISEZ VOTRE COMPTEUR :
+        // Changez "assistant-ia-demo" par un nom unique pour votre projet
+        const COUNTER_NAMESPACE = 'assistant-ia-jis-2026';
+        const COUNTER_KEY = 'visites-totales';
+        
+        const API_URL = `https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+        const GET_URL = `https://api.countapi.xyz/get/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+
+        // ========== GESTION DU COMPTEUR CLOUD ==========
+        async function incrementCloudCounter() {
+            try {
+                updateStatus('⏳ Synchronisation...');
+
+                // Incrémenter le compteur via l'API
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (data.value !== undefined) {
+                    updateCounter(data.value);
+                    updateStatus(`✅ Synchronisé (${data.value} visites)`);
+                    console.log('✅ Compteur mis à jour:', data.value);
+                    return data.value;
+                } else {
+                    throw new Error('Réponse invalide');
+                }
+
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                updateStatus('❌ Erreur de connexion');
+                // Fallback sur compteur local
+                return incrementLocalCounter();
+            }
+        }
+
+        async function getCloudCounter() {
+            try {
+                const response = await fetch(GET_URL);
+                const data = await response.json();
+                
+                if (data.value !== undefined) {
+                    updateCounter(data.value);
+                    return data.value;
+                }
+            } catch (error) {
+                console.error('Erreur récupération compteur:', error);
+            }
+            return 0;
+        }
+
+        function incrementLocalCounter() {
+            let count = parseInt(localStorage.getItem('localBackupCount') || '0');
+            count++;
+            localStorage.setItem('localBackupCount', count);
+            updateCounter(count);
+            updateStatus('📱 Mode local (hors ligne)');
+            return count;
+        }
+
+        function updateCounter(count) {
+            const element = document.getElementById('counterValue');
+            animateCounter(element, count);
+        }
+
+        function updateStatus(text) {
+            const statusEl = document.getElementById('counterStatus');
+            statusEl.innerHTML = `<span class="status-online">${text}</span>`;
+        }
+
+        function animateCounter(element, targetValue) {
+            let currentValue = Math.max(0, targetValue - 30);
+            const increment = Math.ceil((targetValue - currentValue) / 20);
+            const duration = 800;
+            const stepTime = duration / ((targetValue - currentValue) / increment);
+            
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = currentValue;
+            }, stepTime);
+        }
+
+        // ========== SYNTHÈSE VOCALE ==========
+        function lireMessage() {
+            if (deja_lu) return;
+            
+            deja_lu = true;
+            
+            indicator.classList.remove('visible');
+            setTimeout(() => {
+                indicator.classList.add('hidden');
+            }, 500);
+
+            const utterance = new SpeechSynthesisUtterance(texte.join(' '));
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function handleTap() {
+            lireMessage();
+        }
+
+        // ========== INITIALISATION ==========
+        window.addEventListener('load', async function() {
+            // Incrémenter le compteur cloud
+            await incrementCloudCounter();
+
+            // Afficher l'indicateur
+            setTimeout(function() {
+                indicator.classList.add('visible');
+            }, 800);
+
+            // Rafraîchir le compteur toutes les 30 secondes
+            // pour voir les visites des autres appareils en temps réel
+            setInterval(async () => {
+                await getCloudCounter();
+            }, 30000);
+        });
+
+        // Console helper
+        console.log('🌐 Compteur Cloud activé');
+        console.log('📊 Namespace:', COUNTER_NAMESPACE);
+        console.log('🔑 Key:', COUNTER_KEY);
+        console.log('📍 URL API:', API_URL);
+    </script>
+</body>
+</html>

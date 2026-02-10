@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA - Message Vocal (Cloud)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a url('https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/vous-etes/professionnel/presse-media/photos/JIS26_40x60_sslogospatners.jpg') center center no-repeat fixed;
+            background-size: auto 100%;
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #tapIndicator {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #tapIndicator.visible {
+            opacity: 1;
+        }
+
+        .tap-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .tap-icon {
+            font-size: 50px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .tap-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            letter-spacing: 1px;
+            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                           0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6),
+                           0 0 0 30px rgba(255, 255, 255, 0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #visitCounter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px 30px;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        #visitCounter:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .counter-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .counter-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a0d8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+        }
+
+        .counter-status {
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        .status-online {
+            color: #10b981;
+        }
+
+        .status-offline {
+            color: #ef4444;
+        }
+
+        .status-syncing {
+            color: #f59e0b;
+        }
+
+        #exportBtn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(102, 126, 234, 0.9);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #exportBtn:hover {
+            background: rgba(102, 126, 234, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
+        }
+
+        #statsPanel {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+
+        #statsPanel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .stats-header {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-label {
+            opacity: 0.8;
+        }
+
+        .stats-value {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            #visitCounter {
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+            }
+
+            .counter-label {
+                font-size: 12px;
+            }
+
+            .counter-value {
+                font-size: 36px;
+            }
+
+            #exportBtn {
+                top: 20px;
+                left: 20px;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+
+            #statsPanel {
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body onclick="handleTap()">
+    <!-- Bouton d'export -->
+    <button id="exportBtn" onclick="event.stopPropagation(); toggleStats();">
+        📊 Statistiques
+    </button>
+
+    <!-- Compteur de visites -->
+    <div id="visitCounter">
+        <div class="counter-label">Visites Globales</div>
+        <div class="counter-value" id="counterValue">...</div>
+        <div class="counter-status" id="counterStatus">
+            <span class="status-syncing">⏳ Synchronisation...</span>
+        </div>
+    </div>
+
+    <!-- Panneau de statistiques -->
+    <div id="statsPanel">
+        <div class="stats-header">📈 Statistiques Cloud</div>
+        <div class="stats-item">
+            <span class="stats-label">Total global :</span>
+            <span class="stats-value" id="statTotal">...</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Depuis cet appareil :</span>
+            <span class="stats-value" id="statLocal">0</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Première visite :</span>
+            <span class="stats-value" id="statFirst">-</span>
+        </div>
+        <div class="stats-item">
+            <span class="stats-label">Dernière màj :</span>
+            <span class="stats-value" id="statLast">-</span>
+        </div>
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; opacity: 0.7; text-align: center;">
+            🌐 Compteur synchronisé sur tous les appareils
+        </div>
+    </div>
+
+    <div id="tapIndicator">
+        <div class="tap-circle">
+            <div class="tap-icon">👆</div>
+        </div>
+        <div class="tap-text">Tapez sur l'écran</div>
+    </div>
+
+    <script>
+        const texte = [
+            "Bonjour…",
+            "Je suis votre assistant IA.",
+            "Le prototype a été conçu pour simuler une maison connectée avec un dispositif intelligent.",
+            "Approchez-vous du support interactif pour commencer l'expérience.",
+            "Bonne découverte !"
+        ];
+
+        let deja_lu = false;
+        const indicator = document.getElementById('tapIndicator');
+
+        // ========== CONFIGURATION CLOUD ==========
+        // 🔧 IMPORTANT: Remplacez cette URL par votre URL de Google Apps Script
+        const CLOUD_API_URL = 'VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI';
+        
+        // Si vous n'avez pas encore configuré Google Apps Script, 
+        // le système utilisera un mode de secours local
+        const USE_CLOUD = CLOUD_API_URL !== 'VOTRE_URL_GOOGLE_APPS_SCRIPT_ICI';
+
+        // ========== GESTION DU COMPTEUR CLOUD ==========
+        async function incrementCloudCounter() {
+            if (!USE_CLOUD) {
+                console.warn('⚠️ Mode local - Cloud non configuré');
+                return await incrementLocalCounter();
+            }
+
+            try {
+                // Enregistrer cette visite
+                const deviceInfo = {
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    screen: `${window.screen.width}x${window.screen.height}`,
+                    language: navigator.language,
+                    platform: navigator.platform
+                };
+
+                updateStatus('syncing', '⏳ Synchronisation...');
+
+                const response = await fetch(CLOUD_API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Pour Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'increment',
+                        data: deviceInfo
+                    })
+                });
+
+                // Récupérer le total
+                const countResponse = await fetch(CLOUD_API_URL + '?action=getCount');
+                const data = await countResponse.json();
+
+                updateCounter(data.count);
+                updateStats(data);
+                updateStatus('online', '✅ Synchronisé');
+
+                // Incrémenter le compteur local
+                incrementLocalVisit();
+
+                console.log('✅ Compteur cloud mis à jour:', data.count);
+                return data;
+
+            } catch (error) {
+                console.error('❌ Erreur cloud:', error);
+                updateStatus('offline', '📡 Mode hors ligne');
+                return await incrementLocalCounter();
+            }
+        }
+
+        async function incrementLocalCounter() {
+            console.log('📱 Utilisation du mode local');
+            let localData = JSON.parse(localStorage.getItem('localVisitData')) || {
+                count: 0,
+                firstVisit: new Date().toISOString()
+            };
+
+            localData.count++;
+            localData.lastVisit = new Date().toISOString();
+            localStorage.setItem('localVisitData', JSON.stringify(localData));
+
+            updateCounter(localData.count);
+            updateStats(localData);
+            updateStatus('offline', '📱 Mode local');
+            incrementLocalVisit();
+
+            return localData;
+        }
+
+        function incrementLocalVisit() {
+            let localCount = parseInt(localStorage.getItem('thisDeviceCount') || '0');
+            localCount++;
+            localStorage.setItem('thisDeviceCount', localCount);
+            document.getElementById('statLocal').textContent = localCount;
+        }
+
+        function updateCounter(count) {
+            const element = document.getElementById('counterValue');
+            animateCounter(element, count);
+        }
+
+        function updateStats(data) {
+            document.getElementById('statTotal').textContent = data.count || 0;
+            
+            if (data.firstVisit) {
+                const firstDate = new Date(data.firstVisit);
+                document.getElementById('statFirst').textContent = 
+                    firstDate.toLocaleDateString('fr-FR') + ' ' + firstDate.toLocaleTimeString('fr-FR');
+            }
+
+            if (data.lastVisit) {
+                const lastDate = new Date(data.lastVisit);
+                document.getElementById('statLast').textContent = 
+                    lastDate.toLocaleDateString('fr-FR') + ' ' + lastDate.toLocaleTimeString('fr-FR');
+            }
+        }
+
+        function updateStatus(type, text) {
+            const statusEl = document.getElementById('counterStatus');
+            statusEl.innerHTML = `<span class="status-${type}">${text}</span>`;
+        }
+
+        function animateCounter(element, targetValue) {
+            let currentValue = Math.max(0, targetValue - 50);
+            const increment = Math.ceil((targetValue - currentValue) / 30);
+            const duration = 1000;
+            const stepTime = duration / ((targetValue - currentValue) / increment);
+            
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = currentValue;
+            }, stepTime);
+        }
+
+        function toggleStats() {
+            const panel = document.getElementById('statsPanel');
+            panel.classList.toggle('visible');
+        }
+
+        // ========== SYNTHÈSE VOCALE ==========
+        function lireMessage() {
+            if (deja_lu) return;
+            
+            deja_lu = true;
+            
+            indicator.classList.remove('visible');
+            setTimeout(() => {
+                indicator.classList.add('hidden');
+            }, 500);
+
+            const utterance = new SpeechSynthesisUtterance(texte.join(' '));
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function handleTap() {
+            lireMessage();
+        }
+
+        // ========== INITIALISATION ==========
+        window.addEventListener('load', async function() {
+            // Afficher le compteur local immédiatement
+            const localCount = parseInt(localStorage.getItem('thisDeviceCount') || '0');
+            document.getElementById('statLocal').textContent = localCount;
+
+            // Incrémenter le compteur cloud
+            await incrementCloudCounter();
+
+            // Afficher l'indicateur
+            setTimeout(function() {
+                indicator.classList.add('visible');
+            }, 800);
+
+            // Rafraîchir toutes les 30 secondes pour voir les visites des autres appareils
+            if (USE_CLOUD) {
+                setInterval(async () => {
+                    try {
+                        const response = await fetch(CLOUD_API_URL + '?action=getCount');
+                        const data = await response.json();
+                        updateCounter(data.count);
+                        updateStats(data);
+                    } catch (e) {
+                        console.log('Rafraîchissement ignoré');
+                    }
+                }, 30000);
+            }
+        });
+    </script>
+</body>
+</html>
