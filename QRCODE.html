@@ -1,87 +1,59 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Assistant IA – Bibliothèque</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Assistant IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-  body {
-    margin: 0;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background: #000;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a url('https://www.cite-sciences.fr/fileadmin/fileadmin_CSI/fichiers/vous-etes/professionnel/presse-media/photos/JIS26_40x60_sslogospatners.jpg') center center no-repeat fixed;
+            background-size: auto 100%;
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding-left: 50px;
+        }
 
-  #startScreen {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
+        #qrcode {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
 
-  #startScreen h1 {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  #startScreen .icon {
-    font-size: 60px;
-    animation: pulse 1.8s infinite;
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
-  }
-
-  #content {
-    display: none;
-  }
-</style>
+        #qrcode canvas {
+            display: block;
+        }
+    </style>
+    <!-- Bibliothèque QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-
 <body>
+    <!-- QR Code positionné à gauche sur l'image de fond -->
+    <div id="qrcode"></div>
 
-<!-- Écran de démarrage -->
-<div id="startScreen">
-  <div class="icon">🔊</div>
-  <h1>Touchez l’écran pour commencer</h1>
-</div>
+    <script>
+        // URL cible pour le QR code
+        const targetUrl = 'https://bsi-ed.github.io/FDS/assistant.html';
 
-<!-- Contenu principal -->
-<div id="content">
-  <h1>Bienvenue à la bibliothèque</h1>
-  <p>Votre assistant IA vous parle…</p>
-</div>
-
-<audio id="audio" src="audio.mp3" preload="auto"></audio>
-
-<script>
-  const startScreen = document.getElementById("startScreen");
-  const content = document.getElementById("content");
-  const audio = document.getElementById("audio");
-
-  function startExperience() {
-    startScreen.style.display = "none";
-    content.style.display = "block";
-    audio.play();
-  }
-
-  // Un seul geste suffit (mobile + desktop)
-  startScreen.addEventListener("click", startExperience);
-  startScreen.addEventListener("touchstart", startExperience, { once: true });
-</script>
-
+        // Générer le QR code
+        new QRCode(document.getElementById("qrcode"), {
+            text: targetUrl,
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
 </body>
 </html>
