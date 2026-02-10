@@ -20,12 +20,107 @@
             min-height: 100vh;
             width: 100vw;
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        #tapIndicator {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        #tapIndicator.show {
+            display: flex;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .tap-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+                        inset 0 2px 10px rgba(255, 255, 255, 0.2);
+            animation: tapPulse 2s ease-in-out infinite;
+        }
+
+        .tap-text {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5),
+                         0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes tapPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+                           inset 0 2px 10px rgba(255, 255, 255, 0.2),
+                           0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4),
+                           inset 0 2px 15px rgba(255, 255, 255, 0.3),
+                           0 0 0 20px rgba(255, 255, 255, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.8);
+            }
+        }
+
+        body.hide-indicator #tapIndicator {
+            animation: fadeOut 0.5s ease-out forwards;
         }
     </style>
 </head>
 <body>
     <!-- Page affichant uniquement le poster en arrière-plan -->
-    <!-- La synthèse vocale se lance automatiquement au chargement -->
+    <!-- Tap sur l'écran pour déclencher la synthèse vocale -->
+    
+    <div id="tapIndicator">
+        <div class="tap-icon">👆</div>
+        <div class="tap-text">Tapez sur l'écran</div>
+    </div>
     
     <script>
         const texte = [
@@ -36,25 +131,87 @@
         ];
 
         let synthese = window.speechSynthesis;
+        let lectureEnCours = false;
+        let indicateurAffiche = false;
 
         function lireMessage() {
-            if (synthese.speaking) {
-                return;
+            if (synthese.speaking || lectureEnCours) {
+                return false;
             }
 
+            lectureEnCours = true;
             const utterance = new SpeechSynthesisUtterance(texte.join(' '));
             utterance.lang = 'fr-FR';
             utterance.rate = 0.9;
             utterance.pitch = 1;
             utterance.volume = 1;
 
+            utterance.onend = function() {
+                lectureEnCours = false;
+            };
+
+            utterance.onerror = function() {
+                lectureEnCours = false;
+            };
+
             synthese.speak(utterance);
+            return true;
         }
 
-        // Lecture automatique au chargement de la page
-        window.addEventListener('load', function() {
-            setTimeout(lireMessage, 500);
+        function cacherIndicateur() {
+            document.body.classList.add('hide-indicator');
+            setTimeout(() => {
+                document.getElementById('tapIndicator').classList.remove('show');
+                document.body.classList.remove('hide-indicator');
+                indicateurAffiche = false;
+            }, 500);
+        }
+
+        function demarrerLecture() {
+            if (lireMessage()) {
+                cacherIndicateur();
+            }
+        }
+
+        // Écouter le tap/clic sur toute la page
+        document.body.addEventListener('click', function(e) {
+            if (indicateurAffiche) {
+                demarrerLecture();
+            }
         });
+
+        document.body.addEventListener('touchstart', function(e) {
+            if (indicateurAffiche) {
+                demarrerLecture();
+            }
+        }, { passive: true });
+
+        // Tentative de lecture automatique au chargement
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                // Essayer de lire automatiquement
+                const reussi = lireMessage();
+                
+                // Vérifier si la lecture a bien démarré
+                setTimeout(function() {
+                    if (!synthese.speaking && !lectureEnCours) {
+                        // L'autoplay est bloqué, afficher l'indicateur
+                        document.getElementById('tapIndicator').classList.add('show');
+                        indicateurAffiche = true;
+                    }
+                }, 1000);
+            }, 500);
+        });
+
+        // Sur mobile, afficher directement l'indicateur
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+            setTimeout(function() {
+                if (!synthese.speaking && !lectureEnCours) {
+                    document.getElementById('tapIndicator').classList.add('show');
+                    indicateurAffiche = true;
+                }
+            }, 800);
+        }
     </script>
 </body>
 </html>
