@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant IA – Bibliothèque</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root {
+      --primary-color: #0055a5;
+      --bg-light: #f7f7f7;
+      --bg-dark: #1c1c1c;
+      --text-light: #333;
+      --text-dark: #eee;
+      --btn-light: #222;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .container {
+      max-width: 500px;
+      padding: 30px;
+    }
+
+    .logo {
+      max-width: 120px;
+      margin-bottom: 20px;
+    }
+
+    .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: normal;
+      margin-bottom: 20px;
+    }
+
+    .info {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      background-color: var(--btn-light);
+      color: #fff;
+      cursor: pointer;
+      display: none;
+    }
+
+    button:hover {
+      background-color: var(--primary-color);
+    }
+
+    .hint {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .counter {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #999;
+    }
+
+    .dynamic-text {
+      margin-top: 20px;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--primary-color);
+      min-height: 50px;
+    }
+
+    .qr {
+      margin-top: 30px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    body.dark-mode .qr {
+      background: #fff;
+    }
+
+    .qr-text {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Logo Bibliothèque" class="logo">
+
+    <div class="icon">🔊</div>
+
+    <h1>
+      Message audio de bienvenue<br>
+      <strong>Assistant IA de la bibliothèque</strong>
+    </h1>
+
+    <div class="info">
+      Approchez-vous du support interactif pour commencer l’exploration.
+    </div>
+
+    <button id="playButton">Écouter le message</button>
+
+    <div class="hint">
+      Si le son ne démarre pas automatiquement,<br>
+      appuyez sur le bouton.
+    </div>
+
+    <div class="dynamic-text" id="dynamicText"></div>
+
+    <div class="counter" id="counter">Nombre de scans : 0</div>
+
+    <!-- QR code dynamique -->
+    <div class="qr">
+      <div id="qrcode"></div>
+      <div class="qr-text">Scannez pour partager l’expérience</div>
+    </div>
+
+    <audio id="audio" src="audio.mp3"></audio>
+  </div>
+
+  <!-- Librairie QRCode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    const audio = document.getElementById("audio");
+    const button = document.getElementById("playButton");
+    const counterDiv = document.getElementById("counter");
+    const dynamicText = document.getElementById("dynamicText");
+
+    // Mode sombre automatique
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add('dark-mode');
+    }
+
+    // Compteur local
+    let scans = localStorage.getItem('scanCount') || 0;
+    scans = parseInt(scans) + 1;
+    localStorage.setItem('scanCount', scans);
+    counterDiv.textContent = `Nombre de scans : ${scans}`;
+
+    // Texte dynamique
+    const messages = [
+      "Bonjour…",
+      "Je suis votre assistant IA.",
+      "Approchez-vous du support interactif.",
+      "Bonne découverte !"
+    ];
+
+    function showDynamicText(index = 0) {
+      if (index >= messages.length) return;
+      dynamicText.textContent = messages[index];
+      setTimeout(() => showDynamicText(index + 1), 2000);
+    }
+    showDynamicText();
+
+    // Lecture audio
+    window.addEventListener("load", () => {
+      audio.play().catch(() => {
+        button.style.display = "inline-block";
+      });
+    });
+
+    button.addEventListener("click", () => {
+      audio.play();
+    });
+
+    // Génération du QR code (URL de la page)
+    new QRCode(document.getElementById("qrcode"), {
+      text: window.location.href,
+      width: 150,
+      height: 150
+    });
+  </script>
+</body>
+</html>
