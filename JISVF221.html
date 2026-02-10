@@ -2933,11 +2933,29 @@
         // ========== FONCTIONS DE SYNTHÈSE VOCALE AMÉLIORÉES ==========
         
         /**
+         * Détecte si l'appareil est iOS/iPadOS (iPhone, iPad, iPod)
+         * Inclut la détection des iPad modernes qui se présentent comme desktop
+         */
+        function isIOSDevice() {
+            // Détection classique
+            const classicDetection = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            
+            // Détection iPad moderne (iPadOS 13+)
+            // Ces appareils se présentent comme MacIntel mais ont un écran tactile
+            const iPadModern = navigator.userAgent.includes('Mac') && 'ontouchend' in document;
+            
+            // Détection alternative via maxTouchPoints
+            const iPadTouchPoints = navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform);
+            
+            return classicDetection || iPadModern || iPadTouchPoints;
+        }
+
+        /**
          * Initialise la synthèse vocale sur iOS
          * Cette fonction doit être appelée au premier clic/touch utilisateur
          */
         function initIOSVoice() {
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isIOS = isIOSDevice();
             
             if (isIOS && !state.iosVoiceReady) {
                 console.log('📱 Initialisation synthèse vocale iOS...');
@@ -5757,7 +5775,7 @@ function handleVoiceCommand(command) {
 
         // Fonction pour afficher la popup de bienvenue iOS
         function showIOSWelcomePopup() {
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isIOS = isIOSDevice();
             if (!isIOS) return false;
             
             // Créer la popup
@@ -5858,7 +5876,7 @@ function handleVoiceCommand(command) {
             await initVoices();
             initVoiceRecognition();
             
-            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isIOS = isIOSDevice();
             
             // Initialiser les panels fermés sur mobile/tablette
             if (window.innerWidth <= 1024) {
@@ -5887,6 +5905,7 @@ function handleVoiceCommand(command) {
             
             // Si iOS/iPad : afficher popup de bienvenue
             if (isIOS) {
+                console.log('📱 Appareil iOS/iPadOS détecté - affichage popup');
                 setTimeout(() => {
                     showIOSWelcomePopup();
                 }, 1000);
