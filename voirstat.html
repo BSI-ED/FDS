@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Statistiques d'Écoute</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats-display {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .stats-display.visible {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .info-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            text-align: left;
+        }
+
+        .info-box strong {
+            color: #856404;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            border-radius: 5px;
+            color: #721c24;
+            display: none;
+        }
+
+        .error.visible {
+            display: block;
+        }
+
+        .refresh-btn {
+            margin-top: 20px;
+            background: #28a745;
+            font-size: 16px;
+            padding: 12px 30px;
+        }
+
+        .refresh-btn:hover {
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Statistiques d'Écoute</h1>
+        <p class="subtitle">Consultez le nombre d'écoutes de votre assistant IA</p>
+
+        <div class="input-group">
+            <label for="compteurId">Identifiant de votre compteur :</label>
+            <input 
+                type="text" 
+                id="compteurId" 
+                placeholder="ex: assistant-ia-jis2026"
+                value="JIS2026"
+            >
+        </div>
+
+        <button onclick="chargerStats()">🔍 Afficher les Statistiques</button>
+
+        <div id="statsDisplay" class="stats-display">
+            <div class="stat-label">Nombre total d'écoutes</div>
+            <div class="stat-value" id="statValue">0</div>
+            <button class="refresh-btn" onclick="chargerStats()">🔄 Actualiser</button>
+        </div>
+
+        <div id="errorMessage" class="error"></div>
+
+        <div class="info-box">
+            <strong>💡 Astuce :</strong> L'identifiant doit correspondre à celui que vous avez défini dans votre fichier HTML (variable <code>COMPTEUR_ID</code>).
+        </div>
+    </div>
+
+    <script>
+        // Charger les stats automatiquement
+        window.addEventListener('load', function() {
+            chargerStats();
+        });
+
+        function chargerStats() {
+            const compteurId = document.getElementById('compteurId').value.trim();
+            const statsDisplay = document.getElementById('statsDisplay');
+            const statValue = document.getElementById('statValue');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Réinitialiser les messages
+            errorMessage.classList.remove('visible');
+            errorMessage.textContent = '';
+
+            // Vérifier que l'ID est renseigné
+            if (!compteurId) {
+                errorMessage.textContent = '⚠️ Veuillez entrer un identifiant valide pour votre compteur.';
+                errorMessage.classList.add('visible');
+                statsDisplay.classList.remove('visible');
+                return;
+            }
+
+            // Afficher un état de chargement
+            statsDisplay.classList.add('visible');
+            statValue.textContent = '...';
+
+            // Récupérer les stats depuis CountAPI
+            const url = `https://api.countapi.xyz/get/${compteurId}/ecoutes`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Compteur introuvable');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Animer le compteur
+                    animerCompteur(statValue, data.value);
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    statsDisplay.classList.remove('visible');
+                    errorMessage.textContent = `❌ Erreur : ${error.message}. Vérifiez que l'identifiant est correct et que votre page a été utilisée au moins une fois.`;
+                    errorMessage.classList.add('visible');
+                });
+        }
+
+        function animerCompteur(element, targetValue) {
+            let currentValue = 0;
+            const increment = Math.ceil(targetValue / 30) || 1;
+            const stepTime = 30;
+
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = currentValue;
+            }, stepTime);
+        }
+
+        // Permettre de soumettre avec la touche Entrée
+        document.getElementById('compteurId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                chargerStats();
+            }
+        });
+    </script>
+</body>
+</html>
